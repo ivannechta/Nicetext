@@ -1,0 +1,442 @@
+head	1.14;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.14
+date	98.08.19.16.15.05;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	98.06.22.18.04.07;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	98.03.13.03.41.48;	author root;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	98.02.19.19.29.03;	author root;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.04.10.20.23.45;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.02.14.01.16.47;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.02.14.01.15.59;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.02.07.14.22.22;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.20.17.39.17;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.20.17.29.07;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.15.13.02.48;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.14.23.01.59;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.14.22.35.21;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.09.19.20.13;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@#
+# MTC++ MakeFile
+# Copyright (c) Mark T. Chapman 1995
+#
+
+LIBTARGET=../lib/libmtc++.a
+LIBOBJS= mstring.o stdermsg.o initfile.o
+SRCS=mstring.cc stdermsg.cc initfile.cc raofmake.cc raofmalt.cc raofread.cc bsttest.cc rbttest.cc listtest.cc inittest.cc numsize.cc
+
+CC=g++
+CFLAGS+=$(CDEBUG) 
+LFLAGS= -L../lib -lmtc++
+
+.cc.o: 
+	$(CC) $(CFLAGS) -c -o $@@ $<
+
+all: $(LIBTARGET) raofmake raofmalt raofread bsttest rbttest listtest inittest numsize
+
+install: all
+	cp raofmake ../bin
+	cp raofmalt ../bin
+	cp raofread ../bin
+	cp listtest ../bin
+	cp bsttest ../bin
+	cp rbttest ../bin
+	cp inittest ../bin
+	cp numsize ../bin
+	strip ../bin/raofmake ../bin/raofmalt ../bin/raofread ../bin/listtest ../bin/bsttest ../bin/rbttest ../bin/inittest ../bin/numsize
+
+depend:
+	makedepend -- $(CFLAGS) -- $(SRCS)
+
+clean:
+	rm -f $(LIBTARGET) *.o *.core inittest bsttest rbttest listtest raofmake raofmalt raofread numsize ../bin/inittest ../bin/bsttest ../bin/rbttest ../bin/listtest ../bin/raofmake ../bin/raofmalt ../bin/raofread ../bin/numsize
+
+$(LIBTARGET): $(LIBOBJS)
+	ar -rc $(LIBTARGET) $(LIBOBJS)
+	ranlib $(LIBTARGET)
+
+# THESE ARE SAMPLE PROGRAMS
+
+raofmake: raofmake.o $(LIBTARGET)
+	g++  $(CFLAGS) -o raofmake raofmake.o $(LFLAGS)
+
+raofmalt: raofmalt.o $(LIBTARGET)
+	g++  $(CFLAGS) -o raofmalt raofmalt.o $(LFLAGS)
+
+raofread: raofread.o $(LIBTARGET)
+	g++  $(CFLAGS) -o raofread raofread.o $(LFLAGS)
+
+listtest: listtest.o $(LIBTARGET)
+	g++  $(CFLAGS) -o listtest listtest.o $(LFLAGS)
+
+bsttest: bsttest.o $(LIBTARGET)
+	g++  $(CFLAGS) -o bsttest bsttest.o $(LFLAGS)
+
+rbttest: rbttest.o $(LIBTARGET)
+	g++  $(CFLAGS) -o rbttest rbttest.o $(LFLAGS)
+
+inittest: inittest.o $(LIBTARGET)
+	g++  $(CFLAGS) -o inittest inittest.o $(LFLAGS)
+
+numsize: numsize.o $(LIBTARGET)
+	g++  $(CFLAGS) -o numsize numsize.o $(LFLAGS)
+
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d28 1
+@
+
+
+1.12
+log
+@*** empty log message ***
+@
+text
+@a9 4
+ifdef DEBUG
+CDEBUG=-g
+endif
+
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d15 1
+a15 1
+CFLAGS+=$(CDEBUG) -I/usr/include/g++ 
+a68 116
+
+# DO NOT DELETE
+
+mstring.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+mstring.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+mstring.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+mstring.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+mstring.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+mstring.o: /usr/include/g++/fstream.h /usr/include/string.h
+mstring.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+mstring.o: /usr/include/ctype.h /usr/include/runetype.h
+mstring.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+mstring.o: /usr/include/sys/time.h ../include/mstring.h ../include/errormsg.h
+stdermsg.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+stdermsg.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+stdermsg.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+stdermsg.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+stdermsg.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+stdermsg.o: /usr/include/g++/fstream.h /usr/include/string.h
+stdermsg.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+stdermsg.o: /usr/include/ctype.h /usr/include/runetype.h
+stdermsg.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+stdermsg.o: /usr/include/sys/time.h ../include/errormsg.h
+initfile.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+initfile.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+initfile.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+initfile.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+initfile.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+initfile.o: /usr/include/g++/fstream.h /usr/include/string.h
+initfile.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+initfile.o: /usr/include/ctype.h /usr/include/runetype.h
+initfile.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+initfile.o: /usr/include/sys/time.h ../include/mstring.h
+initfile.o: ../include/errormsg.h ../include/initfile.h
+raofmake.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+raofmake.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+raofmake.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+raofmake.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+raofmake.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+raofmake.o: /usr/include/g++/fstream.h /usr/include/string.h
+raofmake.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+raofmake.o: /usr/include/ctype.h /usr/include/runetype.h
+raofmake.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+raofmake.o: /usr/include/sys/time.h ../include/mstring.h
+raofmake.o: ../include/errormsg.h ../include/bst.h ../include/raof.h
+raofmalt.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+raofmalt.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+raofmalt.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+raofmalt.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+raofmalt.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+raofmalt.o: /usr/include/g++/fstream.h /usr/include/string.h
+raofmalt.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+raofmalt.o: /usr/include/ctype.h /usr/include/runetype.h
+raofmalt.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+raofmalt.o: /usr/include/sys/time.h ../include/mstring.h
+raofmalt.o: ../include/errormsg.h ../include/rbt.h ../include/raof.h
+raofmalt.o: ../include/raofalt.h
+raofread.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+raofread.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+raofread.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+raofread.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+raofread.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+raofread.o: /usr/include/g++/fstream.h /usr/include/string.h
+raofread.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+raofread.o: /usr/include/ctype.h /usr/include/runetype.h
+raofread.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+raofread.o: /usr/include/sys/time.h ../include/mstring.h
+raofread.o: ../include/errormsg.h ../include/bst.h ../include/raof.h
+bsttest.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+bsttest.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+bsttest.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+bsttest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bsttest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bsttest.o: /usr/include/g++/fstream.h /usr/include/string.h
+bsttest.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+bsttest.o: /usr/include/ctype.h /usr/include/runetype.h
+bsttest.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+bsttest.o: /usr/include/sys/time.h ../include/mstring.h ../include/errormsg.h
+bsttest.o: ../include/bst.h
+rbttest.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+rbttest.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+rbttest.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+rbttest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+rbttest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+rbttest.o: /usr/include/g++/fstream.h /usr/include/string.h
+rbttest.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+rbttest.o: /usr/include/ctype.h /usr/include/runetype.h
+rbttest.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+rbttest.o: /usr/include/sys/time.h ../include/mstring.h ../include/errormsg.h
+rbttest.o: ../include/rbt.h
+listtest.o: ../include/MTC++.h /usr/include/stdio.h /usr/include/sys/types.h
+listtest.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+listtest.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+listtest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+listtest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+listtest.o: /usr/include/g++/fstream.h /usr/include/string.h
+listtest.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+listtest.o: /usr/include/ctype.h /usr/include/runetype.h
+listtest.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+listtest.o: /usr/include/sys/time.h ../include/mstring.h
+listtest.o: ../include/errormsg.h ../include/list.h
+inittest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+inittest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+inittest.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+inittest.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+inittest.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+inittest.o: /usr/include/stdio.h /usr/include/stdlib.h ../include/MTC++.h
+inittest.o: /usr/include/string.h /usr/include/unistd.h
+inittest.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+inittest.o: /usr/include/runetype.h /usr/include/sys/stat.h
+inittest.o: /usr/include/sys/time.h /usr/include/sys/time.h
+inittest.o: ../include/mstring.h ../include/errormsg.h ../include/bst.h
+inittest.o: ../include/list.h ../include/initfile.h
+numsize.o: /usr/include/stdio.h /usr/include/sys/types.h
+numsize.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+numsize.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+@
+
+
+1.10
+log
+@added numsize
+@
+text
+@d37 1
+a37 1
+	rm -f $(LIBTARGET) *.o *.core inittest bsttest rbttest listtest raofmake raofmalt raofread ../bin/inittest ../bin/bsttest ../bin/rbttest ../bin/listtest ../bin/raofmake ../bin/raofmalt ../bin/raofread ../bin/numsize
+@
+
+
+1.9
+log
+@removed rinfo
+@
+text
+@d8 1
+a8 1
+SRCS=mstring.cc stdermsg.cc initfile.cc raofmake.cc raofmalt.cc raofread.cc bsttest.cc rbttest.cc listtest.cc inittest.cc
+d21 1
+a21 1
+all: $(LIBTARGET) raofmake raofmalt raofread bsttest rbttest listtest inittest
+d31 1
+d37 1
+a37 1
+	rm -f $(LIBTARGET) *.o *.core inittest bsttest rbttest listtest raofmake raofmalt raofread ../bin/inittest ../bin/bsttest ../bin/rbttest ../bin/listtest ../bin/raofmake ../bin/raofmalt ../bin/raofread
+d66 3
+d124 1
+a124 1
+raofmalt.o: ../include/errormsg.h ../include/bst.h ../include/raof.h
+d182 3
+@
+
+
+1.8
+log
+@rinfo update
+@
+text
+@d21 1
+a21 1
+all: rinfo $(LIBTARGET) raofmake raofmalt raofread bsttest rbttest listtest inittest
+a33 3
+
+rinfo:
+	../../rinfo/rinfo
+@
+
+
+1.7
+log
+@added *.core to clean target
+..
+@
+text
+@d36 1
+a36 1
+	rinfo
+@
+
+
+1.6
+log
+@back to 1.4
+@
+text
+@d39 1
+a39 1
+	rm -f $(LIBTARGET) *.o inittest bsttest rbttest listtest raofmake raofmalt raofread ../bin/inittest ../bin/bsttest ../bin/rbttest ../bin/listtest ../bin/raofmake ../bin/raofmalt ../bin/raofread
+@
+
+
+1.5
+log
+@added -O -pipe
+./
+@
+text
+@d15 1
+a15 1
+CFLAGS+=$(CDEBUG) -O -pipe -I/usr/include/g++ 
+@
+
+
+1.4
+log
+@converted to gmake
+@
+text
+@d15 1
+a15 1
+CFLAGS+=$(CDEBUG) -I/usr/include/g++ 
+@
+
+
+1.3
+log
+@added install
+@
+text
+@d10 1
+a10 1
+.ifdef DEBUG
+d12 1
+a12 1
+.endif
+@
+
+
+1.2
+log
+@added bsttest and rbttest
+@
+text
+@d22 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+SRCS=mstring.cc stdermsg.cc initfile.cc raofmake.cc raofmalt.cc raofread.cc listtest.cc inittest.cc
+d21 1
+a21 1
+all: rinfo $(LIBTARGET) raofmake raofmalt raofread listtest inittest
+d26 2
+d37 1
+a37 1
+	rm -f $(LIBTARGET) *.o inittest listtest raofmake raofmalt raofread ../bin/inittest ../bin/listtest ../bin/raofmake ../bin/raofmalt ../bin/raofread
+d57 6
+d134 22
+@

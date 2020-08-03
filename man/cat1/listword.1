@@ -1,0 +1,66 @@
+
+
+
+LISTWORD(1L)					     LISTWORD(1L)
+
+
+NNAAMMEE
+       listword
+
+SSYYNNOOPPSSIISS
+       lliissttwwoorrdd [-c] [-l] [-p] [[-u updateFreq]||[-q]] [-x]
+
+DDEESSCCRRIIPPTTIIOONN
+       _l_i_s_t_w_o_r_d  creates  word-lists from sample natural-language
+       texts.  It uses the same parser as the  ssccrraammbbllee((11LL))  pro-
+       gram in the NNIICCEETTEEXXTT system.
+
+       It  reads input from stdin and sends the output to stdout.
+
+OOPPTTIIOONNSS
+       --cc     Print word frequency along with each unique word to
+	      stdout.
+
+       --ll     Convert all words to lower-case.
+
+       --pp     Print  words  as	they  are read.  This changes the
+	      behavior of _l_i_s_t_w_o_r_d so that it does not keep track
+	      of  frequency.  It does not print any status infor-
+	      mation to stderr if the --pp parameter is set.   This
+	      is extremely useful when creating NNIICCEETTEEXXTT scanners
+	      for other natural-languages.
+
+       --uu uuppddaatteeFFrreeqq
+	      Print status updates  to	stderr	every  _u_p_d_a_t_e_F_r_e_q
+	      sentences.  Use zero to disable updates.
+
+	      The  status  shows  the number of unique words read
+	      and the total number of words read.
+
+       --qq     Be quiet.  This is the same as --uu 00
+
+       --xx     Exclude non-words (numbers, punctuation, etc.).
+
+EEXXAAMMPPLLEESS
+       It is strongly suggested that you try the examples in  the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+SSEEEE AALLSSOO
+       bitcp(1L),    dct2mstr(1L),   expgram(1L),   genmodel(1L),
+       gramtest(1L),  impkimmo(1L),   impmsc(1L),   impwbstr(1L),
+       nicetext(1L),   printint(1L),  scramble(1L),  sortdct(1L),
+       txt2dct(1L).
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+

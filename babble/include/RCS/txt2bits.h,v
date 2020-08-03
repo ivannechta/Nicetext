@@ -1,0 +1,188 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.5
+date	97.03.05.17.44.52;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	97.03.03.19.46.48;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	97.02.27.15.56.45;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	97.02.16.06.58.07;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.13.15.14.40;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.5
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@/*
+ * Text to Bitstream Engine Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * "The engine for the unbabble process"
+ *
+ * $Id: txt2bits.h,v 1.4 1997/03/03 19:46:48 markc Exp markc $
+ *
+ * $Log: txt2bits.h,v $
+ * Revision 1.4  1997/03/03 19:46:48  markc
+ * Added -v for verbose error reporting
+ *
+ * Revision 1.3  1997/02/27 15:56:45  markc
+ * Added -s Small Mode
+ *
+ * Revision 1.2  1997/02/16 06:58:07  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.1  1996/01/13 15:14:40  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __TXT2BITS_H_
+#define __TXT2BITS_H_
+
+static char rcsid__TXT2BITS_H_ []  = "@@(#)$Id$";
+
+// forward reference
+class MTCtextToBits;
+
+// concrete class for conversion objects
+
+class MTCtextToBits
+{
+private:
+	MTCstring dictName;
+	MTCstring typeName;
+	MTCstring outputName;
+	MTCstring inputName;
+	MTCRBT <MTCdictRecord> dictRecRBT;
+	MTCRBT <MTCtypeAltRecord> typeAltRecRBT;
+	MTCreadRAOF <MTCdictRecord> *dictRecRAOF;
+	MTCoutputBitStream *outputBitStream;
+	FILE *inputStream;
+	BOOL okay;
+	BOOL smallMode;
+	BOOL verboseMode;
+
+protected:
+	void setOkay(BOOL aBOOL) { okay=(aBOOL!=FALSE); };
+	void setSmallMode(BOOL aBOOL) { smallMode=aBOOL; };
+
+public:
+	// constructors and destructors
+	MTCtextToBits();
+	~MTCtextToBits();
+
+	// open data structures methods
+	BOOL openDictName(const MTCstring &, BOOL useSmallMode=FALSE);
+	BOOL openTypeName(const MTCstring &);
+	BOOL openOutputName(const MTCstring &);
+	BOOL openInputName(const MTCstring &);
+
+	// attribute access methods
+	BOOL getOkay() const 			{ return okay; };
+	const MTCstring & getDictName() const	{ return dictName; };
+	const MTCstring & getTypeName() const	{ return typeName; };
+	const MTCstring & getOutputName() const	{ return outputName; };
+	const MTCstring & getInputName() const	{ return inputName; };
+	BOOL getSmallMode() const		{ return smallMode; };
+	void setVerboseMode(BOOL aBOOL)		{ verboseMode=aBOOL; };
+	BOOL getVerboseMode() const		{ return verboseMode; };
+
+	// do it
+	BOOL isReady(); 			// am I ready to doIt?
+	BOOL doIt(BOOL checkIfReady=TRUE);	// babble away!
+};
+
+#endif // __TXT2BITS_H_
+@
+
+
+1.4
+log
+@Added -v for verbose error reporting
+@
+text
+@d7 1
+a7 1
+ * $Id: txt2bits.h,v 1.3 1997/02/27 15:56:45 markc Exp markc $
+d10 3
+d27 2
+@
+
+
+1.3
+log
+@Added -s Small Mode
+@
+text
+@d7 1
+a7 1
+ * $Id: txt2bits.h,v 1.2 1997/02/16 06:58:07 markc Exp markc $
+d10 3
+d44 1
+d68 2
+@
+
+
+1.2
+log
+@BST replaced with RBT
+@
+text
+@d7 1
+a7 1
+ * $Id: txt2bits.h,v 1.1 1996/01/13 15:14:40 markc Exp markc $
+d10 3
+d36 1
+d40 1
+d44 1
+d52 1
+a52 1
+	BOOL openDictName(const MTCstring &);
+d63 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 5
+a11 1
+ * $Id$
+a12 1
+ * $Log$
+d31 2
+a32 2
+	MTCBST <MTCdictRecord> dictRecBST;
+	MTCBST <MTCtypeAltRecord> typeAltRecBST;
+@

@@ -1,0 +1,225 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.5
+date	97.03.05.17.39.05;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.11.08.19.24.43;	author chapman;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.07.19.56.17;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.24.20.14.40;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.13.23.08.31;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial check in
+@
+
+
+1.5
+log
+@Added static char rcsid__DICTAREC_H_ []  = "@@(#)$Id$";
+@
+text
+@/*
+ *
+ * Alternate Key Dictionary Record Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * This is the MTCdictRecord sorted by (type, bitstring) instread of (value)
+ *
+ * $Id: dictarec.h,v 1.4 1995/11/08 19:24:43 chapman Exp markc $
+ *
+ * $Log: dictarec.h,v $
+ * Revision 1.4  1995/11/08 19:24:43  chapman
+ * Converted from distdict.h to dictarec.h
+ *
+ * Revision 1.3  1995/11/07  19:56:17  chapman
+ * DO NOT USE ANYMORE -- SEE UPDATED MSTRDICT.H
+ *
+ * Revision 1.2  1995/08/24  20:14:40  markc
+ * bitstring is now a long
+ *
+ * Revision 1.1  1995/08/13  23:08:31  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __DICTAREC_H
+#define __DICTAREC_H
+
+static char rcsid__DICTAREC_H_ []  = "@@(#)$Id$";
+
+class MTCdictAltRecord : public MTCdictRecord {
+private:
+protected:
+public:
+	// constructors and destructor
+	MTCdictAltRecord() {};
+	MTCdictAltRecord(const MTCdictAltRecord &src) 
+		: MTCdictRecord(src) {};
+
+	// overloaded operator methods
+	MTCdictAltRecord & operator=(const MTCdictAltRecord &aSrc)
+		{ 	MTCdictRecord::operator=((const MTCdictRecord)aSrc); 
+			return *this;
+		};
+
+	virtual int isLessThan(const MTCdictRecord &aSrc) const
+		{
+			return ((getTypeIndex()<aSrc.getTypeIndex())||
+			((getTypeIndex()==aSrc.getTypeIndex())&&
+			(getBitString()<aSrc.getBitString())));
+		}
+
+        virtual int isEqual(const MTCdictRecord &aSrc) const
+		{
+			return ((getTypeIndex()==aSrc.getTypeIndex())&&
+			(getBitString()==aSrc.getBitString()));
+		}
+};
+
+#endif // __DICTAREC_H
+
+@
+
+
+1.4
+log
+@Converted from distdict.h to dictarec.h
+@
+text
+@d8 1
+a8 1
+ * $Id: dictarec.h,v 1.3 1995/11/07 19:56:17 chapman Exp chapman $
+d11 3
+d28 2
+@
+
+
+1.3
+log
+@DO NOT USE ANYMORE -- SEE UPDATED MSTRDICT.H
+@
+text
+@a0 3
+
+#ifdef DO_NOT_USE_ANYMORE
+
+d3 1
+a3 1
+ * Distribution Dict Structure 
+d6 3
+a8 1
+ * class MTCdistDict - _typeIndex_, _bitstring_, value
+d10 3
+a12 1
+ * $Id: distdict.h,v 1.2 1995/08/24 20:14:40 markc Exp chapman $
+a13 1
+ * $Log: distdict.h,v $
+d23 2
+a24 2
+#ifndef __DISTDICT_H
+#define __DISTDICT_H
+d26 1
+a26 3
+#define DISTDICT_VALUE_MAX_LENGTH 512
+
+class MTCdistDict {
+a27 3
+	MTCstring value;
+	long typeIndex;
+	long bitstring;
+d31 3
+a33 10
+	MTCdistDict() : typeIndex(0), bitstring(0) {};
+	MTCdistDict(const MTCdistDict &src) : value(src.value), typeIndex(src.typeIndex), bitstring(src.bitstring) { };
+
+	// attribute set/get methods 
+	const MTCstring & getValue() const { return value; };
+	long getTypeIndex() const  { return typeIndex;  };
+	long getBitString() const { return bitstring; };
+	void setValue(const MTCstring &aString) { value=aString; };
+	void setTypeIndex(long aNum)  { typeIndex=aNum; };
+	void setBitString(long aNum) { bitstring=aNum; };
+d36 17
+a52 13
+	MTCdistDict & operator=(const MTCdistDict &);
+	int isLessThan(const MTCdistDict &) const;
+        int isEqual(const MTCdistDict &) const;
+     	BOOL operator==(const MTCdistDict &) const;
+        BOOL operator!=(const MTCdistDict &) const;
+        BOOL operator<(const MTCdistDict &)  const;
+        BOOL operator<=(const MTCdistDict &) const;
+        BOOL operator>(const MTCdistDict &)  const;
+        BOOL operator>=(const MTCdistDict &) const;
+
+        // stream insertor / extractors
+        friend ostream & operator<<(ostream &, const MTCdistDict &);
+        friend istream & operator>>(istream &, MTCdistDict &); 
+d55 1
+a55 1
+#endif // __DISTDICT_H
+a56 1
+#endif DO_NOT_USE_ANYMORE
+@
+
+
+1.2
+log
+@bitstring is now a long
+@
+text
+@d2 2
+d11 1
+a11 1
+ * $Id: distdict.h,v 1.1 1995/08/13 23:08:31 markc Exp markc $
+d14 3
+d64 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d9 5
+a13 1
+ * $Id$
+a14 1
+ * $Log$
+d27 1
+a27 1
+	MTCstring bitstring;
+d31 1
+a31 1
+	MTCdistDict() : typeIndex(0) {};
+d37 1
+a37 1
+	MTCstring getBitstring() const { return bitstring; };
+d40 1
+a40 1
+	void setBitstring(MTCstring aNum) { bitstring=aNum; };
+@

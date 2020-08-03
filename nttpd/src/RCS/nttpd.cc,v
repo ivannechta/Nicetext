@@ -1,0 +1,3481 @@
+head	1.21;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.21
+date	98.08.25.20.44.08;	author markc;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	98.08.25.18.10.32;	author markc;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	98.08.24.02.37.52;	author markc;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	98.08.21.19.23.15;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	98.08.20.13.26.23;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	98.08.19.21.58.38;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	98.08.19.21.50.05;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	98.08.19.21.30.50;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	98.08.19.20.02.49;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	98.08.19.18.18.15;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	98.08.19.15.26.57;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	98.08.17.15.23.14;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	98.07.13.18.23.11;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	97.08.28.05.05.01;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	97.08.28.02.10.11;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	97.08.23.02.59.32;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	97.08.22.12.33.07;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	97.08.22.12.21.01;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	97.08.20.01.41.18;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	97.08.18.19.40.17;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	97.08.18.03.44.49;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.21
+log
+@Moved "Official Home Page"
+@
+text
+@/*
+ * HTTP Server Daemon for NICETEXT System
+ * Copyright (c) Mark T. Chapman 1996-1998
+ *
+ * WARNING: THIS IS A TERRIBLE HACK OF A PROGRAM 
+ *          IT PROBABLY IS A SECURITY RISK AND A RESOURCE HOG
+ * 
+ * $Id: nttpd.cc,v 1.20 1998/08/25 18:10:32 markc Exp markc $
+ *
+ * $Log: nttpd.cc,v $
+ * Revision 1.20  1998/08/25 18:10:32  markc
+ * added "truncateLength()" to clean up the dataStr
+ * fixed problem in recvStrBuf to NULL terminate the buffer - THIS FIXED A BIG BUG
+ *
+ * Revision 1.19  1998/08/24 02:37:52  markc
+ * Getting closer - DEBUGMSG(), DEBUG(),
+ * an optimized MTCstring class in mtc++ library (cache length of string)
+ *
+ * Revision 1.18  1998/08/21 19:23:15  markc
+ * fixed noCaseStrStr() to perform a bit better
+ * added some debug messages
+ *
+ * Revision 1.17  1998/08/20 13:26:23  markc
+ * removed MSG_EOR for Digital UNIX
+ * added setStatFreq(0) for MTCbitsToText - this disables status updates to stderr
+ *
+ * Revision 1.16  1998/08/19 21:58:38  markc
+ * cast bzero parameters properly
+ * also, the 1.15 version needed #ifdef's for MSG_EOF, MSG_EOR
+ * These are being done to port to gcc 2.8.1 on Digital UNIX
+ *
+ * Revision 1.15  1998/08/19 21:50:05  markc
+ * *** empty log message ***
+ *
+ * Revision 1.14  1998/08/19 21:30:50  markc
+ * fixed blank messages
+ * made it look even cleaner
+ *
+ * Revision 1.13  1998/08/19 20:02:49  markc
+ * made it look better
+ * added exit if I get confused
+ *
+ * Revision 1.12  1998/08/19 18:18:15  markc
+ * append '/' to workDir
+ *
+ * Revision 1.11  1998/08/19 15:26:57  markc
+ * added command-line parameters
+ *
+ * Revision 1.10  1998/08/17 15:23:14  markc
+ * *** empty log message ***
+ *
+ * Revision 1.9  1998/07/13 18:23:11  markc
+ * It's working again - using stringLists instead of strings
+ * this is much more efficient
+ *
+ *
+ * Revision 1.8  1997/08/28 05:05:01  markc
+ * NOT WORKING
+ *
+ * Revision 1.7  1997/08/28 02:10:11  markc
+ * Working - but inefficient!
+ *
+ * Revision 1.6  1997/08/23 02:59:32  markc
+ * Fixed it!
+ *
+ * Revision 1.5  1997/08/22 12:33:07  markc
+ * Switched to MTCstring from strstream
+ *
+ * Revision 1.4  1997/08/22 12:21:01  markc
+ * *** empty log message ***
+ *
+ * Revision 1.3  1997/08/20 01:41:18  markc
+ * Added word-wrap
+ * Added strstream for Content-length:
+ *
+ * Revision 1.2  1997/08/18 19:40:17  markc
+ * Added scramble
+ *
+ * Revision 1.1  1997/08/18 03:44:49  markc
+ * Initial revision
+ *
+ *
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <iostream.h>
+#include <fstream.h>
+#include <strstream.h>
+#include <signal.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/dictrec.h"
+#include "../../gendict/include/dictarec.h"
+#include "../../gendict/include/typerec.h"
+#include "../../gendict/include/typearec.h"
+#include "../../gendict/include/sentnode.h"
+#include "../../gendict/include/sentmdl.h"
+#include "../../gendict/include/dconst.h"
+#include "../../babble/include/bitstrm.h"
+#include "../../babble/include/bitinput.h"
+#include "../../babble/include/bitoutput.h"
+#include "../../babble/include/rule.h"
+#include "../../babble/include/grammar.h"
+#include "../../babble/include/bits2txt.h"
+#include "../../babble/include/txt2bits.h"
+#include "../include/postdata.h"
+#include "../../mtc++/include/strlst.h"
+
+#define MYPORT 	2119	// the port for the server
+#define BACKLOG 100	// # of pending connections in the queue 
+#define TMPDIR  "/tmp"  // where to place the temporary files...
+#define WORKDIR  "./"  // location of dictionary and style source files
+#define MAX_COLUMN 70   // when to wrap words
+#define MAX_SEND_BLOCK 128    // maximum length of send() buffers
+
+//#define DEBUG 
+#ifdef DEBUG
+#define DEBUGMSG(x) cout << getpid() << ": "; x 
+#else
+#define DEBUGMSG(x)
+#endif
+
+#define DICTPARM "dict"
+#define TYPEPARM "type"
+#define MODELPARM "model"
+
+#define MAX_BUFFER 655350 
+#define CONTENT_LENGTH_STR "Content-length: "
+#define CLS_LEN 16 
+
+BOOL sendInitial(MTCstringList &os);
+BOOL sendFile(MTCstringList &os, const char *file, BOOL wordWrap=FALSE);
+BOOL sendNiceText(MTCstringList &os, MTCRBT<MTCpostData> &pdSet);
+BOOL sendScramText(MTCstringList &os, MTCRBT<MTCpostData> &pdSet);
+BOOL sendStop(int fd);
+BOOL parseParms(const MTCstring &aStr, MTCRBT<MTCpostData> &);
+void dumpPostData(MTCpostData *aPD);
+void randomize();
+void closeAndExit(int fd);
+BOOL postResponse(MTCstringList &os, int fd);
+MTCstring & recvStrBuf(int fd, MTCstring &);
+const char * noCaseStrStr(const char *big, const char *little, BOOL prefix=FALSE);
+void usage();
+
+int hexdigit(char c);
+
+void killZombies(int);
+
+MTCstring workDir(WORKDIR);
+MTCstring tmpDir(TMPDIR);
+int myPort=MYPORT;
+BOOL localHostOnly=TRUE;
+
+int main(int argc, char *argv[])
+{
+	// read parameters 
+
+        extern char *optarg;
+	extern int optind;
+	int ch;
+	while ((ch = getopt(argc, argv, "b:hp:wt:")) != EOF)
+	{
+		switch(ch) 
+		{
+			case 'b':
+				workDir=optarg;
+				if (workDir.c_str()[workDir.length()] != '/')
+				{
+					workDir += "/";
+				}
+                                break;
+			case 'p':
+				myPort=atoi(optarg);
+				break;
+			case 't':
+				tmpDir=optarg;
+				break;
+			case 'w':
+				localHostOnly=FALSE;
+				break;
+			default:
+				usage();	
+				return(-1);
+		}
+	}
+
+	argc -= optind;
+	argv += optind;
+
+	if (workDir == WORKDIR)
+	{
+		char buffer[512];
+		workDir=getwd(buffer);
+	}
+
+	// check some constants
+
+#ifdef DEBUG
+	if (strlen(CONTENT_LENGTH_STR)!=CLS_LEN)
+	{
+		DEBUGMSG(cout << "OH NO! - YOU MUST SET CLS_LEN to " << strlen(CONTENT_LENGTH_STR) << " instead of " << CLS_LEN <<" in nttpd.cc " << endl;)
+	}
+#endif DEBUG 
+
+	// start processing
+
+	cerr << "NTTPD 0.1 process started" << endl;
+	cerr << "\tbase directory: " << workDir << endl;
+	cerr << "\ttemp directory: " << tmpDir << endl;
+	cerr << "\tlistening on port: " << myPort << endl;
+ 
+	if (localHostOnly==TRUE)
+	{
+		cerr << "\tI will only accept connections from localhost" << endl; 
+	}
+	else
+	{
+		cerr << "\t-w selected - I will accept connections from ANY MACHINE!" << endl;
+	}
+
+	cerr << endl;
+	cerr << "* * * * * * * * * *" << endl;
+	cerr << "To connect to this server, ";
+	cerr << "go to http://localhost:" << myPort << '/' << endl;
+	cerr << "from your favorite browser" << endl; 
+	cerr << "* * * * * * * * * *" << endl;
+	cerr << endl;
+	cerr << "To kill this server, hit control-c or use the operating systems kill command" << endl; 
+	cerr << endl;
+	cerr << "WARNING: " << endl;
+	cerr << "\tAlthough the rest of the NICETEXT system is quite stable" << endl;
+	cerr << "\tthis program is a terrible hack." << endl;
+	cerr << "\tIt is most likely a resource hog and a security risk..." << endl; 
+	cerr << endl;
+ 
+	// start processing
+
+	int sockfd, newfd;	
+	struct sockaddr_in my_addr;
+	struct sockaddr_in their_addr;
+	int sin_size=sizeof(struct sockaddr_in);
+
+	signal(SIGCHLD, killZombies);
+	signal(SIGKILL, killZombies);
+	signal(SIGSTOP, killZombies);
+	signal(SIGQUIT, killZombies);
+
+	if ((sockfd=socket(AF_INET, SOCK_STREAM, 0))==-1)
+	{
+		perror("socket");
+		exit(1);
+	}
+
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_port = htons(myPort);
+	my_addr.sin_addr.s_addr = INADDR_ANY;
+	bzero(((char *)&(my_addr.sin_zero)), sizeof(my_addr.sin_zero));
+	
+	if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))==-1)
+	{
+		perror("bind");
+		exit(2);
+	}
+
+	if (listen(sockfd, BACKLOG)==-1)
+	{
+		perror("listen");
+		exit(3);
+	}
+
+	for(;;) 
+	{
+		if ((newfd=accept(sockfd, (struct sockaddr *)&their_addr, &sin_size))==-1)
+		{
+			perror("accept");
+			continue;
+		}
+
+		time_t now(time(NULL));
+
+		cout << ctime(&now) << "Server (" << getpid() << ") got a connection from " << inet_ntoa(their_addr.sin_addr) << endl;
+
+                // spawn child process
+
+                if (!fork())
+                {
+			randomize();
+
+			BOOL keepAlive=FALSE;
+
+#ifdef DEBUG
+			for(int reqLoop=1; ; reqLoop++)	
+#else
+			for(;;)
+#endif
+			{
+				DEBUGMSG(cout << "START OF REQUEST LOOP: " << reqLoop << endl;)
+
+				MTCstringList response;
+
+                        	if ((localHostOnly==TRUE)&&(strcmp(inet_ntoa(their_addr.
+sin_addr),"127.0.0.1")!=0))
+                        	{
+                                	response.add("I cannot accept a connection from ");   
+									response.add(inet_ntoa(their_addr.sin_addr));
+									response.add("\nbecause the -w parameter is not set for nttpd\n");
+                                	postResponse(response, newfd);
+                                	closeAndExit(newfd);
+                        	}
+
+				MTCstring recvBuf;
+
+				recvStrBuf(newfd, recvBuf);
+
+				if (recvBuf.length()==0)
+				{
+					DEBUGMSG(cout << "EMPTY RECEIVE BUFFER - ";)
+
+					if (keepAlive==TRUE)
+					{
+						DEBUGMSG(cout << "KEEPALIVE ON" << endl;)
+						sendStop(newfd);
+						closeAndExit(newfd);
+					}
+					else
+					{
+						DEBUGMSG(cout << "NO KEEPALIVE" << endl;)
+						perror("receive");
+
+						response.add("ERROR - I AM CONFUSED BY THIS EMPTY REQUEST!\n");
+						postResponse(response, newfd);
+						closeAndExit(newfd);
+					}
+				}
+
+				DEBUGMSG(cout << "CHECKING FOR KEEP-ALIVE..." << endl;)
+
+				if ((keepAlive==FALSE)&&(noCaseStrStr(recvBuf.c_str(), "Connection: Keep-Alive")!=NULL))
+				{
+					keepAlive=TRUE;
+					DEBUGMSG(cout << "KEEPALIVE SET TO TRUE!" << endl;)
+				}
+
+				// is this a "GET" request?
+
+				if (noCaseStrStr(recvBuf.c_str(), "GET /", TRUE)!=NULL)
+				{
+					DEBUGMSG(cout << "GET REQUEST" << endl;)
+
+					// is this an initial request?
+
+					if ((recvBuf.length()>4)&&(recvBuf.c_str()[5]==' '))
+					{
+						sendInitial(response);
+					}
+					else    // no, then treat as file req
+					{
+						// TREAT ALL AS INITIAL...
+
+						sendInitial(response);
+/*
+ * FILE REQUESTS ARE DISABLED FOR SECURITY REASONS
+ * OTHERWISE, SOMEONE COULD REQUEST COPIES OF ANY FILE(S) 
+ * THAT THE EFFECTIVE-USER-ID OF THIS PROCESS CAN READ
+ * 
+						 sendFile(response, strtok(&buffer[5], " "));
+
+						*response << "<HTML><HEAD><TITLE><ERROR - URL NOT AVAILABLE></TITLE></HEAD><BODY>THE URL REQUESTED IS NOT AVAILABLE AT THIS TIME<BR></BODY></HTML>");
+						postResponse(response, newfd);
+						closeAndExit(newfd);
+*/
+					}
+				}
+				else
+				{
+					MTCstringList dataStr;
+					BOOL postOp=(noCaseStrStr(recvBuf.c_str(), "POST /", TRUE)!=NULL);
+
+					if (postOp)
+					{
+						DEBUGMSG(cout << "POST OPERATION" << endl;)
+						unsigned requestLength=0;
+
+						BOOL readingContentLength=TRUE; 
+
+#ifdef DEBUG
+						int clLoop=0; 
+#endif
+						do	
+						{
+							DEBUGMSG(cout << "Reading Content Length: " << ++clLoop << endl;) 
+
+							const char *cl=noCaseStrStr(recvBuf.c_str(), CONTENT_LENGTH_STR); 
+							if (cl!=NULL)
+							{
+								int clLen=strlen(cl);
+
+								if (clLen>CLS_LEN)
+								{
+									int i;
+			
+									for(i=CLS_LEN; i<clLen&&cl[i]>='0'&&cl[i]<='9'; i++)
+									{
+										DEBUGMSG(cout << "\"" << cl[i] << "\"" << endl;)
+									}
+
+									DEBUGMSG(cout << "i=" << i << ",cl[i]=\"" << cl[i] << "\"" << endl;)
+
+									if ((cl[i]=='\n')||(cl[i]=='\r'))
+									{
+										requestLength=atoi(&cl[CLS_LEN]);
+										readingContentLength=FALSE;
+									}
+									else
+									{
+										DEBUGMSG(cout << "Hmmm..we don't seem to have read the entire value of the Content-Length: (" << cl << ")" << endl;)
+										if (cl[i]!='\0')
+										{
+											DEBUGMSG(cout << "the expected value of 'NULL' was not the last character - somethings wrong with this logic" << endl;)
+										}
+									}
+								}
+								else
+								{
+									DEBUGMSG(cout << "clLen<=CLS_LEN" << endl;)
+								}
+							}
+							else
+							{
+								DEBUGMSG(cout << "cl==NULL!" << endl;)
+							}
+
+							if (readingContentLength==TRUE)
+							{
+								MTCstring readMoreStr;
+								recvStrBuf(newfd, readMoreStr);
+								recvBuf+=readMoreStr;
+
+							}
+						} while (readingContentLength==TRUE);
+
+						DEBUGMSG(cout << "Content-Length: " << requestLength << endl;)
+
+						dataStr.add(noCaseStrStr(recvBuf.c_str(), "NTTPDATA"));
+
+						DEBUGMSG(cout << "INITIAL DATASTR LENGTH: " << dataStr.length() << endl;)
+
+						if ((dataStr.length()<requestLength))
+						{
+							DEBUGMSG(cout << "READING MORE DATA..." << endl;)
+
+							do
+							{
+								MTCstring tempBuf;
+ 								recvStrBuf(newfd, tempBuf);
+ 								dataStr.add(tempBuf);
+								DEBUGMSG(cout << "INTERMEDIATE DATASTR LENGTH: " << dataStr.length() << endl;)
+							}  while (dataStr.length() < requestLength);
+							DEBUGMSG(cout << "DONE ADDING TO DATASTR" << endl;)
+						}
+
+						if ((dataStr.length()>requestLength))
+						{
+							DEBUGMSG(cout << "TRUNCATING dataStr.Length() from " << dataStr.length() << " to match content-length " << requestLength << endl;)
+							dataStr.truncateLength(requestLength);
+						}
+
+						DEBUGMSG(cout << "FINAL DATASTR LENGTH: " << dataStr.length() << endl;)
+
+						DEBUGMSG(cout << "DONE READING" << endl;)
+
+						MTCRBT<MTCpostData> pdSet;
+
+						parseParms(dataStr.getValue(), pdSet);
+
+						MTCpostData pd;
+
+						pd.setParam("NTTPDATA");
+
+						MTCpostData *pdPtr;
+
+						if ((pdPtr=pdSet.find(pd))==NULL)
+						{
+							if (keepAlive==TRUE)
+							{
+								DEBUGMSG(cout << "INVALID POST REQUEST - There is no NTTPDATA" << endl;)
+								/*
+								postResponse(response, newfd);
+								sendStop(newfd);
+								closeAndExit(newfd);
+								*/
+								continue;
+							}
+							else
+							{
+								response.add("ERROR: INVALID NTTPD POST REQUEST");
+							}
+						}
+						else
+						{
+							if (pdPtr->getValue()=="INITIAL")
+							{
+								DEBUGMSG(cout << "SENDING NICETEXT" << endl;)
+								sendNiceText(response, pdSet);
+								if (keepAlive==TRUE)
+								{
+									
+									postResponse(response, newfd);
+									sendStop(newfd);
+									closeAndExit(newfd);
+								}
+							}
+							else if (pdPtr->getValue()=="NICETEXT")
+							{
+								DEBUGMSG(cout << "Sending Scrambled Text" << endl;)
+
+								sendScramText(response, pdSet);
+								DEBUGMSG(cout << "DONE Sending Scrambled Text" << endl;)
+
+								if (keepAlive==TRUE)
+								{
+									postResponse(response, newfd);
+									sendStop(newfd);
+
+									closeAndExit(newfd);
+								}
+							}
+							else
+							{
+								DEBUGMSG(cout << "BAD POST - SENDING INITIAL" << endl;)
+								response.add("POST REQUEST ACCEPTED<BR>Post type:");
+								response.add(pdPtr->getValue());
+								response.add("<BR>");
+
+								sendInitial(response);
+							}	
+						}
+					}
+					else
+					{
+						// any other requests are errors...
+
+						DEBUGMSG(cout << "Confused...!!!" << endl;)
+						// exit!!!
+
+						sendStop(newfd);
+						closeAndExit(newfd);
+
+						if (keepAlive==TRUE)
+						{
+							DEBUGMSG(cout << "CONTINUING..." << endl;)
+							goto continue_loop;
+						}
+						else
+						{
+							response.add("ERROR - I AM CONFUSED ABOUT THIS REQUEST!");
+						}
+					}
+				}
+
+				if (keepAlive==TRUE)
+				{
+					postResponse(response, newfd);
+					sendStop(newfd);
+				}
+				else
+				{
+					postResponse(response, newfd);
+					closeAndExit(newfd);
+				}
+
+continue_loop:
+				response.clear();
+			}
+
+			closeAndExit(newfd);
+
+		}
+
+		// parent process again...
+
+		close(newfd);
+	}
+
+	exit(0);
+}
+
+// send the initial page
+
+BOOL sendInitial(MTCstringList &os)
+{
+	DEBUGMSG(cout << "INITIAL REQUEST." << endl;)
+ 	os.add("<HTML> 
+<HEAD> 
+<TITLE>NICETEXT Primary Input Screen</TITLE> 
+</HEAD> 
+<BODY BGCOLOR=\"#AAAAAA\"> 
+<H2>NICETEXT Web-Sampler &copy; 1998  -  Primary Input Screen</H2>
+<P>The purpose of this demo is to convert your message into something 
+completely different. The same message can be changed into many
+different texts - even with the same style and dictionary.  What's more, 
+you will have the opportunity to convert the <I>nicetext</I> back into
+your original message!</P> 
+<FORM METHOD=POST ACTION=\"nicetext?\"> 
+<INPUT TYPE=HIDDEN NAME=NTTPDATA VALUE=\"INITIAL\">
+<H3>Enter a Message:</H3>
+<P>
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=12></TEXTAREA> 
+</P> 
+<H3>Select the <B>NICETEXT</B> Style:
+<SELECT NAME=STYLE> 
+<OPTION VALUE=\"Shakespeare\"> Shakespeare 
+<OPTION VALUE=\"Asoep's Fables\"> Asoep's Fables 
+<OPTION VALUE=\"Wizard of OZ\"> Wizard of OZ 
+</SELECT> 
+<INPUT TYPE=CHECKBOX NAME=BIGDICT VALUE=\"YES\"> Use a larger dictionary
+</H3>
+</P>
+<INPUT TYPE=SUBMIT VALUE=\" Convert my message \"> 
+<INPUT TYPE=RESET  VALUE=\" Clear \"> 
+</FORM> 
+<P>For more information please see the <A HREF=\"http://www.ctgi.net/nicetext/\">Official NICETEXT Home Page</A></P> 
+</BODY> 
+</HTML>");
+
+	return TRUE;
+}
+
+// send a file
+
+BOOL sendFile(MTCstringList &os, const char *file, BOOL wordWrap)
+{
+	if (strncmp(file, tmpDir.c_str(), tmpDir.length())!=0)
+	{
+		os.add("ERROR:  I cannot allow you to view this file.");
+		os.add("\n(");
+		os.add(file);
+		os.add(")\n");
+		cerr << "User attempted to read: " << file << endl;
+	}
+
+	if (file==NULL)
+	{
+		return FALSE;
+	}
+	else
+	{
+		ifstream readFile(file);
+
+		if (readFile.bad())
+		{
+			os.add("ERROR - I COULD NOT FIND THAT URL");
+			return FALSE;
+		}
+
+		char c;
+		MTCstring lineBuffer;
+
+		while (!readFile.bad()&&!readFile.eof())
+		{
+			readFile.get(c);
+
+			if ((c==' ')&&(wordWrap==TRUE)&&(lineBuffer.length()>MAX_COLUMN))
+			{
+				lineBuffer+=" \n";
+				os.add(lineBuffer);
+				lineBuffer="";
+			}
+			else
+			{
+				lineBuffer += c;
+
+				if (c=='\n')
+				{
+					os.add(lineBuffer);
+					lineBuffer="";
+				}
+			}
+		}
+
+		os.add(lineBuffer);
+	}
+
+	return TRUE;
+}
+
+// parse the parameters from a POST operation
+
+BOOL parseParms(const MTCstring & aStr, MTCRBT<MTCpostData> &pd)
+{
+	DEBUGMSG(cout << "Parsing Parameters...for {" << aStr << "}[" << aStr.length() << "]" << endl;)
+
+	pd.clear();
+
+	const char *h=aStr.c_str();
+
+	if ((h==NULL)||(*h==(char)NULL))
+	{
+		DEBUGMSG(cout << "DONE Parsing Parameters...the string length is zero" << endl;)
+		return FALSE;
+	}
+
+	MTCpostData newData;
+	const char *t;
+	char value[aStr.length()+1];
+	BOOL done=FALSE;
+
+	do
+	{
+		// read parameter name
+
+		for(t=h; ((*t!='\0')&&(*t!='=')&&(*t!='\n')&&(*t!='\r')); t++);
+
+		// did we find one?
+
+		if ((t-h)>0)
+		{
+			// copy the parameter name
+
+			char parm[(t-h)];
+	 
+			strncpy(parm, h, (t-h));
+
+			parm[(t-h)] = '\0';
+
+			newData.setParam(parm);
+
+			DEBUGMSG(cout << "parm:" << newData.getParam() << endl;)
+
+			// is this the end of the data?
+		
+			if ((*t=='\0')||(*t=='\n')||(*t=='\r'))
+			{
+				pd.add(newData);
+				done=TRUE;
+			}
+			else
+			{
+				// is this a parameter we care about?
+			
+				if ((newData.getParam()!="STYLE")
+				&&  (newData.getParam()!="NTTPDATA")
+				&&  (newData.getParam()!="PLAINTEXT")
+				&&  (newData.getParam()!="BIGDICT"))
+				{
+					DEBUGMSG(cout << "WE DON'T CARE ABOUT:" << newData.getParam() << endl;)
+					// if not then skip the value!
+
+					for(t=h; ((*t!='\0')&&(*t!='\n')&&(*t!='\r')&&(*t!='&')); t++);
+				}
+				else
+				{
+					// read parameter value 
+
+					char *v=value;
+
+					int len=0;
+
+					h=(t+1);
+
+					for(t=h; ((*t!='\0')&&(*t!='\n')&&(*t!='\r')&&(*t!='&')); t++)
+					{
+						len++;
+						switch (*t) {
+						case '+':
+							*v++=' ';
+							break;
+						case '%':
+							if ((*(++t)!='\0')&&(*(++t)!='\0'))
+							{
+								*v++=(char)hexdigit(*(t-1))*16+hexdigit(*t);
+								len+=2;
+							}
+							else
+							{
+								cout << getpid() << " : ERROR: I COULD NOT READ THE REST OF THE HEX DIGITS!" << endl;
+								done=TRUE;
+							}
+							break;
+						default:
+							*v++=*t;
+							break;
+						}
+					}
+	
+					*v='\0';
+	
+					newData.setValue(value);
+	
+					DEBUGMSG(cout << "value(" << newData.getValue().length() << ", " << len << "):" << newData.getValue() << endl;)
+
+					pd.add(newData);
+				}
+	
+				if ((*t=='\0')||(*t=='\n')||(*t=='\r'))
+				{
+					done=TRUE;
+				}
+	
+				h=(t+1);
+	
+				if ((*h=='\0')||(*t=='\n')||(*t=='\r'))
+				{
+					done=TRUE;
+				}
+			}
+		}
+		else 
+		{
+			// we are all done!
+			done=TRUE;
+		}
+	} while (done==FALSE);
+
+#ifdef DEBUG
+	DEBUGMSG(cout << "DONE Parsing Parameters..." << endl;)
+
+	pd.forEach(dumpPostData);
+#endif
+
+	return TRUE;
+}
+
+// dump post data to stdout
+
+void dumpPostData(MTCpostData *aPD)
+{
+	if (aPD!=NULL)
+	{
+		DEBUGMSG(cout << aPD->getParam() << "=" << aPD->getValue() << endl;)
+	}
+	else
+	{
+		DEBUGMSG(cout << "* * * * * ERROR: NULL VALUE FOR POST DATA PTR" << endl;)
+	}
+}
+
+// return the integer value for a hex digit
+
+int hexdigit(char c)
+{
+	if ((c>='0')&&(c<='9'))
+	{
+		return (9-('9'-c));
+	}
+	if ((c>='A')&&(c<='F'))
+	{
+		return (15-('F'-c));
+	}
+	if ((c>='a')&&(c<='f'))
+	{
+		return (15-('f'-c));
+	}
+
+	return 0;
+}
+
+// send nice text from the plaintext
+
+BOOL sendNiceText(MTCstringList &os, MTCRBT<MTCpostData> &pdSet)
+{
+	os.add("<HTML> 
+<HEAD> 
+<TITLE>NICETEXT Output Screen</TITLE> 
+</HEAD> 
+<BODY BGCOLOR=\"#AAAAAA\"> 
+<H2>NICETEXT Web-Sampler &copy; 1998  -  <I>Nicetext</I> Output Screen</H2>
+<P>This is the result of the <I>nicetext</I> operation on the message
+you selected.  If you <I>scramble</I> the unmodified text below then  
+the software will recover your original message on the next page.
+But, if you modify the text - who knows what you will end up with?  Also,
+if you are not satisfied with the quality of the <I>nicetext</I> then 
+use the reload button on your browser for another try!</P>
+<FORM METHOD=POST ACTION=\"scramble?\"> 
+<INPUT TYPE=HIDDEN NAME=NTTPDATA VALUE=\"NICETEXT\">
+<P>
+<H3>Here is the <I>NICETEXT</I>:</H3>
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=12>
+");
+
+	MTCstring plainTextFileName(tempnam(tmpDir.c_str(), "nttp-pt"));
+
+	ofstream plainTextFile(plainTextFileName.c_str());
+
+	MTCpostData pd;
+	pd.setParam("STYLE");
+	MTCpostData *ptPtr=pdSet.find(pd);
+
+	MTCstring formStyle;
+
+	char c='S';
+
+	if (ptPtr!=NULL)
+	{
+		c=ptPtr->getValue().c_str()[0];
+		formStyle=ptPtr->getValue();
+	}
+
+	MTCstring dictParm(workDir), typeParm(workDir), modelParm(workDir);
+
+	switch (c) {
+	case 'A':
+		dictParm+="fabl";
+		dictParm+=DICTPARM;
+		typeParm+="fabl";
+		typeParm+=TYPEPARM;
+		modelParm+="fabl";
+		modelParm+=MODELPARM;
+		break;
+	case 'S':
+		dictParm+="shak";
+		dictParm+=DICTPARM;
+		typeParm+="shak";
+		typeParm+=TYPEPARM;
+		modelParm+="shak";
+		modelParm+=MODELPARM;
+		break;
+	default:
+		dictParm+="wizoz";
+		dictParm+=DICTPARM;
+		typeParm+="wizoz";
+		typeParm+=TYPEPARM;
+		modelParm+="wizoz";
+		modelParm+=MODELPARM;
+		break;
+	};
+
+	MTCstring formDict;
+	pd.setParam("BIGDICT");
+	ptPtr=pdSet.find(pd);
+
+	if (ptPtr!=NULL)
+	{
+		dictParm=workDir;
+		dictParm+="mstr";
+		dictParm+=DICTPARM;
+		formDict=" checked ";
+	}
+
+	pd.setParam("PLAINTEXT");
+	ptPtr=pdSet.find(pd);
+
+	if (ptPtr==NULL)
+	{
+		os.add("SORRY, I COULD NOT SEND THE PLAINTEXT TO THE NICETEXT SYSTEM<BR>");
+	}
+	else
+	{
+		if (ptPtr->getValue().length()==0)
+		{
+			plainTextFile << " " << endl;
+		}
+		else
+		{
+			plainTextFile << ptPtr->getValue() << endl;
+		}
+
+		plainTextFile.flush();
+		plainTextFile.close();
+
+		MTCbitsToTextModel *converter= new MTCbitsToTextModel;
+
+		if (converter==NULL)
+		{
+			os.add("SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT");
+		}
+		else 
+		if (converter->openInputName(plainTextFileName.c_str())==FALSE)
+		{
+			os.add("SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>");
+		}
+		else 
+		{
+			converter->setStatFreq(0);	// do not show stats
+
+			MTCstring niceTextFileName(tempnam(tmpDir.c_str(), "nttp-nt"));
+
+			if (converter->openOutputName(niceTextFileName)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>");
+			}
+			else 
+			if (converter->openTypeName(typeParm)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>");
+				os.add(typeParm);
+			}
+			else if (converter->openModelName(modelParm)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE MODEL DATABASE<BR>");
+			}
+			else if (converter->openDictName(dictParm, TRUE)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>");
+			}
+			else 
+			{
+				converter->doIt();
+				delete converter;
+				converter=NULL;
+				sendFile(os, niceTextFileName.c_str(), TRUE);
+				unlink(niceTextFileName.c_str());
+				unlink(plainTextFileName.c_str());
+			}
+		}
+	}
+
+	os.add("</TEXTAREA> 
+</P> 
+<H3>
+<INPUT TYPE=HIDDEN NAME=STYLE VALUE=\"");
+
+	os.add(formStyle.c_str());
+
+	os.add("\">Style:");
+
+	os.add(formStyle.c_str());
+
+	os.add("\n");
+
+	if (formDict.length()!=0)
+	{
+		os.add("... with a larger dictionary.
+<INPUT TYPE=HIDDEN NAME=BIGDICT VALUE=\"YES\">");
+	}
+
+	os.add("</H3>
+<INPUT TYPE=SUBMIT VALUE=\" Scramble this message \"> 
+<INPUT TYPE=RESET  VALUE=\" Reset \"> 
+</FORM> 
+</BODY>
+</HTML>
+");
+}
+
+// send a stop request for keep-alive functions
+
+BOOL sendStop(int fd)
+{
+	DEBUGMSG(cout << "SENDING STOP" << endl;)
+
+#ifdef MSG_EOF
+	if (send(fd, "\n", 1, MSG_EOF)==-1)
+#else
+	if (send(fd, "\n", 1, 0)==-1)
+#endif
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// send scrambled text from the nicetext
+
+BOOL sendScramText(MTCstringList &os, MTCRBT<MTCpostData> &pdSet)
+{
+	os.add("<HTML> 
+<HEAD> 
+<TITLE>SCRAMBLED Output Screen</TITLE> 
+</HEAD> 
+<BODY BGCOLOR=\"#AAAAAA\"> 
+
+<H2>NICETEXT Web-Sampler &copy; 1998  -  <I>Scrambled</I> Output Screen</H2>
+<P>This page contains the <I>scrambled</I> version of the <I>nicetext</I>
+on the previous page.  If you did not modify the <I>nicetext</I> then this
+should be your original message! (If it does NOT match your original message
+then rest assured that it is because of the poor implementation of HTTP/1.0
+rather than a problem with the basic transformation software.)</P>
+<H3>Here is the SCRAMBLED Text:</H3> 
+<FORM METHOD=POST ACTION=\"index.html\"> 
+<INPUT TYPE=HIDDEN NAME=NTTPDATA VALUE=\"INITIAL\">
+<P>
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=12 READONLY=\"YES\">
+");
+
+	MTCstring plainTextFileName(tempnam(tmpDir.c_str(), "nttp-pt"));
+
+	ofstream plainTextFile(plainTextFileName.c_str());
+
+	MTCpostData pd;
+	pd.setParam("STYLE");
+	MTCpostData *ptPtr=pdSet.find(pd);
+
+	MTCstring formStyle;
+
+	char c='S';
+
+	if (ptPtr!=NULL)
+	{
+		c=ptPtr->getValue().c_str()[0];
+		formStyle=ptPtr->getValue();
+	}
+
+	MTCstring dictParm(workDir), typeParm(workDir);
+
+	switch (c) {
+	case 'A':
+		dictParm+="fabl";
+		dictParm+=DICTPARM;
+		typeParm+="fabl";
+		typeParm+=TYPEPARM;
+		break;
+	case 'S':
+		dictParm+="shak";
+		dictParm+=DICTPARM;
+		typeParm+="shak";
+		typeParm+=TYPEPARM;
+		break;
+	default:
+		dictParm+="wizoz";
+		dictParm+=DICTPARM;
+		typeParm+="wizoz";
+		typeParm+=TYPEPARM;
+		break;
+	};
+
+	pd.setParam("BIGDICT");
+	ptPtr=pdSet.find(pd);
+
+	if (ptPtr!=NULL)
+	{
+		dictParm=workDir;
+		dictParm+="mstr";
+		dictParm+=DICTPARM;
+	}
+
+	pd.setParam("PLAINTEXT");
+	ptPtr=pdSet.find(pd);
+
+	if (ptPtr==NULL)
+	{
+		os.add("SORRY, I COULD NOT SEND THE PLAINTEXT TO THE SCRAMBLE SYSTEM");
+	}
+	else
+	{
+		if (ptPtr->getValue().length()==0)
+		{
+			plainTextFile << " " << endl;
+			DEBUGMSG(cout << "BLANK SUBMITTED!" << endl;)
+		}
+		else
+		{
+			plainTextFile << ptPtr->getValue() << endl;
+		}
+
+		plainTextFile.flush();
+		plainTextFile.close();
+	
+		MTCtextToBits *converter= new MTCtextToBits;
+
+		if (converter==NULL)
+		{
+			os.add("SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT");
+		}
+		else 
+		if (converter->openInputName(plainTextFileName.c_str())==FALSE)
+		{
+			os.add("SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>");
+		}
+		else 
+		{
+			converter->setVerboseMode(FALSE);
+
+			MTCstring niceTextFileName(tempnam(tmpDir.c_str(), "nttp-nt"));
+
+			if (converter->openOutputName(niceTextFileName)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>");
+			}
+			else 
+			if (converter->openTypeName(typeParm)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>");
+			}
+			else if (converter->openDictName(dictParm, TRUE)==FALSE)
+			{
+				os.add("SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>");
+			}
+			else 
+			{
+				converter->doIt();
+				delete converter;
+				converter=NULL;
+				sendFile(os, niceTextFileName.c_str());
+				unlink(niceTextFileName.c_str());
+				unlink(plainTextFileName.c_str());
+			}
+		}
+	}
+
+	os.add("
+</TEXTAREA> 
+</P>
+</FORM> 
+<P>
+<A HREF=\"start.html\">GO BACK TO START PAGE...</A>
+</P>
+</BODY>
+</HTML>
+");
+}
+
+// kill any remaining zombie processes
+
+void killZombies(int)
+{
+	while(waitpid(-1,NULL,WNOHANG)>0);
+}
+
+
+// select a random number seed according to time...
+
+void randomize()
+{
+        struct timeval t;
+        struct timezone tz; 
+
+        if (gettimeofday(&t, &tz)==-1)
+        {
+                errorMsg(EMT_WARNING, "random seed generation failed...no big de
+al though...", "randomize()");
+        }
+
+        srandom(t.tv_sec|t.tv_usec);
+}
+
+// close file and exit (child process only...)
+
+void closeAndExit(int fd)
+{
+	close(fd);
+	exit(0);
+}
+
+// post the response to the socket
+
+BOOL postResponse(MTCstringList &os, int fd)
+{
+	int l=os.length();
+	
+	MTCstring header("HTTP/1.0 200 OK\nServer: Nicetext/0.1.0\nContent-type: text/html\nConnection: close\nContent-length: ");
+
+	char tempStr[20];
+
+	sprintf(tempStr, "%d\n\n", l); 
+	header+=tempStr;
+
+	DEBUGMSG(cout << "RESPONSE:" << endl;)
+	DEBUGMSG(cout << header;)
+	DEBUGMSG(cout << os.getValue().c_str() << endl;)
+
+	DEBUGMSG(cout << "END OF RESPONSE" << endl;)
+
+	send(fd, header.c_str(), header.length(), 0);
+
+	if (l>0)
+	{
+		int blocks=l/MAX_SEND_BLOCK;
+		int remainder=l%MAX_SEND_BLOCK;
+
+		for(int i=0; i<blocks; i++)
+		{
+			send(fd, &os.getValue().c_str()[i*MAX_SEND_BLOCK], MAX_SEND_BLOCK, 0);
+		}
+
+		if (remainder!=0)
+		{
+			send(fd, &os.getValue().c_str()[l-remainder], remainder, 0);
+		}
+	}
+
+	return TRUE;
+}
+
+// read a string buffer from the socket
+
+MTCstring & recvStrBuf(int fd, MTCstring &bufStr)
+{
+	DEBUGMSG(cout << "recvStrBuf() START" << endl;)
+
+	char readBuf[MAX_BUFFER+1];
+	ssize_t size;
+
+	if ((size=recv(fd, readBuf, MAX_BUFFER, 0))==-1)
+	{
+		perror("recvStrBuf()");
+		bufStr="";
+	}
+	else
+	{
+		readBuf[size]=(char)NULL;
+		bufStr=readBuf;
+	}
+
+	DEBUGMSG(cout << "size of recv(): " << size << endl;);
+
+	DEBUGMSG(cout << "bufstr:{" << bufStr << "}[" << bufStr.length() << "]" << endl;)
+	DEBUGMSG(cout << "recvStrBuf() END" << endl;)
+
+	return bufStr;
+}
+
+// strstr case insensitive
+
+const char * noCaseStrStr(const char *big, const char *little, BOOL prefix)
+{
+	DEBUGMSG(cout << "start NOCASESTRSTR(" << little << ") " << strlen(big) << "," << strlen(little) << "," << prefix << endl;)
+
+	int bigLen = strlen(big);
+	int littleLen = strlen(little);
+	MTCstring littleStr(little);
+	littleStr.toLower();
+	int score;
+
+#ifdef DEBUG
+	int loop=0;
+#endif DEBUG
+
+	for(int i=0; (((prefix==FALSE)&&(i<bigLen))||((prefix==TRUE)&&(i==0))); i++)
+	{
+		score=0;
+
+		for(int j=0; ((j<littleLen)&&((i+j)<bigLen)); j++)
+		{
+#ifdef DEBUG
+			loop++;
+#endif DEBUG
+
+			if ((tolower(big[i+j])==(littleStr.c_str()[j])))
+			{
+				score++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (score==littleLen)
+		{
+			DEBUGMSG(cout << "end NOCASESTRSTR(" << little << ") FOUND IT IN: " << loop << " loops " << endl;)
+			return &big[i];
+		}
+	}
+
+	DEBUGMSG(cout << "end NOCASESTRSTR(" << little << ") NOTHING FOUND IN: " << loop << " loops " << endl;)
+
+	return NULL;
+}
+
+void usage()
+{
+	cerr << "Usage: nttpd [-b dataBaseDir] [-p port] [-t tempDir] [-w]" << endl;
+	cerr << "\t-b\tDirectory where dictionaries & style sources exist." << endl;
+	cerr << "\t\t(default is current directory)" << endl;  
+	cerr << "\t-t\tTemp directory where work files are written" << endl;
+	cerr << "\t\t(default is /tmp )" << endl;  
+	cerr << "\t-p\tPort # to listen() for connections (default is 2119)" << endl;
+	cerr << "\t-w\tAccept connections machines other than localhost"  << endl;
+
+}
+@
+
+
+1.20
+log
+@added "truncateLength()" to clean up the dataStr
+fixed problem in recvStrBuf to NULL terminate the buffer - THIS FIXED A BIG BUG
+@
+text
+@d8 1
+a8 1
+ * $Id: nttpd.cc,v 1.19 1998/08/24 02:37:52 markc Exp markc $
+d11 4
+d637 1
+a637 1
+<P>For more information please see the <A HREF=\"http://www.ctgi.net/\">Official NICETEXT Home Page</A></P> 
+@
+
+
+1.19
+log
+@Getting closer - DEBUGMSG(), DEBUG(),
+an optimized MTCstring class in mtc++ library (cache length of string)
+@
+text
+@d8 1
+a8 1
+ * $Id: nttpd.cc,v 1.18 1998/08/21 19:23:15 markc Exp markc $
+d11 4
+d125 1
+a125 1
+#define MAX_SEND_BLOCK 512    // maximum length of send() buffers
+d127 1
+a127 1
+// #define DEBUG 
+d138 3
+a140 2
+#define MAX_BUFFER 65536 
+#define CONTENT_LENGTH_STR "Content-length:"
+d152 1
+a152 1
+MTCstring & recvStrBuf(int fd);
+d207 11
+a309 2
+				MTCstring recvBuf(recvStrBuf(newfd));
+
+d316 2
+a317 2
+					response.add(inet_ntoa(their_addr.sin_addr));
+					response.add("\nbecause the -w parameter is not set for nttpd\n");
+d322 4
+a354 1
+				DEBUGMSG(cout << "{" << recvBuf << "}[" << recvBuf.length() << "]" << endl;)
+a389 3
+					dataStr.add(noCaseStrStr(recvBuf.c_str(), "NTTPDATA"));
+					postOp|=(dataStr.length()!=0);
+
+d393 1
+d395 1
+a395 1
+						long requestLength=0;
+d397 46
+a442 1
+						MTCstring lengthStr=noCaseStrStr(recvBuf.c_str(), CONTENT_LENGTH_STR); 
+d444 12
+a455 14
+						if (lengthStr.length()<strlen(CONTENT_LENGTH_STR))
+						{
+							DEBUGMSG(cout << "Content-Length NOT DEFINED" << endl;)
+/*
+							MTCstring errorStr("HTTP/1.0 400 BAD REQUEST\nServer: Nicetext/0.0.0\nContent-type: text/html\nConnection: close\nContent-length: 0\n\n");
+							send(newfd, errorStr.c_str(), errorStr.length(), 0);
+							sendStop(newfd);
+							closeAndExit(newfd);
+*/
+						}
+						else
+						{
+							requestLength=atol(&lengthStr.c_str()[strlen(CONTENT_LENGTH_STR)]);
+						}
+a456 9
+						DEBUGMSG(cout << "LENGTH OF REQUEST: " << requestLength << endl;)
+/*
+						if (requestLength==0)
+						{
+								DEBUGMSG(cout << "REQUEST LENGTH WAS ZERO  - I'm outta here..." << endl;)
+								sendStop(newfd);
+								closeAndExit(newfd);
+						}
+*/
+d458 1
+a458 1
+						// if ((dataStr.length()!=0)
+d465 3
+a467 1
+ 								dataStr.add(recvStrBuf(newfd));
+d473 6
+d507 1
+a507 1
+								response.add("ERROR: INVALID POST REQUEST");
+d586 3
+d623 3
+a625 3
+<OPTION> Shakespeare 
+<OPTION> Asoep's Fables 
+<OPTION> Wizard of OZ 
+d723 1
+a723 1
+		for(t=h; ((*t!='\0')&&(*t!='=')&&(*t!='\n')); t++);
+d743 1
+a743 1
+			if ((*t=='\0')||(*t=='\n'))
+d760 1
+a760 1
+					for(t=h; ((*t!='\0')&&(*t!='\n')&&(*t!='&')); t++);
+d772 1
+a772 1
+					for(t=h; ((*t!='\0')&&(*t!='\n')&&(*t!='&')); t++)
+d806 1
+a806 1
+				if ((*t=='\0')||(*t=='\n'))
+d813 1
+a813 1
+				if ((*h=='\0')||(*t=='\n'))
+d1253 1
+a1253 1
+	MTCstring header("HTTP/1.0 200 OK\nServer: Nicetext/0.0.0\nContent-type: text/html\nConnection: close\nContent-length: ");
+d1289 1
+a1289 1
+MTCstring & recvStrBuf(int fd)
+a1292 2
+	static MTCstring buffer;
+
+d1299 1
+a1299 1
+		buffer="";
+d1303 2
+a1304 1
+		buffer=readBuf;
+d1307 3
+d1312 1
+a1312 1
+	return buffer;
+d1331 1
+a1331 1
+	for(int i=0; ((i<bigLen)||((i==1)&&(prefix==TRUE))); i++)
+d1335 1
+a1335 1
+		for(int j=0; j<littleLen&&((i+j)<bigLen); j++)
+d1365 1
+a1365 1
+        cerr << "Usage: nttpd [-b dataBaseDir] [-p port] [-t tempDir] [-w]" << endl;
+@
+
+
+1.18
+log
+@fixed noCaseStrStr() to perform a bit better
+added some debug messages
+@
+text
+@d5 2
+a6 1
+ * WARNING: THIS IS A TERRIBLE HACK OF A PROGRAM - BUT HAVE FUN!!!!
+d8 1
+a8 1
+ * $Id: nttpd.cc,v 1.17 1998/08/20 13:26:23 markc Exp markc $
+d11 4
+d123 1
+a123 1
+//#define DEBUG 
+d125 1
+a125 1
+#define DEBUGMSG(x) x 
+d142 1
+a142 1
+BOOL parseParms(const char *, MTCRBT<MTCpostData> &);
+d239 3
+d276 1
+a276 1
+		cout << ctime(&now) << "Server got a connection from " << inet_ntoa(their_addr.sin_addr) << endl;
+d286 5
+a290 1
+			for(;;)	
+d292 1
+a292 1
+				DEBUGMSG(cout << "START OF REQUEST" << endl;)
+d386 1
+a386 1
+							DEBUGMSG(cout << "LENGTHSTR IS LESS THAN CONTENT_LENGTH_STR" << endl;)
+a399 1
+
+d408 3
+a410 3
+						DEBUGMSG(cout << "DATASTR LENGTH: " << dataStr.length() << endl;)
+						if ((dataStr.length()!=0)
+						&& (dataStr.length()<requestLength))
+d417 1
+a417 1
+								DEBUGMSG(cout << "DATASTR LENGTH: " << dataStr.length() << endl;)
+d422 3
+a424 2
+				cout << "DONE READING!!!!" << endl;
+				cout.flush();
+d428 1
+a428 3
+				cout << "Parsing Parameters" << endl;
+						parseParms(dataStr.getValue().c_str(), pdSet);
+				cout << "DONE Parsing Parameters" << endl;
+d440 1
+a440 1
+								DEBUGMSG(cout << "INVALID POST REQUEST" << endl;)
+d469 1
+a469 2
+								DEBUGMSG(cout << "SENDING SCRAMBLED TEXT" << endl;)
+			cout << "Sending Scrambled Text" << endl;
+d472 2
+a473 1
+			cout << "DONE Sending Scrambled Text" << endl;
+a592 2
+	int column;
+
+d616 1
+a616 25
+/*
+				switch (c) {
+				case ' ':	os += '+';
+						if ((wordWrap==TRUE)&&(column>MAX_COLUMN))
+						{
+							os += "%%0A";
+							column=0;
+						}
+						break;
+				default:
+						if ((wordWrap==TRUE)&&(c=='\n'))
+						{
+							column=0;
+						}
+						os += "%%";
+						int n=(int)c/16;
+						if (n<10) os += (char)n;
+						else os += (char)(n-10+'A');
+						n=(int)c%16;
+						if (n<10) os += (char)n;
+						else os += (char)(n-10+'A');
+				}
+
+*/
+				lineBuffer+='\n';
+a625 1
+					column=0;
+d640 1
+a640 1
+BOOL parseParms(const char *aStr, MTCRBT<MTCpostData> &pd)
+d642 1
+a642 1
+	DEBUGMSG(cout << "Parsing Parameters..." << endl;)
+d646 3
+a648 1
+	if (aStr==NULL)
+d650 1
+d654 4
+a657 1
+	const char *ptr=noCaseStrStr(aStr, "NTTPDATA");
+d659 1
+a659 1
+	if (ptr==NULL)
+d661 3
+a663 2
+		return FALSE;
+	}
+d665 1
+a665 7
+	BOOL paramState=TRUE; 
+	MTCpostData newData;
+	MTCstring param;
+	MTCstring partial;
+	MTCstringList value;
+	int l=strlen(ptr);
+	int j=0;
+d667 1
+a667 3
+	for(int i=0; i<l; i++)
+	{
+		if (paramState==TRUE)
+d669 5
+a673 1
+			partial="";
+d675 5
+a679 4
+			if (ptr[i]=='=')
+			{
+				newData.setParam(param);
+				param="";
+d681 3
+a683 20
+				if ((i+1)==l)
+				{
+					newData.setValue("");
+					pd.add(newData);
+					value.clear();
+					paramState=TRUE;
+				}
+				else
+				{
+					paramState=FALSE;
+				}
+			}
+			else
+			{
+				param=param+ptr[i];
+			}
+		}
+		else
+		{
+			if ((ptr[i]=='&')||(ptr[i]=='\n')||((i+1)==l))
+a684 11
+				if (partial.length()>0)
+				{
+					value.add(partial);
+					newData.setValue(value.getValue());
+				}
+				else
+				{
+					newData.setValue("");
+				}
+
+				partial="";
+d686 1
+a686 2
+				value.clear();
+				paramState=TRUE;
+d690 6
+a695 1
+				if (ptr[i]=='+') 
+d697 4
+a700 1
+					partial+=' ';
+d704 5
+a708 6
+					if (ptr[i]=='%')
+					{
+						if ((i+2)<l)
+						{
+							char c=ptr[++i];
+							char d=ptr[++i];
+d710 1
+a710 1
+							int nc=hexdigit(c)*16+hexdigit(d);
+d712 9
+a720 1
+							if (nc)
+d722 2
+a723 1
+								partial+=(char)nc;
+d725 9
+a733 7
+								
+							// cout << "c:" << c << " d: " << d << " int=" << nc << " char=" << (char) nc << endl;
+
+						}
+						else
+						{
+							cout << "* * * ERROR: I could not read the remaining hex values after a %" <<endl;
+d736 13
+a748 4
+					else
+					{
+						partial+=ptr[i];
+					}
+d750 4
+a753 2
+
+				if (++j>MAX_COLUMN)
+d755 1
+a755 3
+					value.add(partial);
+					partial="";
+					j=0;
+d759 6
+a764 1
+	}
+d767 1
+a767 1
+	DEBUGMSG(cout << "PARSEPARMS:" << ptr << ":" << endl;)
+a1008 2
+	cout.flush();
+
+d1090 2
+a1091 3
+			plainTextFile << "BLANK" << endl;
+			plainTextFile << "BLANK" << endl;
+			cout << "BLANK SUBMITTED!" << endl;
+d1231 1
+a1231 2
+	cout << "recvStrBuf() START" << endl;
+	cout.flush();
+d1248 2
+a1249 2
+	cout << "recvStrBuf() END" << endl;
+	cout.flush();
+d1257 1
+a1257 1
+	cout << "start NOCASESTRSTR() " << prefix << "," << strlen(big) << "," << strlen(little) << endl;
+d1264 2
+d1267 1
+d1275 1
+d1277 1
+d1291 1
+a1291 1
+			cout << "end NOCASESTRSTR() FOUND ONE!" << loop << endl;
+d1296 1
+a1296 1
+	cout << "end NOCASESTRSTR() NOTHING FOUND " << loop << endl;
+@
+
+
+1.17
+log
+@removed MSG_EOR for Digital UNIX
+added setStatFreq(0) for MTCbitsToText - this disables status updates to stderr
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.16 1998/08/19 21:58:38 markc Exp markc $
+d10 4
+d220 4
+a223 3
+	cerr << "WARNING: Although the rest of the NICETEXT system is quite stable" << endl;
+	cerr << "this program is a terrible hack." << endl;
+	cerr << "It is most likely a resource hog and a security risk..." << endl; 
+d345 2
+a346 3
+ * OTHERWISE, SOMEONE COULD REQUEST ANY FILE(S) FROM THE SYSTEM
+ * THAT THE EFFECTIVE-USER-ID OF THE PROCESS CAN SEE
+ * THROUGH THE HTTP PROTOCOLS 
+d358 1
+a358 1
+					MTCstring dataStr;
+d361 2
+a362 1
+					postOp|=((dataStr=noCaseStrStr(recvBuf.c_str(), "NTTPDATA")).length()!=0);
+d405 1
+a405 1
+ 								dataStr+=recvStrBuf(newfd);
+d411 3
+d416 3
+a418 1
+						parseParms(dataStr.c_str(), pdSet);
+d460 2
+d463 1
+d555 1
+a555 1
+<OPTION> King James Bible
+d776 1
+d780 1
+d880 1
+a880 1
+		dictParm+="kj";
+d882 1
+a882 1
+		typeParm+="kj";
+d884 1
+a884 1
+		modelParm+="kj";
+d919 1
+d921 1
+a921 1
+	
+d1019 2
+d1074 1
+a1074 1
+		dictParm+="kj";
+d1076 1
+a1076 1
+		typeParm+="kj";
+d1111 1
+d1244 3
+d1262 2
+d1271 10
+a1280 1
+	for(int i=0; i<strlen(big)||((i==1)&&(prefix==TRUE)); i++)
+d1282 1
+a1282 1
+		int score=0;
+d1284 1
+a1284 1
+		for(int j=0; j<strlen(little)&&((i+j)<strlen(big)); j++)
+d1286 3
+a1288 1
+			if ((tolower(big[i+j])==tolower(little[j])))
+d1292 4
+d1298 1
+a1298 1
+		if (score==strlen(little))
+d1300 1
+d1304 2
+@
+
+
+1.16
+log
+@cast bzero parameters properly
+also, the 1.15 version needed #ifdef's for MSG_EOF, MSG_EOR
+These are being done to port to gcc 2.8.1 on Digital UNIX
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.15 1998/08/19 21:50:05 markc Exp markc $
+d10 5
+d919 2
+a989 3
+#ifdef MSG_EOR
+	if (send(fd, "\n", 1, MSG_EOR)==-1)
+#else
+a990 1
+#endif
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.14 1998/08/19 21:30:50 markc Exp markc $
+d10 3
+d234 1
+a234 1
+	bzero(&(my_addr.sin_zero), sizeof(my_addr.sin_zero));
+@
+
+
+1.14
+log
+@fixed blank messages
+made it look even cleaner
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.13 1998/08/19 20:02:49 markc Exp markc $
+d10 4
+d977 1
+d979 7
+@
+
+
+1.13
+log
+@made it look better
+added exit if I get confused
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.12 1998/08/19 18:18:15 markc Exp markc $
+d10 4
+d514 2
+a515 2
+<H1>NICETEXT Web-Sampler &copy; 1998  -  Primary Input Screen</H1>
+<H3>The purpose of this demo is to convert your message into something 
+d519 1
+a519 1
+your original message!</H3> 
+d522 1
+a522 1
+<H2>Enter a Message:</H2>
+d538 1
+a538 1
+<H2>For more information please see the <A HREF=\"http://www.ctgi.net/\">Official NICETEXT Home Page</A></H2> 
+d668 12
+a679 1
+				paramState=FALSE;
+d690 10
+a699 1
+				value.add(partial);
+a700 1
+				newData.setValue(value.getValue());
+a720 1
+							partial+=(char)nc;
+d722 5
+d732 1
+a732 1
+							DEBUGMSG(cout << "* * * ERROR: I could not read the remaining hex values after a %" <<endl;)
+d801 2
+a802 2
+<H1>NICETEXT Web-Sampler &copy; 1998  -  <I>Nicetext</I>Output Screen</H1>
+<H3>This is the result of the <I>nicetext</I> operation on the message
+d807 1
+a807 1
+use the reload button on your browser for another try!</H3>
+d811 1
+a811 1
+<H2>Here is the <I>NICETEXT</I>:</H2>
+d883 8
+a890 1
+		plainTextFile << ptPtr->getValue() << endl;
+d991 2
+a992 3
+<H1>NICETEXT Web-Sampler &copy; 1998  -  <I>Scrambled</I> Output Screen</H1>
+<H2>Here is the SCRAMBLED Text:</H2> 
+<H3>This page contains the <I>scrambled</I> version of the <I>nicetext</I>
+d996 2
+a997 1
+rather than a problem with the basic transformation software.)</H3>
+d1001 1
+a1001 1
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=10>
+d1064 10
+a1073 1
+		plainTextFile << ptPtr->getValue() << endl;
+@
+
+
+1.12
+log
+@append '/' to workDir
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.11 1998/08/19 15:26:57 markc Exp markc $
+d10 3
+d98 1
+a98 1
+// #define DEBUG 1
+d100 1
+a100 1
+#define DEBUGMSG(x) (x) 
+d459 5
+d507 1
+a507 1
+<TITLE>NICETEXT Input Screen</TITLE> 
+d510 6
+a515 1
+
+d518 1
+d520 1
+a520 2
+Enter a Message:<BR> 
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=10></TEXTAREA> 
+d522 1
+a522 1
+<P>Select a Style:
+d526 1
+a526 1
+<OPTION> Federal Reserve 
+d529 1
+d531 2
+a532 3
+
+<INPUT TYPE=SUBMIT VALUE=\"      Okay       \"> 
+<INPUT TYPE=RESET  VALUE=\"      Clear      \"> 
+d534 1
+d545 8
+a552 3
+	cout << "WARNING: File Request Made "  << file << endl;
+
+	return FALSE;	// disable this function!!!!
+d774 7
+a780 1
+
+d784 2
+a785 2
+Here is the NICETEXT:<BR> 
+<TEXTAREA NAME=PLAINTEXT COLS=80 ROWS=10>
+d817 2
+a818 2
+	case 'F':
+		dictParm+="fedr";
+d820 1
+a820 1
+		typeParm+="fedr";
+d822 1
+a822 1
+		modelParm+="fedr";
+a824 1
+	case 'S':
+a831 8
+/*
+		dictParm+="shak";
+		dictParm+=DICTPARM;
+		typeParm+="shak";
+		typeParm+=TYPEPARM;
+		modelParm+="shak";
+		modelParm+=MODELPARM;
+*/
+d907 1
+a907 1
+<P>
+d924 3
+a926 3
+	os.add("</P>
+<INPUT TYPE=SUBMIT VALUE=\"      Okay       \"> 
+<INPUT TYPE=RESET  VALUE=\"      Clear      \"> 
+d957 7
+a966 1
+Here is the SCRAMBLED Text:<BR> 
+a994 6
+		typeParm+=TYPEPARM;
+		break;
+	case 'F':
+		dictParm+="fedr";
+		dictParm+=DICTPARM;
+		typeParm+="fedr";
+@
+
+
+1.11
+log
+@added command-line parameters
+@
+text
+@d7 1
+a7 1
+ * $Id: nttpd.cc,v 1.10 1998/08/17 15:23:14 markc Exp markc $
+d10 3
+d145 4
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@d3 1
+a3 1
+ * Copyright (c) Mark T. Chapman 1996,1997
+d5 3
+a7 1
+ * $Id: nttpd.cc,v 1.9 1998/07/13 18:23:11 markc Exp markc $
+d10 3
+d88 1
+a88 2
+#define LOGDIR  "/tmp"  // where to write the log files
+#define WORKDIR  "../../database/"  // location of dictionary and style source files
+d92 7
+d118 1
+d124 4
+a127 3
+#ifdef DEBUG
+void testStrList();
+#endif DEBUG
+d129 1
+a129 1
+int main()
+d131 66
+d211 1
+a211 1
+	my_addr.sin_port = htons(MYPORT);
+a233 1
+		cout << "Server got a connection from " << inet_ntoa(their_addr.sin_addr) << endl;
+d235 3
+a237 1
+		// spawn child process
+d239 4
+a242 2
+		if (!fork())
+		{
+d249 1
+a249 1
+				cout << "START OF REQUEST" << endl;
+d255 10
+d267 1
+a267 1
+					cout << "EMPTY RECEIVE BUFFER - ";
+d271 1
+a271 1
+						cout << "KEEPALIVE ON" << endl;
+d277 1
+a277 1
+						cout << "NO KEEPALIVE" << endl;
+d286 1
+a286 1
+				cout << "CHECKING FOR KEEP-ALIVE..." << endl;
+d291 1
+a291 1
+					cout << "KEEPALIVE SET TO TRUE!" << endl;
+d294 1
+a294 1
+				cout << "{" << recvBuf << "}[" << recvBuf.length() << "]" << endl;
+d299 1
+a299 1
+					cout << "GET REQUEST" << endl;
+a311 1
+
+d313 5
+a323 1
+
+d335 1
+a335 1
+						cout << "POST OPERATION" << endl;
+d343 1
+a343 1
+							cout << "LENGTHSTR IS LESS THAN CONTENT_LENGTH_STR" << endl;
+d356 2
+a357 1
+						cout << "LENGTH OF REQUEST: " << requestLength << endl;
+d361 1
+a361 1
+								cout << "REQUEST LENGTH WAS ZERO  - I'm outta here..." << endl;
+d366 1
+a366 1
+						cout << "DATASTR LENGTH: " << dataStr.length() << endl;
+d370 1
+a370 1
+							cout << "READING MORE DATA..." << endl;
+d375 1
+a375 1
+								cout << "DATASTR LENGTH: " << dataStr.length() << endl;
+d377 1
+a377 1
+							cout << "DONE ADDING TO DATASTR" << endl;
+d394 1
+a394 1
+								cout << "INVALID POST REQUEST" << endl;
+d411 1
+a411 1
+								cout << "SENDING NICETEXT" << endl;
+d423 1
+a423 1
+								cout << "SENDING SCRAMBLED TEXT" << endl;
+d435 1
+a435 1
+								cout << "BAD POST - SENDING INITIAL" << endl;
+d448 1
+a448 1
+						cout << "Confused...!!!" << endl;
+d451 1
+a451 1
+							cout << "CONTINUING..." << endl;
+d489 1
+a489 1
+	cout << "INITIAL REQUEST." << endl;
+d524 4
+a527 1
+	cout << "File Request: "  << file << endl;
+d604 1
+a604 1
+	cout << "Parsing Parameters..." << endl;
+d679 1
+a679 1
+							cout << "* * * ERROR: I could not read the remaining hex values after a %" <<endl;
+d698 1
+a698 1
+	cout << "PARSEPARMS:" << ptr << ":" << endl;
+d711 1
+a711 1
+		cout << aPD->getParam() << "=" << aPD->getValue() << endl;
+d715 1
+a715 1
+		cout << "* * * * * ERROR: NULL VALUE FOR POST DATA PTR" << endl;
+d756 1
+a756 1
+	MTCstring plainTextFileName(tempnam(TMPDIR, "nttp-pt"));
+d774 1
+a774 1
+	MTCstring dictParm(WORKDIR), typeParm(WORKDIR), modelParm(WORKDIR);
+d818 1
+a818 1
+		dictParm=WORKDIR;
+d850 1
+a850 1
+			MTCstring niceTextFileName(tempnam(TMPDIR, "nttp-nt"));
+d914 1
+a914 1
+	cout << "SENDING STOP" << endl;
+d941 1
+a941 1
+	MTCstring plainTextFileName(tempnam(TMPDIR, "nttp-pt"));
+d959 1
+a959 1
+	MTCstring dictParm(WORKDIR), typeParm(WORKDIR);
+d975 5
+a984 6
+/*
+		dictParm+="shak";
+		dictParm+=DICTPARM;
+		typeParm+="shak";
+		typeParm+=TYPEPARM;
+*/
+d993 1
+a993 1
+		dictParm=WORKDIR;
+d1026 1
+a1026 1
+			MTCstring niceTextFileName(tempnam(TMPDIR, "nttp-nt"));
+d1110 3
+a1112 3
+	cout << "RESPONSE:" << endl;
+	cout << header;
+	cout << os.getValue().c_str() << endl;
+d1114 1
+a1114 1
+	cout << "END OF RESPONSE" << endl;
+d1183 2
+a1184 2
+#ifdef DEBUG
+void testStrList()
+d1186 7
+a1192 6
+	int c;
+
+	cout << "Enter the number of adds before compressing:" << endl;
+	cin >> c;
+
+	MTCstringList l;
+a1193 14
+	for(;;)
+	{
+		for(int i=0; i< c; i++)
+		{
+			MTCstring t;
+			cin >> t; 
+			l.add(t);
+		}
+		cout << "The Value is: " << endl;
+		cout << l.getValue() << endl;;
+		cout << "The length is: " << l.length() << endl;
+	}
+
+	exit(0);
+a1194 1
+#endif DEBUG
+@
+
+
+1.9
+log
+@It's working again - using stringLists instead of strings
+this is much more efficient
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.8 1997/08/28 05:05:01 markc Exp $
+d8 4
+d78 1
+a78 1
+#include "../include/strlst.h"
+a649 1
+<FONT COLOR=\"#FF0000\">WARNING: There may be some problems with the format of this page.  This is due to the incomplete HTTP/1.0 protocol implementation, not a result of the NICETEXT transformation.</FONT>
+a834 1
+<FONT COLOR=\"#FF0000\">WARNING: It is possible that even that you did not edit the NICETEXT on the previous screen the text below might not match the data entered on the first input screen.  This is due to the incomplete HTTP/1.0 protocol implementation, not a result of the NICETEXT transformation.</FONT>
+@
+
+
+1.8
+log
+@NOT WORKING
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.7 1997/08/28 02:10:11 markc Exp markc $
+d8 4
+d80 1
+a80 1
+#define WORKDIR  "../../work/"  // location of dictionary and style source files
+a159 1
+			BOOL firstPass=TRUE;
+d165 1
+a165 3
+				MTCstringList recvBuf;
+
+				recvBuf.add(recvStrBuf(newfd));
+d192 1
+a192 1
+				if ((keepAlive==FALSE)&&(noCaseStrStr(recvBuf.getValue().c_str(), "Connection: Keep-Alive")!=NULL))
+d198 1
+a198 1
+				cout << "{" << recvBuf.getValue() << "}[" << recvBuf.length() << "]" << endl;
+d201 1
+a201 3
+				cout << "CHECKING FOR GET REQUEST... " << endl;
+
+				if ((firstPass==TRUE)&&(recvBuf.length()>=6)&&(strncmp(recvBuf.getValue().c_str(), "GET /", 5)==0))
+d207 1
+a207 1
+					if ((recvBuf.length()>=6)&&(recvBuf.getValue().c_str()[5]==' '))
+d230 1
+d232 1
+a232 10
+					cout << "CHECKING FOR POST REQUEST..." << endl;
+					BOOL postOp;
+
+					if (recvBuf.length()>=6)
+					{
+						postOp=(strncmp(recvBuf.getValue().c_str(), "POST /", 6)==0);
+					}
+
+					cout << "CHECKING FOR NTTPDDATA..." << endl;
+					postOp|=((dataStr=noCaseStrStr(recvBuf.getValue().c_str(), "NTTPDATA")).length()!=0);
+d240 1
+a240 3
+						cout << "CHECKING FOR CONTENT LENGTH" << endl;
+
+						MTCstring lengthStr=noCaseStrStr(recvBuf.getValue().c_str(), CONTENT_LENGTH_STR); 
+a257 1
+
+a265 1
+
+d300 1
+a300 1
+
+a373 1
+				firstPass=FALSE;
+a389 1
+
+a423 1
+
+d425 1
+d450 24
+d484 1
+a583 1
+			}
+d585 6
+a590 5
+			if (++j>MAX_COLUMN)
+			{
+				value.add(partial);
+				partial="";
+				j=0;
+d693 7
+d706 1
+d758 1
+a799 1
+
+d875 5
+d884 1
+d1013 1
+a1082 1
+
+@
+
+
+1.7
+log
+@Working - but inefficient!
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.6 1997/08/23 02:59:32 markc Exp markc $
+d8 3
+d70 1
+d78 1
+d87 4
+a90 4
+BOOL sendInitial(MTCstring &os);
+BOOL sendFile(MTCstring &os, const char *file, BOOL encode=FALSE, BOOL wordWrap=FALSE);
+BOOL sendNiceText(MTCstring &os, MTCRBT<MTCpostData> &pdSet);
+BOOL sendScramText(MTCstring &os, MTCRBT<MTCpostData> &pdSet);
+d96 1
+a96 1
+BOOL postResponse(MTCstring &os, int fd);
+d104 4
+d156 1
+d162 5
+a166 2
+				MTCstring recvBuf(recvStrBuf(newfd));
+				MTCstring response;
+d183 1
+a183 1
+						response+="ERROR - I AM CONFUSED BY THIS EMPTY REQUEST!\n";
+d189 3
+a191 1
+				if ((keepAlive==FALSE)&&(noCaseStrStr(recvBuf.c_str(), "Connection: Keep-Alive")!=NULL))
+d197 1
+a197 1
+				cout << "{" << recvBuf << "}[" << recvBuf.length() << "]" << endl;
+d200 3
+a202 1
+				if (noCaseStrStr(recvBuf.c_str(), "GET /", TRUE)!=NULL)
+d208 1
+a208 1
+					if ((recvBuf.length()>4)&&(recvBuf.c_str()[5]==' '))
+a230 1
+					BOOL postOp=(noCaseStrStr(recvBuf.c_str(), "POST /", TRUE)!=NULL);
+d232 10
+a241 1
+					postOp|=((dataStr=noCaseStrStr(recvBuf.c_str(), "NTTPDATA")).length()!=0);
+d249 3
+a251 1
+						MTCstring lengthStr=noCaseStrStr(recvBuf.c_str(), CONTENT_LENGTH_STR); 
+d255 1
+d269 10
+d283 2
+d308 6
+a313 1
+								continue;
+d317 1
+a317 1
+								response += "ERROR: INVALID POST REQUEST";
+d349 3
+a351 3
+								response += "POST REQUEST ACCEPTED<BR>Post type:";
+								response += pdPtr->getValue().c_str();
+								response += "<BR>";
+d364 2
+d369 1
+a369 1
+							response +=  "ERROR - I AM CONFUSED ABOUT THIS REQUEST!";
+d385 3
+a387 1
+				response="";
+a398 20
+// send a string to the socket
+
+/*
+BOOL sendStr(int fd, const char *aStr)
+{
+	if (aStr==NULL)
+	{
+		return FALSE;
+	}
+
+	if (send(fd, aStr, strlen(aStr), 0)==-1)
+	{
+		perror("send");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+*/
+
+d401 1
+a401 1
+BOOL sendInitial(MTCstring &os)
+d403 1
+a403 1
+	cout << "Initial Request." << endl;
+d405 1
+a405 1
+ 	os += "<HTML> 
+d430 1
+a430 1
+</HTML>";
+d437 1
+a437 1
+BOOL sendFile(MTCstring &os, const char *file, BOOL encode, BOOL wordWrap)
+d452 1
+a452 1
+			os += "ERROR - I COULD NOT FIND THAT URL";
+d457 1
+a457 1
+		int column=0;
+a461 1
+			column++;
+d463 1
+a463 1
+			if ((encode==TRUE)&&(!isalnum(c)))
+d465 3
+a467 22
+				switch (c) {
+				case ' ':	os += '+';
+						if ((wordWrap==TRUE)&&(column>MAX_COLUMN))
+						{
+							os += "%%0A";
+							column=0;
+						}
+						break;
+				default:
+						if ((wordWrap==TRUE)&&(c=='\n'))
+						{
+							column=0;
+						}
+						os += "%%";
+						int n=(int)c/16;
+						if (n<10) os += (char)n;
+						else os += (char)(n-10+'A');
+						n=(int)c%16;
+						if (n<10) os += (char)n;
+						else os += (char)(n-10+'A');
+				}
+
+d471 1
+a471 1
+				os += c;
+d473 1
+a473 1
+				if (wordWrap==TRUE)
+d475 2
+a476 12
+					if ((column>MAX_COLUMN)&&(c==' '))
+					{
+						os += '\n';
+						column=0;
+					}
+					else 
+					{
+						if (c=='\n')
+						{
+							column=0;
+						}
+					}
+d480 2
+d491 2
+d509 5
+a513 1
+	MTCstring param, value;
+d515 1
+a515 1
+	for(int i=0; i<strlen(ptr); i++)
+d519 2
+d534 1
+a534 1
+			if ((ptr[i]=='&')||(ptr[i]=='\n')||((i+1)==strlen(ptr)))
+d536 3
+a538 1
+				newData.setValue(value);
+d540 1
+a540 1
+				value="";
+d547 1
+a547 1
+					value=value+' ';
+d553 1
+a553 1
+						if ((i+2)<strlen(ptr))
+d559 1
+a559 1
+							value=value+(char)nc;
+d571 1
+a571 1
+						value=value+ptr[i];
+d575 7
+d628 1
+a628 1
+BOOL sendNiceText(MTCstring &os, MTCRBT<MTCpostData> &pdSet)
+d630 1
+a630 1
+	os += "<HTML> 
+d642 1
+a642 1
+";
+d709 1
+a709 1
+		os += "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE NICETEXT SYSTEM<BR>";
+d721 1
+a721 1
+			os += "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT";
+d726 1
+a726 1
+			os += "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>";
+d734 1
+a734 1
+				os += "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>";
+d739 1
+a739 1
+				os += "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>";
+d743 1
+a743 1
+				os += "SORRY, I COULD NOT OPEN THE MODEL DATABASE<BR>";
+d747 1
+a747 1
+				os += "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>";
+d754 1
+a754 1
+				sendFile(os, niceTextFileName.c_str(), FALSE, TRUE);
+d761 1
+a761 1
+	os += "</TEXTAREA> 
+d764 1
+a764 1
+<INPUT TYPE=HIDDEN NAME=STYLE VALUE=\"";
+d766 1
+a766 1
+	os += formStyle.c_str();
+d768 1
+a768 1
+	os += "\">Style:";
+d770 1
+a770 1
+	os += formStyle.c_str();
+d772 1
+a772 1
+	os += "\n";
+d776 2
+a777 2
+		os +=  "... with a larger dictionary.
+<INPUT TYPE=HIDDEN NAME=BIGDICT VALUE=\"YES\">";
+d780 1
+a780 1
+	os += "</P>
+d787 1
+a787 1
+";
+d806 1
+a806 1
+BOOL sendScramText(MTCstring &os, MTCRBT<MTCpostData> &pdSet)
+d808 1
+a808 1
+	os += "<HTML> 
+d820 1
+a820 1
+";
+d879 1
+a879 1
+		os += "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE SCRAMBLE SYSTEM";
+d891 1
+a891 1
+			os += "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT";
+d896 1
+a896 1
+			os += "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>";
+d906 1
+a906 1
+				os += "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>";
+d911 1
+a911 1
+				os += "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>";
+d915 1
+a915 1
+				os += "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>";
+d922 1
+a922 1
+				sendFile(os, niceTextFileName.c_str(), FALSE);
+d929 1
+a929 1
+	os += "
+d938 1
+a938 1
+";
+d975 1
+a975 1
+BOOL postResponse(MTCstring &os, int fd)
+d988 1
+a988 1
+	cout << os.c_str() << endl;
+d993 1
+a993 1
+	for(int i=0; i<l; i++)
+d995 12
+a1006 1
+		send(fd, &os.c_str()[i], 1, 0);
+d1058 27
+@
+
+
+1.6
+log
+@Fixed it!
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.5 1997/08/22 12:33:07 markc Exp markc $
+d8 3
+d214 3
+d218 1
+a218 1
+					if ((noCaseStrStr(recvBuf.c_str(), "POST /", TRUE)!=NULL)||((dataStr=noCaseStrStr(recvBuf.c_str(), "NTTPDATA")).length()!=0))
+d250 1
+d497 1
+a497 1
+	char *ptr=noCaseStrStr(aStr, "NTTPDATA");
+d975 4
+a978 1
+	send(fd, os.c_str(), l, 0);
+@
+
+
+1.5
+log
+@Switched to MTCstring from strstream
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.4 1997/08/22 12:21:01 markc Exp markc $
+d8 3
+d70 1
+a70 1
+#define MAX_COLUMN 76   // when to wrap words
+d76 2
+a77 1
+#define MAX_BUFFER 655360 
+d89 2
+a142 1
+			char buffer[MAX_BUFFER+1];
+d144 1
+a144 1
+			ssize_t size;
+d149 1
+d152 1
+a152 9
+/*
+				if (response==NULL)
+				{
+					perror("StrStream Allocation");
+					closeAndExit(newfd);
+				}
+*/
+
+				if ((size=recv(newfd, buffer, MAX_BUFFER, 0))==-1)
+d154 1
+a154 1
+					cout << "SIZE==-1 and ";
+d158 1
+a158 1
+						cout << "KEEPALIVE" << endl;
+d173 1
+a173 8
+				buffer[size]=NULL;
+
+				if (keepAlive==FALSE)
+				{
+					//sendHeader(response);
+				}
+
+				if ((keepAlive==FALSE)&&(strstr(buffer, "Connection: Keep-Alive")!=NULL))
+d179 1
+a179 1
+				cout << "{" << buffer << "}[" << size << "]" << endl;
+d182 1
+a182 1
+				if (strncmp(buffer, "GET /", 5)==0)
+d188 1
+a188 1
+					if (buffer[5]==' ')
+d210 3
+a212 1
+					if ((strncmp(buffer, "POST /", 6)==0)||(strstr(buffer, "NTTPDATA")!=NULL))
+d215 31
+d248 1
+a248 1
+						parseParms(buffer, pdSet);
+d490 1
+a490 1
+	char *ptr=strstr(aStr, "NTTPDATA");
+d611 1
+d789 1
+d971 47
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d5 1
+a5 1
+ * $Id: nttpd.cc,v 1.3 1997/08/20 01:41:18 markc Exp markc $
+d8 3
+d75 4
+a78 4
+BOOL sendInitial(strstream &os);
+BOOL sendFile(strstream &os, const char *file, BOOL encode=FALSE, BOOL wordWrap=FALSE);
+BOOL sendNiceText(strstream &os, MTCRBT<MTCpostData> &pdSet);
+BOOL sendScramText(strstream &os, MTCRBT<MTCpostData> &pdSet);
+d84 1
+a84 1
+BOOL postResponse(strstream &os, int fd);
+d144 1
+a144 1
+				strstream *response=new strstream;
+d146 1
+d152 1
+d169 2
+a170 2
+						*response <<  "ERROR - I AM CONFUSED BY THIS EMPTY REQUEST!\n";
+						postResponse(*response, newfd);
+d179 1
+a179 1
+					//sendHeader(*response);
+d199 1
+a199 1
+						sendInitial(*response);
+d205 1
+a205 1
+						sendInitial(*response);
+d208 1
+a208 1
+						 sendFile(*response, strtok(&buffer[5], " "));
+d211 1
+a211 1
+						postResponse(*response, newfd);
+d241 1
+a241 1
+								*response <<  "ERROR: INVALID POST REQUEST";
+d249 1
+a249 1
+								sendNiceText(*response, pdSet);
+d253 1
+a253 1
+									postResponse(*response, newfd);
+d261 1
+a261 1
+								sendScramText(*response, pdSet);
+d264 1
+a264 1
+									postResponse(*response, newfd);
+d273 3
+a275 1
+								*response << "POST REQUEST ACCEPTED<BR>Post type:" << pdPtr->getValue().c_str() << "<BR>";
+d277 1
+a277 1
+								sendInitial(*response);
+d291 1
+a291 1
+							*response <<  "ERROR - I AM CONFUSED ABOUT THIS REQUEST!";
+d298 1
+a298 1
+					postResponse(*response, newfd);
+d303 1
+a303 3
+					postResponse(*response, newfd);
+					delete response;
+					response=NULL;
+d307 1
+a307 5
+				if (response!=NULL)
+				{
+					delete response;
+					response=NULL;
+				}
+d341 1
+a341 1
+BOOL sendInitial(strstream &os)
+d345 1
+a345 1
+ 	os << "<HTML> 
+d377 1
+a377 1
+BOOL sendFile(strstream &os, const char *file, BOOL encode, BOOL wordWrap)
+d392 1
+a392 1
+			os << "ERROR - I COULD NOT FIND THAT URL";
+d407 1
+a407 1
+				case ' ':	os << '+';
+d410 1
+a410 1
+							os << "%%0A";
+d419 1
+a419 1
+						os << "%%";
+d421 2
+a422 2
+						if (n<10) os << (char)n;
+						else os << (char)(n-10+'A');
+d424 2
+a425 2
+						if (n<10) os << (char)n;
+						else os << (char)(n-10+'A');
+d431 1
+a431 1
+				os << c;
+d437 1
+a437 1
+						os << '\n';
+d579 1
+a579 1
+BOOL sendNiceText(strstream &os, MTCRBT<MTCpostData> &pdSet)
+d581 1
+a581 1
+	os << "<HTML> 
+d659 1
+a659 1
+		os << "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE NICETEXT SYSTEM<BR>";
+d671 1
+a671 1
+			os << "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT";
+d676 1
+a676 1
+			os << "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>";
+d684 1
+a684 1
+				os << "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>";
+d689 1
+a689 1
+				os << "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>";
+d693 1
+a693 1
+				os << "SORRY, I COULD NOT OPEN THE MODEL DATABASE<BR>";
+d697 1
+a697 1
+				os << "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>";
+d711 1
+a711 2
+	os << "
+</TEXTAREA> 
+d716 1
+a716 1
+	os << formStyle.c_str();
+d718 1
+a718 1
+	os << "\">Style:";
+d720 1
+a720 1
+	os << formStyle.c_str();
+d722 1
+a722 1
+	os << "\n";
+d726 1
+a726 1
+		os <<  "... with a larger dictionary.
+d730 1
+a730 1
+	os << "</P>
+d756 1
+a756 1
+BOOL sendScramText(strstream &os, MTCRBT<MTCpostData> &pdSet)
+d758 1
+a758 1
+	os << "<HTML> 
+d828 1
+a828 1
+		os << "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE SCRAMBLE SYSTEM";
+d840 1
+a840 1
+			os << "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT";
+d845 1
+a845 1
+			os << "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>";
+d855 1
+a855 1
+				os << "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>";
+d860 1
+a860 1
+				os << "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>";
+d864 1
+a864 1
+				os << "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>";
+d878 1
+a878 1
+	os << "
+d924 1
+a924 1
+BOOL postResponse(strstream &os, int fd)
+d926 1
+a926 1
+	int l=strlen(os.str());
+d937 1
+a937 1
+	cout << os.str() << endl;
+d942 1
+a942 1
+	send(fd, os.str(), l, 0);
+@
+
+
+1.3
+log
+@Added word-wrap
+Added strstream for Content-length:
+@
+text
+@d5 6
+a10 1
+ * $Id: nttp.cc,v 1.2 1997/08/18 19:40:17 markc Exp markc $
+a11 1
+ * $Log: nttp.cc,v $
+d141 7
+a147 1
+				strstream response;
+d164 2
+a165 2
+						response <<  "ERROR - I AM CONFUSED BY THIS EMPTY REQUEST!\n";
+						postResponse(response, newfd);
+d174 1
+a174 1
+					//sendHeader(response);
+d194 1
+a194 1
+						sendInitial(response);
+d200 1
+a200 1
+						sendInitial(response);
+d203 1
+a203 1
+						 sendFile(response, strtok(&buffer[5], " "));
+d205 2
+a206 2
+						response << "<HTML><HEAD><TITLE><ERROR - URL NOT AVAILABLE></TITLE></HEAD><BODY>THE URL REQUESTED IS NOT AVAILABLE AT THIS TIME<BR></BODY></HTML>");
+						postResponse(response, newfd);
+d236 1
+a236 1
+								response <<  "ERROR: INVALID POST REQUEST";
+d244 1
+a244 1
+								sendNiceText(response, pdSet);
+d248 1
+a248 1
+									postResponse(response, newfd);
+d256 1
+a256 1
+								sendScramText(response, pdSet);
+d259 1
+a259 1
+									postResponse(response, newfd);
+d268 1
+a268 1
+								response << "POST REQUEST ACCEPTED<BR>Post type:" << pdPtr->getValue().c_str() << "<BR>";
+d270 1
+a270 1
+								sendInitial(response);
+d284 1
+a284 1
+							response <<  "ERROR - I AM CONFUSED ABOUT THIS REQUEST!";
+d291 1
+a291 1
+					postResponse(response, newfd);
+d296 3
+a298 1
+					postResponse(response, newfd);
+d301 6
+d414 4
+d432 1
+a432 1
+				if ((wordWrap==TRUE)&&(column>MAX_COLUMN)&&(c==' '))
+d434 12
+a445 2
+					os << '\n';
+					column=0;
+@
+
+
+1.2
+log
+@Added scramble
+@
+text
+@d5 1
+a5 1
+ * $Id: nttp.cc,v 1.1 1997/08/18 03:44:49 markc Exp markc $
+d8 3
+d30 1
+d60 1
+d66 1
+a66 1
+#define MAX_BUFFER 10239 
+d68 4
+a71 5
+BOOL sendStr(int fd, const char *aStr);
+BOOL sendInitial(int fd);
+BOOL sendFile(int fd, const char *file, BOOL encode=FALSE);
+BOOL sendNiceText(int fd, MTCRBT<MTCpostData> &pdSet);
+BOOL sendScramText(int fd, MTCRBT<MTCpostData> &pdSet);
+d76 3
+d137 3
+a139 1
+				if ((size=recv(newfd, &buffer, MAX_BUFFER, 0))==-1)
+d147 1
+a147 2
+						close(newfd);
+						exit(0);
+d153 4
+a156 3
+						sendStr(newfd, "ERROR - I AM CONFUSED BY THIS EMPTY REQUEST!");
+						close(newfd);
+						exit(0);
+d162 5
+d184 1
+a184 1
+						sendInitial(newfd);
+d190 1
+a190 1
+						sendInitial(newfd);
+d193 1
+a193 1
+						 sendFile(newfd, strtok(&buffer[5], " "));
+d195 3
+a197 3
+						sendStr(newfd, "<HTML><HEAD><TITLE><ERROR - URL NOT AVAILABLE></TITLE></HEAD><BODY>THE URL REQUESTED IS NOT AVAILABLE AT THIS TIME<BR></BODY></HTML>");
+						close(newfd);
+						exit(0);
+d226 1
+a226 1
+								sendStr(newfd, "ERROR: INVALID POST REQUEST");
+d234 1
+a234 1
+								sendNiceText(newfd, pdSet);
+d237 2
+d240 1
+a240 2
+									close(newfd);
+									exit(0);
+d246 1
+a246 1
+								sendScramText(newfd, pdSet);
+d249 1
+d251 2
+a252 2
+									close(newfd);
+									exit(0);
+d258 1
+a258 3
+								sendStr(newfd, "POST REQUEST ACCEPTED<BR>Post type:");
+								sendStr(newfd, pdPtr->getValue().c_str());
+								sendStr(newfd, "<BR>");
+d260 1
+a260 1
+								sendInitial(newfd);
+d274 1
+a274 1
+							sendStr(newfd, "ERROR - I AM CONFUSED ABOUT THIS REQUEST!");
+d281 1
+d286 2
+a287 2
+					close(newfd);
+					exit(0);
+d302 1
+d318 1
+d322 1
+a322 1
+BOOL sendInitial(int fd)
+d326 1
+a326 2
+char pageStr[] = "
+<HTML> 
+d353 1
+a353 1
+	return sendStr(fd, pageStr);
+d358 1
+a358 1
+BOOL sendFile(int fd, const char *file, BOOL encode)
+d373 1
+a373 1
+			sendStr(fd, "ERROR - I COULD NOT FIND THAT URL");
+d378 1
+d383 1
+a386 2
+				MTCstring replace;
+
+d388 6
+a393 1
+				case ' ':	replace="+";
+d396 1
+a396 1
+						replace="%";
+d398 2
+a399 2
+						if (n<10) replace+=(char)n;
+						else replace+=(char)(n-10+'A');
+d401 2
+a402 2
+						if (n<10) replace+=(char)n;
+						else replace+=(char)(n-10+'A');
+a404 1
+				sendStr(fd, replace.c_str());
+d406 3
+d410 5
+a414 3
+			if (send(fd, &c, 1, 0)==-1)
+			{
+				return FALSE;
+d546 1
+a546 1
+BOOL sendNiceText(int fd, MTCRBT<MTCpostData> &pdSet)
+d548 1
+a548 2
+	sendStr(fd, " 
+<HTML> 
+d559 1
+a559 1
+");
+d626 1
+a626 1
+		sendStr(fd, "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE NICETEXT SYSTEM<BR>");
+d638 1
+a638 1
+			sendStr(fd, "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT");
+d643 1
+a643 1
+			sendStr(fd, "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>");
+d651 1
+a651 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>");
+d656 1
+a656 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>");
+d660 1
+a660 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE MODEL DATABASE<BR>");
+d664 1
+a664 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>");
+d671 1
+a671 1
+				sendFile(fd, niceTextFileName.c_str());
+d678 1
+a678 1
+	sendStr(fd, "
+d682 1
+a682 1
+<INPUT TYPE=HIDDEN NAME=STYLE VALUE=\"");
+d684 1
+a684 1
+	sendStr(fd, formStyle.c_str());
+d686 1
+a686 4
+	sendStr(fd, "\">
+Style:
+");
+	sendStr(fd, formStyle.c_str());
+d688 3
+a690 2
+	sendStr(fd, "
+");
+d694 2
+a695 4
+		sendStr(fd, "
+... with a larger dictionary.
+<INPUT TYPE=HIDDEN NAME=BIGDICT VALUE=\"YES\">
+");
+d698 1
+a698 2
+	sendStr(fd, "
+</P>
+d705 1
+a705 1
+");
+d714 1
+a714 1
+	if (send(fd, "", 0, MSG_EOF)==-1)
+d724 1
+a724 1
+BOOL sendScramText(int fd, MTCRBT<MTCpostData> &pdSet)
+d726 1
+a726 2
+	sendStr(fd, " 
+<HTML> 
+d737 1
+a737 1
+");
+d796 1
+a796 1
+		sendStr(fd, "SORRY, I COULD NOT SEND THE PLAINTEXT TO THE SCRAMBLE SYSTEM");
+d808 1
+a808 1
+			sendStr(fd, "SORRY, I DID NOT HAVE ENOUGH MEMORY TO CREATE THE CONVERTER OBJECT");
+d813 1
+a813 1
+			sendStr(fd, "SORRY, I COULD NOT RECEIVE THE PLAINTEXT FROM THE NICETEXT SYSTEM<BR>");
+d823 1
+a823 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE PLAINTEXT DATABASE<BR>");
+d828 1
+a828 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE TYPE DATABASE<BR>");
+d832 1
+a832 1
+				sendStr(fd, "SORRY, I COULD NOT OPEN THE DICTIONARY DATABASE<BR>");
+d839 1
+a839 1
+				sendFile(fd, niceTextFileName.c_str());
+d846 1
+a846 1
+	sendStr(fd, "
+d855 1
+a855 1
+");
+d857 1
+d882 25
+d908 6
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 5
+a9 1
+ * $Id$
+a10 1
+ * $Log$
+d71 1
+d121 2
+d844 17
+@

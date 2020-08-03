@@ -1,0 +1,1584 @@
+head	1.9;
+access;
+symbols;
+locks;
+comment	@ * @;
+
+
+1.9
+date	98.07.13.18.30.19;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	97.03.05.19.50.40;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	97.02.16.06.03.43;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	97.02.16.02.56.17;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.20.14.24.38;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.20.12.47.16;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.20.10.56.26;	author markc;	state Exp;
+branches
+	1.2.1.1;
+next	1.1;
+
+1.1
+date	96.01.14.13.49.53;	author markc;	state Exp;
+branches;
+next	;
+
+1.2.1.1
+date	96.01.20.12.57.20;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial copy from bst.h
+,
+@
+
+
+1.9
+log
+@fixed copyright
+@
+text
+@
+/*
+ * MTC++ Red Black Tree -- Balance Binary Tree Template
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * class MTCRBT -- Red Black Tree -- allows one instance of a nodev 
+ *
+ * $Id: rbt.h,v 1.8 1997/03/05 19:50:40 markc Exp markc $
+ *
+ * $Log: rbt.h,v $
+ * Revision 1.8  1997/03/05 19:50:40  markc
+ * Added destructor for MTCRBTFREQ
+ *
+ * Revision 1.7  1997/03/05 15:58:28  markc
+ * Added static char rcsid []  = "@@(#)$Id: rbt.h,v 1.8 1997/03/05 19:50:40 markc Exp markc $";
+ *
+ * Revision 1.6  1997/02/16 06:03:43  markc
+ * Added MTCRBTFreq() class
+ *
+ * Revision 1.5  1997/02/16 02:56:17  markc
+ * added findClosestSmaller() method
+ *
+ * Revision 1.4  1996/01/20 14:24:38  markc
+ * it seems to work -- used different approach
+ *
+ * Revision 1.3  1996/01/20  12:47:16  markc
+ * skip this version
+ *
+ * Revision 1.2  1996/01/20  10:56:26  markc
+ * not working yet.
+ *
+ * Revision 1.1  1996/01/14  13:49:53  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef  __RBT_H_
+#define  __RBT_H_
+
+static char rcsid__RBT_H_ []  = "@@(#)$Id: rbt.h,v 1.8 1997/03/05 19:50:40 markc Exp markc $";
+
+#define RBT_RED		0	
+#define RBT_BLACK	1
+
+// red-black binary search tree node template
+
+template <class T> 
+class MTCRBTNode {
+public: 			// (should be protected)	
+	short color;		// is this a red or black node?
+	T v;			// the v of this RBTnode	
+        MTCRBTNode <T> * l;  	// RBTnode < v
+	MTCRBTNode <T> * r;	// RBTnode > v
+	MTCRBTNode <T> * p;	// parent
+public:
+	MTCRBTNode() : l(NULL), r(NULL), p(NULL), color(RBT_BLACK) {};
+        MTCRBTNode(T & v) : l(NULL), r(NULL), p(NULL), color(RBT_BLACK), v(v) 
+		{};
+	virtual ~MTCRBTNode() 
+		{ if (l) delete l; if (r) delete r; r=l=NULL; };
+};
+
+// red-black binary search tree with frequency count node template
+
+template <class T>
+class MTCRBTNodeFreq : public MTCRBTNode<T> {	       
+public:
+        long count;             // the magnitude of this RBTnode
+public:
+	MTCRBTNodeFreq() { count=1; };
+	MTCRBTNodeFreq(T & aT) : MTCRBTNode <T> (aT) { count=1; };
+	virtual ~MTCRBTNodeFreq() {}; 
+};
+
+// red black tree template
+
+template <class T> 
+class MTCRBT  {
+protected:
+	MTCRBTNode <T> * root;
+	MTCRBTNode <T> * current;  
+	virtual MTCRBTNode <T> * createNewNode(T &); 
+
+	void rotateLeft(MTCRBTNode <T> *x);
+	void rotateRight(MTCRBTNode <T> *y);
+
+	void forEachNode(MTCRBTNode <T> *, void (*doIt)(T *));
+
+	long count;
+	
+public:
+	MTCRBT() : count(0), root(NULL) {};
+	virtual ~MTCRBT() { if (root) delete root; root=NULL; };
+	virtual int add(T &, BOOL overwrite=FALSE);
+	T * find(T &); 
+	T * findClosestSmaller(T &); 
+	T * getLowest();
+	long getCount() const { return count; };
+	void clear() { if (root) delete root; root=NULL; count=0; };;
+	void forEach(void (*doIt)(T *));
+#ifdef DEBUG
+	virtual void dump();
+	virtual void dumpNode(MTCRBTNode <T> * );
+#endif // DEBUG
+};
+
+// red-black binary search tree with freq count node template
+ 
+template <class T>
+class MTCRBTFreq : public MTCRBT <T> {
+  protected:
+	virtual MTCRBTNode <T> * createNewNode(T &); 
+	void forEachNodeFreq(MTCRBTNodeFreq <T> *, void (*doIt)(T *, long));
+
+  public:
+	virtual ~MTCRBTFreq() { return; };
+        virtual int add(T &, BOOL overwrite=FALSE);
+	void forEachFreq(void (*doIt)(T *, long));
+#ifdef DEBUG
+	virtual void dump();
+	virtual void dumpNode(MTCRBTNodeFreq <T> * );
+#endif // DEBUG
+};
+
+// create a new node
+
+template <class T>
+inline MTCRBTNode <T> * MTCRBT <T>::createNewNode(T &v)
+{
+	MTCRBTNode <T> * newNode = new MTCRBTNode <T> (v);
+
+	if (newNode==NULL)
+	{
+		perror("MTCRBT::createNewNode()");
+		abort();
+	}
+
+	count++;
+
+	return newNode;
+}
+
+// create a new FREQ node
+
+template <class T>
+inline MTCRBTNode <T> * MTCRBTFreq <T>:: createNewNode(T &aT)
+{
+	MTCRBTNode <T> * newNode = new MTCRBTNodeFreq <T> (aT);
+
+	if (newNode==NULL)
+	{
+		perror("MTCRBTFreq::createNewNode()");
+		abort();
+	}
+
+	count++;
+
+	return newNode;
+}
+
+// rotateLeft method
+
+template <class T> 
+inline void MTCRBT <T>::rotateLeft(MTCRBTNode <T> *x)
+{
+	MTCRBTNode <T> *y=x->r;	// set y
+	
+	if (y==NULL) 
+	{
+		errorMsg(EMT_ERROR, "I cannot rotate l a node with a NULL r subtree", "MTCRBT<T>::rotateLeft()"); 
+		return;
+	}
+
+	x->r=y->l;		// turn y's l subtree into x's r subtree
+
+	if (y->l!=NULL) y->l->p=x; 	// change y.l's parent to x	
+
+	y->p=x->p;		// link x's parent to y 
+
+	if (x->p==NULL)
+	{
+		root=y;
+	}
+	else
+	{
+		if (x==x->p->l)	x->p->l=y;
+		else 		x->p->r=y;
+	}
+
+	y->l=x;			// put x on y's l
+	x->p=y;
+
+	return;
+}
+
+// rotateRight method
+
+template <class T> 
+inline void MTCRBT <T>::rotateRight(MTCRBTNode <T> *y)
+{
+	MTCRBTNode <T> *x=y->l;		// set x
+	
+	if (x==NULL) 
+	{
+		errorMsg(EMT_ERROR, "I cannot rotate r a node with a NULL l subtree", "MTCRBT<T>::rotateRight()"); 
+		return;
+	}
+
+	y->l=x->r;		// turn x's r subtree into y's l subtree
+
+	if (x->r!=NULL) x->r->p=y; 	// change x.r's parent to y 	
+
+	x->p=y->p;		// link y's parent to x
+
+	if (y->p==NULL)
+	{
+		root=x;
+	}
+	else
+	{
+		if (y==y->p->r)	y->p->r=x;
+		else 		y->p->l=x;
+	}
+
+	x->r=y;			// put y on x's r
+	y->p=x;
+
+	return;
+}
+
+// add a node to the RBT
+
+template <class T> 
+inline int MTCRBT <T>::add(T &v, BOOL overwrite)
+{
+	// is this the first node?
+
+	if (root==NULL)
+	{
+		count=0;
+		root=createNewNode(v);
+		// root->color=RBT_BLACK;	// (implied)
+		// root->p=NULL;		// (implied)
+		return 0;
+	}
+
+	// otherwise, dive deeper!
+
+	current=root;
+	MTCRBTNode <T> *x=NULL;
+
+	for(;;) 
+	{
+		if (v==current->v)
+		{
+			if (overwrite==TRUE)
+			{
+				current->v=v;
+			}
+			return 1;
+		}
+
+		if (v<current->v)
+		{
+			if (current->l==NULL)
+			{
+				x=current->l=createNewNode(v);
+				x->p=current;
+				break;
+			}
+			else
+			{
+				current=current->l;
+			}
+		}
+		else
+		{
+			if (current->r==NULL)
+			{
+				x=current->r=createNewNode(v);
+				x->p=current;
+				break;
+			}
+			else
+			{
+				current=current->r;
+			}
+		}
+	}
+
+	// rb insert
+
+	MTCRBTNode <T> *y=NULL;
+
+	x->color=RBT_RED;
+
+	while ((x!=root)&&(x->p->color==RBT_RED))
+	{
+		if (x->p==x->p->p->l)
+		{
+			y=x->p->p->r;
+
+			if ((y!=NULL)&&(y->color==RBT_RED))
+			{
+				x->p->color=RBT_BLACK;
+				y->color=RBT_BLACK;
+				x->p->p->color=RBT_RED;
+				x=x->p->p;
+			}
+			else
+			{
+				if (x==x->p->r)
+				{
+					x=x->p;
+					rotateLeft(x);
+				}
+				x->p->color=RBT_BLACK;
+				x->p->p->color=RBT_RED;
+				rotateRight(x->p->p);
+			}
+		}
+		else
+		{
+			y=x->p->p->l;
+
+			if ((y!=NULL)&&(y->color==RBT_RED))
+			{
+				x->p->color=RBT_BLACK;
+				y->color=RBT_BLACK;
+				x->p->p->color=RBT_RED;
+				x=x->p->p;
+			}
+			else
+			{
+				if (x==x->p->l)
+				{
+					x=x->p;
+					rotateRight(x);
+				}
+				x->p->color=RBT_BLACK;
+				x->p->p->color=RBT_RED;
+				rotateLeft(x->p->p);
+			}
+		}
+	}
+
+	root->color=RBT_BLACK;
+
+	return 0;
+}
+
+// add a node to the FREQ RBT
+
+template <class T>
+inline int MTCRBTFreq <T>::add(T &aT, BOOL overwrite)
+{
+    int retval;
+
+    if ((retval=MTCRBT <T>::add(aT, overwrite))==1)
+    {		
+	((MTCRBTNodeFreq <T>*)current)->count++;
+    }
+
+    return retval;
+}
+
+// find aNode in the RBT 
+
+template <class T>
+inline T * MTCRBT <T>::find(T &v) 
+{
+	MTCRBTNode <T> *current;
+
+	current=root;
+
+	while (current!=NULL)
+	{
+		if (v==current->v)
+			break;
+
+		if (v<current->v)
+		{
+			current=current->l;
+		}
+		else
+		{
+			current=current->r;
+		}
+	}
+
+	if (current==NULL)
+	{
+		return NULL;
+	}
+
+	return &current->v;
+}
+
+// find in the RBT or find the closest node smaller than v 
+
+template <class T>
+inline T * MTCRBT <T>::findClosestSmaller(T &v) 
+{
+	MTCRBTNode <T> *current;
+	MTCRBTNode <T> *closest=NULL;
+
+	current=root;
+
+	while (current!=NULL)
+	{
+		if (v==current->v)
+		{
+			return &current->v;  // found an exact match! 
+		}
+
+		if (v<current->v)
+		{
+			current=current->l;
+		}
+		else
+		{
+			if (closest==NULL)
+			{
+				closest=current;
+			}
+			else
+			{
+				if (closest->v<current->v)
+				{
+					closest=current;
+				}
+			}
+
+			current=current->r;
+		}
+	}
+
+	if (closest==NULL)
+	{
+		return NULL;
+	}
+
+	return &closest->v;
+}
+
+#ifdef DEBUG
+// dump the nodes in the tree to stdout
+
+template <class T>  
+inline void MTCRBT <T>::dump()
+{
+	dumpNode(root);
+}
+
+// dump the freqnodes to stdout
+
+template <class T>
+inline void MTCRBTFreq <T>::dump()
+{
+	dumpNode(root);
+}
+
+template <class T> 
+inline void MTCRBT <T>::dumpNode(MTCRBTNode <T> *aNodePtr)
+{
+	if (aNodePtr==NULL)
+	{
+		return;
+	}
+
+	cout << "left : " << endl;
+
+	dumpNode(aNodePtr->l);
+
+	cout << "node : " << aNodePtr->v;
+
+	if (aNodePtr->color==RBT_RED)
+	{
+		cout << "\tRED" << endl;
+	}
+	else
+	{
+		cout << "\tBLACK" << endl;
+	}
+
+	cout << "right: " << endl;
+
+	dumpNode(aNodePtr->r);
+}
+
+
+template <class T> 
+inline void MTCRBTFreq <T>::dumpNode(MTCRBTNode <T> *aNodePtr)
+{
+	if (aNodePtr==NULL)
+		return;
+
+	dumpNode(aNodePtr->left);
+
+	cout << ((MTCRBTNodeFreq<T> *)aNodePtr)->count << '\t' << aNodePtr->value << endl;
+
+	dumpNode(aNodePtr->right);
+}
+#endif // DEBUG
+
+// get the lowest v node in the RBT -- kinda like a heap...
+
+template <class T>
+inline T * MTCRBT <T>::getLowest() 
+{
+	MTCRBTNode<T> *current;
+	MTCRBTNode<T> *tempNodePtr=root;
+
+	T * answer=NULL;
+
+	while (tempNodePtr!=NULL)
+	{
+		current=tempNodePtr;
+		answer=&current->v;
+		tempNodePtr=tempNodePtr->l;
+	}
+
+	return answer;
+}
+
+// do something to each of the vs in the tree in order 
+
+template <class T>
+inline void MTCRBT <T>::forEach(void (*doIt)(T *))
+{
+        forEachNode(root, doIt);
+}
+
+template <class T>
+inline void MTCRBT <T>::forEachNode(MTCRBTNode <T> *aNodePtr, void (*doIt)(T *))
+{
+        if (aNodePtr==NULL)
+	{
+                return;
+	}
+
+        forEachNode(aNodePtr->l, doIt);
+
+	doIt(&aNodePtr->v);
+
+        forEachNode(aNodePtr->r, doIt);
+}
+
+// do something to each of the values in the tree in order 
+
+template <class T>
+inline void MTCRBTFreq <T>::forEachFreq(void (*doIt)(T *, long))
+{
+        forEachNodeFreq((MTCRBTNodeFreq <T>*)root, doIt);
+}
+
+template <class T>
+inline void MTCRBTFreq <T>::forEachNodeFreq(MTCRBTNodeFreq <T> *aNodePtr, void (*doIt)(T *, long))
+{
+        if (aNodePtr==NULL)
+                return;
+
+        forEachNodeFreq((MTCRBTNodeFreq <T> *)aNodePtr->l, doIt);
+
+	doIt(&aNodePtr->v, aNodePtr->count);
+
+        forEachNodeFreq((MTCRBTNodeFreq <T> *)aNodePtr->r, doIt);
+}
+
+#endif __RBT_H_
+@
+
+
+1.8
+log
+@Added destructor for MTCRBTFREQ
+@
+text
+@d4 1
+a4 1
+ * Copyr (c) Mark T. Chapman 1995
+d8 1
+a8 1
+ * $Id: rbt.h,v 1.7 1997/03/05 15:58:28 markc Exp markc $
+d11 3
+d15 1
+a15 1
+ * Added static char rcsid []  = "@@(#)$Id$";
+d41 1
+a41 1
+static char rcsid__RBT_H_ []  = "@@(#)$Id: rbt.h,v 1.7 1997/03/05 15:58:28 markc Exp markc $";
+@
+
+
+1.7
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.6 1997/02/16 06:03:43 markc Exp markc $
+d11 3
+d38 1
+a38 1
+static char rcsid__RBT_H_ []  = "@@(#)$Id$";
+d114 1
+@
+
+
+1.6
+log
+@Added MTCRBTFreq() class
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.5 1997/02/16 02:56:17 markc Exp markc $
+d11 3
+d34 2
+@
+
+
+1.5
+log
+@added findClosestSmaller() method
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.4 1996/01/20 14:24:38 markc Exp markc $
+d11 3
+d39 1
+a39 1
+public:
+d53 12
+d71 1
+d97 17
+d132 18
+d238 1
+a238 1
+	MTCRBTNode <T> *current=root;
+d341 15
+d436 1
+a436 1
+// dump the vs in the tree to stdout
+d444 8
+d479 14
+d536 21
+@
+
+
+1.4
+log
+@it seems to work -- used different approach
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.3 1996/01/20 12:47:16 markc Exp markc $
+d11 3
+d70 1
+a296 2
+	// otherwise dive deeper
+
+d320 47
+@
+
+
+1.3
+log
+@skip this version
+@
+text
+@d6 1
+a6 1
+ * class MTCRBT -- Red Black Tree -- allows one instance of a nodekey 
+d8 1
+a8 1
+ * $Id: rbt.h,v 1.2 1996/01/20 10:56:26 markc Exp markc $
+d11 3
+d34 4
+a37 3
+	T key;			// the key of this RBTnode	
+        MTCRBTNode <T> * l;  	// RBTnode < key
+	MTCRBTNode <T> * r;	// RBTnode > key
+a38 1
+	short color;		// is this a red or black node?
+d40 2
+a41 2
+	MTCRBTNode() : l(NULL), r(NULL), p(NULL), color(RBT_RED) {};
+        MTCRBTNode(T & v) : l(NULL), r(NULL), p(NULL), color(RBT_RED), key(v) 
+d44 1
+a44 1
+		{	cerr << "NO DESTRUCTOR HERE" << endl; };
+d53 4
+a57 1
+	virtual MTCRBTNode <T> * createNewNode(T &); 
+a58 1
+	MTCRBTNode <T> * rotate(T &v, MTCRBTNode <T> *y);
+a59 1
+	BOOL overwritten;
+d63 1
+a63 1
+	MTCRBT();
+a65 3
+#ifdef RBT_REMOVE_DEFINED
+	int remove(T &);	// not defined here!!!!
+#endif // RBT_REMOVE_DEFINED
+d69 1
+a69 1
+	//void clear() { if (root) delete root; root=NULL; count=0; };;
+a76 15
+// constructor
+
+template <class T>
+inline MTCRBT <T>::MTCRBT()
+	: count(0) 
+{
+	T v;			// ASSUMPTION -- DEFAULT T IS LOWEST VALUE!
+	z=createNewNode(v);
+	z->l=z; z->r=z; z->red=FALSE;
+	root=createNewNode(v);
+	root->key=v;
+	root->r=z;
+	root->l=z;
+}
+
+d95 1
+a95 1
+// split method -- RBT
+d97 2
+a98 2
+template <class T>
+inline MTCRBTNode <T> * MTCRBT <T>::split(T &v, MTCRBTNode <T> *gg, MTCRBTNode <T> *g, MTCRBTNode <T> *p, MTCRBTNode <T> *x)  
+d100 7
+a106 1
+	x->red=TRUE; x->l->red=FALSE; x->r->red=FALSE;
+d108 1
+a108 3
+	if (p->red)
+	{
+		g->red=TRUE;
+d110 1
+a110 1
+		if ((v<g->key)!=(v<p->key)) p=rotate(v,g);
+d112 1
+a112 1
+		x=rotate(v,gg);
+d114 8
+a121 1
+		x->red=FALSE;
+d124 2
+a125 1
+	root->r->red=FALSE;
+d127 1
+a127 1
+	return x;
+d130 1
+a130 1
+// rotate RBT method
+d133 1
+a133 1
+inline MTCRBTNode <T> * MTCRBT <T>::rotate(T &v, MTCRBTNode <T> *y)
+d135 7
+a141 2
+	MTCRBTNode <T> *c;
+	MTCRBTNode <T> *gc;
+d143 1
+a143 1
+	if (v<y->key) c=y->l; else c=y->r; 
+d145 5
+a149 1
+	if (v<c->key)
+d151 1
+a151 3
+		gc=c->l;
+		c->l=gc->r;
+		gc->r=c;
+d155 2
+a156 3
+		gc=c->r;
+		c->r=gc->l;
+		gc->l=c;
+d159 2
+a160 1
+	if (v<y->key) y->l=gc; else y->r=gc;
+d162 1
+a162 1
+	return gc;
+d165 1
+a165 1
+// insert using RBT algorthm
+d168 1
+a168 1
+inline MTCRBTNode <T> * MTCRBT <T>::insert(T &v, MTCRBTNode <T> *x, BOOL overwrite)
+d170 12
+a181 4
+	MTCRBTNode <T> *gg;
+	MTCRBTNode <T> *g;
+	MTCRBTNode <T> *p;
+	MTCRBTNode <T> *retval;
+d183 2
+a184 1
+	p=x; g=x;
+d186 1
+a186 1
+	do
+d188 8
+a195 1
+		gg=g; g=p; p=x;
+d197 1
+a197 2
+/*
+		if (v==x->key)
+d199 1
+a199 1
+			if (overwrite)
+d201 7
+a207 3
+				x->key=v;
+				overwritten=TRUE;
+				return x;
+d210 14
+a223 1
+*/
+d225 1
+a225 1
+		if (v<x->key) x=x->l; else x=x->r;
+d227 1
+a227 2
+		if ((x->l->red)&&(x->r->red)) x=split(v,gg,g,p,x);
+	} while (x!=z);
+d229 1
+a229 1
+	x=createNewNode(v); x->l=z; x->r=z;
+d231 5
+a235 1
+	if (v<p->key) p->l=x; else p->r=x;
+d237 22
+a258 1
+	retval=x;
+d260 20
+a279 11
+	x=split(v,gg,g,p,x);
+
+	return retval; 
+}
+
+// add a node to the RBT
+
+template <class T> 
+inline int MTCRBT <T>::add(T &v, BOOL overwrite)
+{
+	overwritten=FALSE;
+d281 1
+a281 3
+	insert(v, root, overwrite);
+
+	if (overwritten==TRUE) return 1;
+d297 1
+a297 1
+	while ((current!=z)&&(current!=NULL))
+d299 1
+a299 1
+		if (v==current->key)
+d302 1
+a302 1
+		if (v<current->key)
+d312 1
+a312 1
+	if ((current==NULL)||(current==z))
+d317 1
+a317 1
+	return &current->key;
+d321 1
+a321 1
+// dump the keys in the tree to stdout
+d326 1
+a326 1
+	dumpNode(root->r);
+d332 1
+a332 1
+	if ((aNodePtr==NULL)||(aNodePtr==z))
+d337 2
+d341 12
+a352 1
+	cout << aNodePtr->key << endl;
+d358 1
+a358 1
+// get the lowest key node in the RBT -- kinda like a heap...
+d364 2
+a365 1
+	MTCRBTNode<T> *tempNodePtr=root->r;
+d368 1
+a368 1
+	while ((tempNodePtr!=z)&&(tempNodePtr!=NULL))
+d371 1
+a371 1
+		answer=&current->key;
+d378 1
+a378 1
+// do something to each of the keys in the tree in order 
+d383 1
+a383 1
+        forEachNode(root->r, doIt);
+d389 1
+a389 1
+        if ((aNodePtr==NULL)||(aNodePtr==z))
+d396 1
+a396 1
+	doIt(&aNodePtr->key);
+@
+
+
+1.2
+log
+@not working yet.
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.1 1996/01/14 13:49:53 markc Exp markc $
+d11 3
+d23 3
+d32 4
+a35 4
+        MTCRBTNode <T> * l;  	// RBT < key
+	MTCRBTNode <T> * r;	// RBT > key
+	BOOL red;		// is this a red node (or black?)
+	BOOL deleted;		// might not be needed
+d37 3
+a39 2
+	MTCRBTNode() : l(NULL), r(NULL), red(TRUE), deleted(FALSE) {};
+        MTCRBTNode(T & v) : l(NULL), r(NULL), key(v), red(TRUE), deleted(FALSE) {};
+a41 2
+//	   { 	if ((l!=NULL)&&(l!=this)&&(l->deleted==FALSE)) delete l; 
+//		if ((r!=NULL)&&(r!=this)&&(r->deleted==FALSE)) delete r; l=r=NULL; deleted=TRUE;};
+d49 2
+a50 3
+	MTCRBTNode <T> * head;
+	MTCRBTNode <T> * z;
+	long count;
+a52 2
+	MTCRBTNode <T> * split(T &v, MTCRBTNode <T> *gg, MTCRBTNode <T> *g, 
+		MTCRBTNode <T> *p, MTCRBTNode <T> *x);  
+d54 1
+a54 1
+	MTCRBTNode <T> * insert(T &v, MTCRBTNode <T> *x, BOOL overwrite);
+d56 1
+d60 1
+a60 1
+	virtual ~MTCRBT() { if (head) delete head; head=NULL; };
+d68 1
+a68 1
+	//void clear() { if (head) delete head; head=NULL; count=0; };;
+d85 4
+a88 4
+	head=createNewNode(v);
+	head->key=v;
+	head->r=z;
+	head->l=z;
+d127 1
+a127 1
+	head->r->red=FALSE;
+d211 1
+a211 1
+	insert(v, head, overwrite);
+d227 1
+a227 1
+	current=head;
+d258 1
+a258 1
+	dumpNode(head->r);
+d283 1
+a283 1
+	MTCRBTNode<T> *tempNodePtr=head->r;
+d301 1
+a301 1
+        forEachNode(head->r, doIt);
+@
+
+
+1.2.1.1
+log
+@*** empty log message ***
+@
+text
+@d8 1
+a8 1
+ * $Id: rbt.h,v 1.3 1996/01/20 12:47:16 markc Exp markc $
+a10 6
+ * Revision 1.3  1996/01/20  12:47:16  markc
+ * skip this version
+ *
+ * Revision 1.2  1996/01/20  10:56:26  markc
+ * not working yet.
+ *
+a19 3
+#define RBT_RED		0	
+#define RBT_BLACK	1
+
+d26 4
+a29 4
+        MTCRBTNode <T> * l;  	// RBTnode < key
+	MTCRBTNode <T> * r;	// RBTnode > key
+	MTCRBTNode <T> * p;	// parent
+	short color;		// is this a red or black node?
+d31 2
+a32 3
+	MTCRBTNode() : l(NULL), r(NULL), p(NULL), color(RBT_RED) {};
+        MTCRBTNode(T & v) : l(NULL), r(NULL), p(NULL), color(RBT_RED), key(v) 
+		{};
+d35 2
+d44 3
+a46 2
+	MTCRBTNode <T> * root;
+
+d49 2
+d52 1
+a52 1
+
+a53 1
+	long count;
+d57 1
+a57 1
+	virtual ~MTCRBT() { if (root) delete root; root=NULL; };
+d65 1
+a65 1
+	//void clear() { if (root) delete root; root=NULL; count=0; };;
+d82 4
+a85 4
+	root=createNewNode(v);
+	root->key=v;
+	root->r=z;
+	root->l=z;
+d124 1
+a124 1
+	root->r->red=FALSE;
+d208 1
+a208 1
+	insert(v, root, overwrite);
+d224 1
+a224 1
+	current=root;
+d255 1
+a255 1
+	dumpNode(root->r);
+d280 1
+a280 1
+	MTCRBTNode<T> *tempNodePtr=root->r;
+d298 1
+a298 1
+        forEachNode(root->r, doIt);
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+ * Copyright (c) Mark T. Chapman 1995
+a6 1
+ * class MTCRBTFreq - RBT ++ a freq count of nodekey
+d8 1
+a8 2
+ * note: forEach() works with RBT and RBTFreq
+ *       forEachFreq() adds the count as an extra parm to function ptr
+d10 3
+a12 1
+ * $Id$
+a13 1
+ * $Log$
+d20 1
+a20 1
+// binary search tree node template
+d25 5
+a29 3
+	T value;		// the value of this RBTnode	
+        MTCRBTNode <T> * left;  // RBT < value
+	MTCRBTNode <T> * right;	// RBT > value
+d31 2
+a32 2
+	MTCRBTNode() { left=right=NULL; };
+        MTCRBTNode(const T & aT) { left=right=NULL; value=aT; }; 
+d34 3
+a36 1
+	   { if (left) delete left; if (right) delete right; left=right=NULL; };
+d39 1
+a39 13
+// binary search tree with frequency count node template
+
+template <class T>
+class MTCRBTNodeFreq : public MTCRBTNode<T> {	       
+public:
+        long count;             // the magnitude of this RBTnode
+public:
+	MTCRBTNodeFreq() { count=1; };
+	MTCRBTNodeFreq(const T & aT) : MTCRBTNode <T> (aT) { count=1; };
+	virtual ~MTCRBTNodeFreq() {}; 
+};
+
+// binary search tree template
+d44 2
+a45 2
+	MTCRBTNode <T> * root;
+	MTCRBTNode <T> * current;
+d47 1
+a47 1
+	virtual MTCRBTNode <T> * createNewNode(const T &); 
+d49 5
+d56 7
+a62 5
+	MTCRBT () { root=current=NULL; count=0; };
+	virtual ~MTCRBT() { if (root) delete root; root=NULL; };
+	virtual int add(const T &, BOOL overwrite=FALSE);
+	int remove(const T &);
+	T * find(const T &); 
+a63 1
+	T * getCurrent() { if (current!=NULL) return &current->value; else return NULL; };
+d65 1
+a65 1
+	void clear() { if (root) delete root; root=NULL; count=0; };;
+d73 2
+a74 2
+// binary search tree with freq count node template
+ 
+d76 11
+a86 13
+class MTCRBTFreq : public MTCRBT <T> {
+  protected:
+	virtual MTCRBTNode <T> * createNewNode(const T &); 
+	void forEachNodeFreq(MTCRBTNodeFreq <T> *, void (*doIt)(T *, long));
+
+  public:
+        virtual int add(const T &, BOOL overwrite=FALSE);
+	void forEachFreq(void (*doIt)(T *, long));
+#ifdef DEBUG
+	virtual void dump();
+	virtual void dumpNode(MTCRBTNode <T> * );
+#endif // DEBUG
+};
+d91 1
+a91 1
+inline MTCRBTNode <T> * MTCRBT <T>::createNewNode(const T &aT)
+d93 1
+a93 1
+	MTCRBTNode <T> * newNode = new MTCRBTNode <T> (aT);
+d106 1
+a106 1
+// create a new FREQ node
+d109 1
+a109 1
+inline MTCRBTNode <T> * MTCRBTFreq <T>:: createNewNode(const T &aT)
+d111 1
+a111 1
+	MTCRBTNode <T> * newNode = new MTCRBTNodeFreq <T> (aT);
+d113 1
+a113 1
+	if (newNode==NULL)
+d115 7
+a121 2
+		perror("MTCRBTFreq::createNewNode()");
+		abort();
+d124 1
+a124 1
+	count++;
+d126 1
+a126 1
+	return newNode;
+d129 1
+a129 2
+
+// add a node to the RBT
+d132 1
+a132 1
+inline int MTCRBT <T>::add(const T &aT, BOOL overwrite)
+d134 2
+a135 1
+	// is this the first node?
+d137 9
+a145 1
+	if (root==NULL)
+d147 4
+a150 1
+		count=0;
+d152 1
+a152 1
+		root=createNewNode(aT);
+d154 2
+a155 2
+		return 0;
+	}
+d157 1
+a157 1
+	// is it already the current node?
+d159 7
+a165 10
+	if ((current!=NULL)&&(aT==current->value))
+	{
+		if (overwrite==TRUE)
+		{
+			current->value=aT;
+		}
+		return 1;
+	}
+
+	// otherwise, dive deeper!
+d167 1
+a167 1
+	current=root;
+d169 1
+a169 1
+	for(;;) 
+d171 1
+a171 8
+		if (aT==current->value)
+		{
+			if (overwrite==TRUE)
+			{
+				current->value=aT;
+			}
+			return 1;
+		}
+d173 2
+a174 13
+		if (aT<current->value)
+		{
+			if (current->left==NULL)
+			{
+				current->left=createNewNode(aT);
+				return 0;
+			}
+			else
+			{
+				current=current->left;
+			}
+		}
+		else
+d176 1
+a176 1
+			if (current->right==NULL)
+d178 3
+a180 6
+				current->right=createNewNode(aT);
+				return 0;
+			}
+			else
+			{
+				current=current->right;
+d183 1
+a183 2
+	}
+}
+d185 1
+a185 1
+// add a node to the FREQ RBT
+d187 2
+a188 4
+template <class T>
+inline int MTCRBTFreq <T>::add(const T &aT, BOOL overwrite)
+{
+    int retval;
+d190 1
+a190 4
+    if ((retval=MTCRBT <T>::add(aT, overwrite))==1)
+    {		
+	((MTCRBTNodeFreq <T>*)current)->count++;
+    }
+d192 1
+a192 2
+    return retval;
+}
+d194 1
+a194 1
+// remove aNode from the RBT
+d196 1
+a196 4
+template <class T>
+inline int MTCRBT <T>::remove(const T &aT)
+{
+	// is the tree empty?
+d198 2
+a199 4
+	if (root==NULL)
+	{
+		return -1;
+	}
+d201 1
+a201 1
+	// if not, find the node with the value 
+d203 4
+a206 32
+	current=root;
+	MTCRBTNode <T> **parentBranch=NULL;
+	MTCRBTNode <T> *tempPtr=NULL;
+
+	while (current!=NULL)
+	{
+		if (aT==current->value)
+		{
+			break;
+		}
+
+		if (aT<current->value)
+		{
+			parentBranch=&current->left;
+			current=current->left;
+		}
+		else
+		{
+			parentBranch=&current->right;
+			current=current->right;
+		}
+
+	}
+
+	// if we didn't find it, we can't delete it!
+
+	if (current==NULL)
+	{
+		return -1;
+	}
+
+	// if we found it, then we will delete it!
+d208 1
+a208 46
+	if ((current->left==NULL)&&(current->right==NULL))
+	{
+		if (parentBranch==NULL)
+		{
+			delete current;
+			root=NULL;
+		}
+		else
+		{
+			delete current;
+			*parentBranch=NULL;
+		}
+	}
+	else if (current->left==NULL)
+	{
+		if (parentBranch==NULL)
+		{
+			tempPtr=root;
+			root=current->right;
+			delete tempPtr;
+		}
+		else
+		{
+			*parentBranch=current->right;
+			delete current;
+		}
+	}
+	else if (current->right==NULL)
+	{
+		if (parentBranch==NULL)
+		{
+			tempPtr=root;
+			root=current->left;
+			delete tempPtr;
+		}
+		else
+		{
+			*parentBranch=current->left;
+			delete current;
+		}
+	}
+	else
+	{
+		cout << "did not delete!" << endl;
+		count++;	
+	}
+d210 1
+a210 2
+	current=NULL;
+	count--;
+d218 1
+a218 1
+inline T * MTCRBT <T>::find(const T &aT) 
+d220 1
+a220 6
+	// is it the current node?
+
+	if ((current!=NULL)&&(current->value==aT))
+	{
+		return &current->value;
+	}
+d224 1
+a224 1
+	current=root;
+d226 1
+a226 1
+	while (current!=NULL)
+d228 1
+a228 1
+		if (aT==current->value)
+d231 1
+a231 1
+		if (aT<current->value)
+d233 1
+a233 1
+			current=current->left;
+d237 1
+a237 1
+			current=current->right;
+d241 1
+a241 1
+	if (current==NULL)
+d246 1
+a246 1
+	return &current->value;
+d250 1
+a250 1
+// dump the values in the tree to stdout
+d255 1
+a255 1
+	dumpNode(root);
+d261 2
+a262 1
+	if (aNodePtr==NULL)
+d264 1
+d266 1
+a266 8
+	dumpNode(aNodePtr->left);
+
+	cout << aNodePtr->value << endl;
+
+//	cout << aNodePtr->count << '\t' << aNodePtr->value << endl;
+
+	dumpNode(aNodePtr->right);
+}
+d268 1
+a268 1
+// dump the values in the tree to stdout
+d270 1
+a270 4
+template <class T>  
+inline void MTCRBTFreq <T>::dump()
+{
+	dumpNode(root);
+a271 14
+
+template <class T> 
+inline void MTCRBTFreq <T>::dumpNode(MTCRBTNode <T> *aNodePtr)
+{
+	if (aNodePtr==NULL)
+		return;
+
+	dumpNode(aNodePtr->left);
+
+	cout << ((MTCRBTNodeFreq<T> *)aNodePtr)->count << '\t' << aNodePtr->value << endl;
+
+	dumpNode(aNodePtr->right);
+}
+
+d274 1
+a274 1
+// get the lowest value node in the RBT -- kinda like a heap...
+d279 2
+a280 1
+	MTCRBTNode<T> *tempNodePtr=root;
+d283 1
+a283 1
+	while (tempNodePtr!=NULL)
+d286 2
+a287 2
+		answer=&current->value;
+		tempNodePtr=tempNodePtr->left;
+d293 1
+a293 1
+// do something to each of the values in the tree in order 
+d298 1
+a298 1
+        forEachNode(root, doIt);
+d304 2
+a305 22
+        if (aNodePtr==NULL)
+                return;
+
+        forEachNode(aNodePtr->left, doIt);
+
+	doIt(&aNodePtr->value);
+
+        forEachNode(aNodePtr->right, doIt);
+}
+
+// do something to each of the values in the tree in order 
+
+template <class T>
+inline void MTCRBTFreq <T>::forEachFreq(void (*doIt)(T *, long))
+{
+        forEachNodeFreq((MTCRBTNodeFreq <T>*)root, doIt);
+}
+
+template <class T>
+inline void MTCRBTFreq <T>::forEachNodeFreq(MTCRBTNodeFreq <T> *aNodePtr, void (*doIt)(T *, long))
+{
+        if (aNodePtr==NULL)
+d307 1
+d309 1
+a309 1
+        forEachNodeFreq((MTCRBTNodeFreq <T> *)aNodePtr->left, doIt);
+d311 1
+a311 1
+	doIt(&aNodePtr->value, aNodePtr->count);
+d313 1
+a313 1
+        forEachNodeFreq((MTCRBTNodeFreq <T> *)aNodePtr->right, doIt);
+@

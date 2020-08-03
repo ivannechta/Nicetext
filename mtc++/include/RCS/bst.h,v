@@ -1,0 +1,843 @@
+head	1.11;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.11
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.01.14.19.23.54;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	95.11.12.22.04.48;	author chapman;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.10.12.15.53.44;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	95.08.31.02.57.55;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.07.29.16.45.14;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.07.26.13.45.45;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.07.06.03.31.18;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.06.30.19.06.53;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.06.30.18.41.07;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.06.07.01.49.27;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial (Prelim) Version
+@
+
+
+1.11
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+/*
+ * MTC++ Binary Search Tree Template
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * class MTCBST -- Binary Search Tree -- allows one instance of a nodekey 
+ * class MTCBSTFreq - BST ++ a freq count of nodekey
+ *
+ * note: forEach() works with BST and BSTFreq
+ *       forEachFreq() adds the count as an extra parm to function ptr
+ *
+ * $Id: bst.h,v 1.10 1996/01/14 19:23:54 markc Exp markc $
+ *
+ * $Log: bst.h,v $
+ * Revision 1.10  1996/01/14 19:23:54  markc
+ * removed all const & -- it is not very important to have const here,
+ * it did not prevent manipulation via find() -- which should not be done!
+ *
+ * Revision 1.9  1995/11/12  22:04:48  chapman
+ * Added getCurrent()
+ * Optimized "add" and "find" to see if the current node is the search value
+ *
+ * Revision 1.8  1995/10/12  15:53:44  markc
+ * Added getLowest() method
+ *
+ * Revision 1.7  1995/08/31  02:57:55  markc
+ * Added BOOL overwrite to BST::add().
+ *
+ * Revision 1.6  1995/07/29  16:45:14  markc
+ * Added forEachFreq for MTCBSTFreq -- this allows a function to get passed the
+ * frequency of each node.
+ *
+ * Revision 1.5  1995/07/26  13:45:45  markc
+ * Added #ifdef DEBUG
+ *
+ * Revision 1.4  1995/07/06  03:31:18  markc
+ * Check In
+ *
+ * Revision 1.3  1995/06/30  19:06:53  markc
+ * Added forEach() method
+ *
+ * Revision 1.2  1995/06/30  18:41:07  markc
+ * Added Frequency Count Inheritance
+ *
+ * Revision 1.1  1995/06/07  01:49:27  markc
+ * Initial revision
+ *
+ */
+
+#ifndef  __BST_H_
+#define  __BST_H_
+
+static char rcsid__BST_H_ []  = "@@(#)$Id$";
+
+// binary search tree node template
+
+template <class T> 
+class MTCBSTNode {
+public:
+	T value;		// the value of this BSTnode	
+        MTCBSTNode <T> * left;  // BST < value
+	MTCBSTNode <T> * right;	// BST > value
+public:
+	MTCBSTNode() { left=right=NULL; };
+        MTCBSTNode(T & aT) { left=right=NULL; value=aT; }; 
+	virtual ~MTCBSTNode() 
+	   { if (left) delete left; if (right) delete right; left=right=NULL; };
+};
+
+// binary search tree with frequency count node template
+
+template <class T>
+class MTCBSTNodeFreq : public MTCBSTNode<T> {	       
+public:
+        long count;             // the magnitude of this BSTnode
+public:
+	MTCBSTNodeFreq() { count=1; };
+	MTCBSTNodeFreq(T & aT) : MTCBSTNode <T> (aT) { count=1; };
+	virtual ~MTCBSTNodeFreq() {}; 
+};
+
+// binary search tree template
+
+template <class T> 
+class MTCBST  {
+protected:
+	MTCBSTNode <T> * root;
+	MTCBSTNode <T> * current;
+	long count;
+	virtual MTCBSTNode <T> * createNewNode(T &); 
+	void forEachNode(MTCBSTNode <T> *, void (*doIt)(T *));
+	
+public:
+	MTCBST () { root=current=NULL; count=0; };
+	virtual ~MTCBST() { if (root) delete root; root=NULL; };
+	virtual int add(T &, BOOL overwrite=FALSE);
+	int remove(T &);
+	T * find(T &); 
+	T * getLowest();
+	T * getCurrent() { if (current!=NULL) return &current->value; else return NULL; };
+	long getCount() const { return count; };
+	void clear() { if (root) delete root; root=NULL; count=0; };;
+	void forEach(void (*doIt)(T *));
+#ifdef DEBUG
+	virtual void dump();
+	virtual void dumpNode(MTCBSTNode <T> * );
+#endif // DEBUG
+};
+
+// binary search tree with freq count node template
+ 
+template <class T>
+class MTCBSTFreq : public MTCBST <T> {
+  protected:
+	virtual MTCBSTNode <T> * createNewNode(T &); 
+	void forEachNodeFreq(MTCBSTNodeFreq <T> *, void (*doIt)(T *, long));
+
+  public:
+        virtual int add(T &, BOOL overwrite=FALSE);
+	void forEachFreq(void (*doIt)(T *, long));
+#ifdef DEBUG
+	virtual void dump();
+	virtual void dumpNode(MTCBSTNode <T> * );
+#endif // DEBUG
+};
+
+// create a new node
+
+template <class T>
+inline MTCBSTNode <T> * MTCBST <T>::createNewNode(T &aT)
+{
+	MTCBSTNode <T> * newNode = new MTCBSTNode <T> (aT);
+
+	if (newNode==NULL)
+	{
+		perror("MTCBST::createNewNode()");
+		abort();
+	}
+
+	count++;
+
+	return newNode;
+}
+
+// create a new FREQ node
+
+template <class T>
+inline MTCBSTNode <T> * MTCBSTFreq <T>:: createNewNode(T &aT)
+{
+	MTCBSTNode <T> * newNode = new MTCBSTNodeFreq <T> (aT);
+
+	if (newNode==NULL)
+	{
+		perror("MTCBSTFreq::createNewNode()");
+		abort();
+	}
+
+	count++;
+
+	return newNode;
+}
+
+
+// add a node to the BST
+
+template <class T> 
+inline int MTCBST <T>::add(T &aT, BOOL overwrite)
+{
+	// is this the first node?
+
+	if (root==NULL)
+	{
+		count=0;
+
+		root=createNewNode(aT);
+
+		return 0;
+	}
+
+	// is it already the current node?
+
+	if ((current!=NULL)&&(aT==current->value))
+	{
+		if (overwrite==TRUE)
+		{
+			current->value=aT;
+		}
+		return 1;
+	}
+
+	// otherwise, dive deeper!
+
+	current=root;
+
+	for(;;) 
+	{
+		if (aT==current->value)
+		{
+			if (overwrite==TRUE)
+			{
+				current->value=aT;
+			}
+			return 1;
+		}
+
+		if (aT<current->value)
+		{
+			if (current->left==NULL)
+			{
+				current->left=createNewNode(aT);
+				return 0;
+			}
+			else
+			{
+				current=current->left;
+			}
+		}
+		else
+		{
+			if (current->right==NULL)
+			{
+				current->right=createNewNode(aT);
+				return 0;
+			}
+			else
+			{
+				current=current->right;
+			}
+		}
+	}
+}
+
+// add a node to the FREQ BST
+
+template <class T>
+inline int MTCBSTFreq <T>::add(T &aT, BOOL overwrite)
+{
+    int retval;
+
+    if ((retval=MTCBST <T>::add(aT, overwrite))==1)
+    {		
+	((MTCBSTNodeFreq <T>*)current)->count++;
+    }
+
+    return retval;
+}
+
+// remove aNode from the BST
+
+template <class T>
+inline int MTCBST <T>::remove(T &aT)
+{
+	// is the tree empty?
+
+	if (root==NULL)
+	{
+		return -1;
+	}
+
+	// if not, find the node with the value 
+
+	current=root;
+	MTCBSTNode <T> **parentBranch=NULL;
+	MTCBSTNode <T> *tempPtr=NULL;
+
+	while (current!=NULL)
+	{
+		if (aT==current->value)
+		{
+			break;
+		}
+
+		if (aT<current->value)
+		{
+			parentBranch=&current->left;
+			current=current->left;
+		}
+		else
+		{
+			parentBranch=&current->right;
+			current=current->right;
+		}
+
+	}
+
+	// if we didn't find it, we can't delete it!
+
+	if (current==NULL)
+	{
+		return -1;
+	}
+
+	// if we found it, then we will delete it!
+
+	if ((current->left==NULL)&&(current->right==NULL))
+	{
+		if (parentBranch==NULL)
+		{
+			delete current;
+			root=NULL;
+		}
+		else
+		{
+			delete current;
+			*parentBranch=NULL;
+		}
+	}
+	else if (current->left==NULL)
+	{
+		if (parentBranch==NULL)
+		{
+			tempPtr=root;
+			root=current->right;
+			delete tempPtr;
+		}
+		else
+		{
+			*parentBranch=current->right;
+			delete current;
+		}
+	}
+	else if (current->right==NULL)
+	{
+		if (parentBranch==NULL)
+		{
+			tempPtr=root;
+			root=current->left;
+			delete tempPtr;
+		}
+		else
+		{
+			*parentBranch=current->left;
+			delete current;
+		}
+	}
+	else
+	{
+		cout << "did not delete!" << endl;
+		count++;	
+	}
+
+	current=NULL;
+	count--;
+
+	return 0;
+}
+
+// find aNode in the BST 
+
+template <class T>
+inline T * MTCBST <T>::find(T &aT) 
+{
+	// is it the current node?
+
+	if ((current!=NULL)&&(current->value==aT))
+	{
+		return &current->value;
+	}
+
+	// otherwise dive deeper
+
+	current=root;
+
+	while (current!=NULL)
+	{
+		if (aT==current->value)
+			break;
+
+		if (aT<current->value)
+		{
+			current=current->left;
+		}
+		else
+		{
+			current=current->right;
+		}
+	}
+
+	if (current==NULL)
+	{
+		return NULL;
+	}
+
+	return &current->value;
+}
+
+#ifdef DEBUG
+// dump the values in the tree to stdout
+
+template <class T>  
+inline void MTCBST <T>::dump()
+{
+	dumpNode(root);
+}
+
+template <class T> 
+inline void MTCBST <T>::dumpNode(MTCBSTNode <T> *aNodePtr)
+{
+	if (aNodePtr==NULL)
+		return;
+
+	dumpNode(aNodePtr->left);
+
+	cout << aNodePtr->value << endl;
+
+//	cout << aNodePtr->count << '\t' << aNodePtr->value << endl;
+
+	dumpNode(aNodePtr->right);
+}
+
+// dump the values in the tree to stdout
+
+template <class T>  
+inline void MTCBSTFreq <T>::dump()
+{
+	dumpNode(root);
+}
+
+template <class T> 
+inline void MTCBSTFreq <T>::dumpNode(MTCBSTNode <T> *aNodePtr)
+{
+	if (aNodePtr==NULL)
+		return;
+
+	dumpNode(aNodePtr->left);
+
+	cout << ((MTCBSTNodeFreq<T> *)aNodePtr)->count << '\t' << aNodePtr->value << endl;
+
+	dumpNode(aNodePtr->right);
+}
+
+#endif // DEBUG
+
+// get the lowest value node in the BST -- kinda like a heap...
+
+template <class T>
+inline T * MTCBST <T>::getLowest() 
+{
+	MTCBSTNode<T> *tempNodePtr=root;
+	T * answer=NULL;
+
+	while (tempNodePtr!=NULL)
+	{
+		current=tempNodePtr;
+		answer=&current->value;
+		tempNodePtr=tempNodePtr->left;
+	}
+
+	return answer;
+}
+
+// do something to each of the values in the tree in order 
+
+template <class T>
+inline void MTCBST <T>::forEach(void (*doIt)(T *))
+{
+        forEachNode(root, doIt);
+}
+
+template <class T>
+inline void MTCBST <T>::forEachNode(MTCBSTNode <T> *aNodePtr, void (*doIt)(T *))
+{
+        if (aNodePtr==NULL)
+                return;
+
+        forEachNode(aNodePtr->left, doIt);
+
+	doIt(&aNodePtr->value);
+
+        forEachNode(aNodePtr->right, doIt);
+}
+
+// do something to each of the values in the tree in order 
+
+template <class T>
+inline void MTCBSTFreq <T>::forEachFreq(void (*doIt)(T *, long))
+{
+        forEachNodeFreq((MTCBSTNodeFreq <T>*)root, doIt);
+}
+
+template <class T>
+inline void MTCBSTFreq <T>::forEachNodeFreq(MTCBSTNodeFreq <T> *aNodePtr, void (*doIt)(T *, long))
+{
+        if (aNodePtr==NULL)
+                return;
+
+        forEachNodeFreq((MTCBSTNodeFreq <T> *)aNodePtr->left, doIt);
+
+	doIt(&aNodePtr->value, aNodePtr->count);
+
+        forEachNodeFreq((MTCBSTNodeFreq <T> *)aNodePtr->right, doIt);
+}
+
+#endif __BST_H_
+@
+
+
+1.10
+log
+@removed all const & -- it is not very important to have const here,
+it did not prevent manipulation via find() -- which should not be done!
+@
+text
+@d12 1
+a12 1
+ * $Id: bst.h,v 1.9 1995/11/12 22:04:48 chapman Exp markc $
+d15 4
+d52 2
+@
+
+
+1.9
+log
+@Added getCurrent()
+Optimized "add" and "find" to see if the current node is the search value
+@
+text
+@d12 1
+a12 1
+ * $Id: bst.h,v 1.8 1995/10/12 15:53:44 markc Exp chapman $
+d15 4
+d59 1
+a59 1
+        MTCBSTNode(const T & aT) { left=right=NULL; value=aT; }; 
+d72 1
+a72 1
+	MTCBSTNodeFreq(const T & aT) : MTCBSTNode <T> (aT) { count=1; };
+d84 1
+a84 1
+	virtual MTCBSTNode <T> * createNewNode(const T &); 
+d90 3
+a92 3
+	virtual int add(const T &, BOOL overwrite=FALSE);
+	int remove(const T &);
+	T * find(const T &); 
+d109 1
+a109 1
+	virtual MTCBSTNode <T> * createNewNode(const T &); 
+d113 1
+a113 1
+        virtual int add(const T &, BOOL overwrite=FALSE);
+d124 1
+a124 1
+inline MTCBSTNode <T> * MTCBST <T>::createNewNode(const T &aT)
+d142 1
+a142 1
+inline MTCBSTNode <T> * MTCBSTFreq <T>:: createNewNode(const T &aT)
+d161 1
+a161 1
+inline int MTCBST <T>::add(const T &aT, BOOL overwrite)
+d230 1
+a230 1
+inline int MTCBSTFreq <T>::add(const T &aT, BOOL overwrite)
+d245 1
+a245 1
+inline int MTCBST <T>::remove(const T &aT)
+d345 1
+a345 1
+inline T * MTCBST <T>::find(const T &aT) 
+@
+
+
+1.8
+log
+@Added getLowest() method
+@
+text
+@d12 1
+a12 1
+ * $Id: bst.h,v 1.7 1995/08/31 02:57:55 markc Exp markc $
+d15 3
+d90 1
+d120 1
+a120 1
+inline MTCBSTNode <T> * MTCBST <T>:: createNewNode(const T &aT)
+d170 11
+d246 1
+d248 1
+d259 1
+d261 1
+d279 1
+d281 1
+d343 9
+d360 1
+d362 1
+d364 1
+d366 1
+a366 1
+
+@
+
+
+1.7
+log
+@Added BOOL overwrite to BST::add().
+@
+text
+@d12 1
+a12 1
+ * $Id: bst.h,v 1.6 1995/07/29 16:45:14 markc Exp markc $
+d15 3
+d86 1
+d390 18
+@
+
+
+1.6
+log
+@Added forEachFreq for MTCBSTFreq -- this allows a function to get passed the
+frequency of each node.
+@
+text
+@d12 1
+a12 1
+ * $Id: bst.h,v 1.5 1995/07/26 13:45:45 markc Exp markc $
+d15 4
+d80 1
+a80 1
+	virtual int add(const T &);
+d101 1
+a101 1
+        virtual int add(const T &);
+d149 1
+a149 1
+inline int MTCBST <T>::add(const T &aT)
+d166 2
+a167 1
+	for(;;) {
+d170 4
+d207 1
+a207 1
+inline int MTCBSTFreq <T>::add(const T &aT)
+d211 1
+a211 1
+    if ((retval=MTCBST <T>::add(aT))==1)
+@
+
+
+1.5
+log
+@Added #ifdef DEBUG
+@
+text
+@d9 4
+a12 1
+ * $Id: bst.h,v 1.4 1995/07/06 03:31:18 markc Exp chapman $
+d15 3
+d59 1
+d71 1
+a71 4
+	virtual void forEachNode(MTCBSTNode <T> *, void (*doIt)(T *));
+#ifdef DEBUG
+	virtual void dumpNode(MTCBSTNode <T> * );
+#endif // DEBUG
+d80 2
+a81 2
+	virtual void clear() { if (root) delete root; root=NULL; count=0; };;
+	virtual void forEach(void (*doIt)(T *));
+d84 1
+d94 1
+d98 1
+d397 21
+@
+
+
+1.4
+log
+@Check In
+@
+text
+@d9 5
+a13 1
+ * $Id: bst.h 1.3 1995/06/30 19:06:53 markc Exp markc $
+a14 1
+ * $Log: bst.h $
+a27 2
+
+#define DEBUG
+@
+
+
+1.3
+log
+@Added forEach() method
+@
+text
+@d9 1
+a9 1
+ * $Id: bst.h 1.2 1995/06/30 18:41:07 markc Exp markc $
+d12 3
+d75 1
+@
+
+
+1.2
+log
+@Added Frequency Count Inheritance
+@
+text
+@d9 1
+a9 1
+ * $Id: bst.h 1.1 1995/06/07 01:49:27 markc Exp markc $
+d12 3
+d60 4
+d72 1
+a74 1
+	virtual void dumpNode(MTCBSTNode <T> * );
+d365 21
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 2
+a7 1
+ * $Id$
+d9 5
+a13 1
+ * $Log$
+d17 2
+a18 2
+#ifdef  __BST_H_
+#define __BST_H_
+d25 1
+a25 1
+struct MTCBSTNode {
+d27 2
+a28 3
+	T value;		// the value of this BSTnode
+	long count;		// the magnitude of this BSTnode
+	MTCBSTNode <T> * left;	// BST < value
+d31 2
+a32 2
+	MTCBSTNode() { left=right=NULL; count=1; };
+	MTCBSTNode(const T & aT) { left=right=NULL; value=aT; count=1; };
+d37 11
+d52 1
+a52 1
+private:
+d56 1
+a56 2
+
+	MTCBSTNode <T> * createNewNode(const T &); 
+d61 1
+a61 1
+	int add(const T &);
+d63 1
+a63 1
+	const T * find(const T &); 
+d66 17
+a82 2
+	void dump();
+	void dumpNode(MTCBSTNode <T> * );
+d104 19
+d146 1
+a146 2
+			current->count++;
+			return 0;
+d176 15
+d288 1
+a288 1
+inline const T * MTCBST <T>::find(const T &aT) 
+d304 5
+d329 24
+a352 1
+	cout << aNodePtr->count << '\t' << aNodePtr->value << endl;
+@

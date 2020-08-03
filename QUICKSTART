@@ -1,0 +1,53 @@
+------- NICETEXT : How-to-get-started -------
+
+******************* BEGINNER ************
+
+1. Do a "gmake install"  (If you don't have gmake and a GNU C++ compiler
+   for your system then read the PORTING file for more details.)
+
+2. Read the DESCRIPTION section of the man pages for "nttpd", 
+   "nicetext", and "scramble". 
+   (either "more man/cat1/nttpd.1" or "man nttpd") 
+
+3. Try running the "bin/qstart-nttpd" shell-script 
+
+4. Point your favorite browser to http://localhost:2119/
+
+Be aware that there is MUCH more to the software than the nttpd program, 
+but it is the quickest way to get a flavor for what this system can do.
+
+******************* INTERMEDIATE ************
+
+5. Try using the "nicetext" and "scramble" programs from the command-line.
+   The "examples/database" directory has some very large dictionaries
+   and style sources.
+
+6. Next, walk through the "examples/tutorial" which shows how to make 
+   and use custom dictionaries and style-sources.
+
+******************* ADVANCED ************
+
+7. If you cannot get enough of this neat software, then you can read the
+   papers in the "doc" directory.
+
+8. If you have enough system resources then you can remake the dictionaries 
+   and style-sources in "examples/database" from "examples/words" and 
+   "examples/texts".   
+
+9. If you are completely absorbed by this software, you should then try
+   to make your own style-sources. You can also try to create very large and 
+   complex custom dictionaries.  
+
+10. If you want to make this work with other natural languages, simply 
+   modify the lexical scanner to recognize different letters.  (Of course,
+   you must follow the rules described in the papers for the tranformations
+   to work, but it should not be that hard!) 
+
+Feel free to e-mail me with comments! 
+
+The FAQ will appear on http://www.ctgi.net/ only if needed.   
+
+(Right now, there are no questions because this is the first public release!) 
+
+- Mark Chapman
+markc@ctgi.net 

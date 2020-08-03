@@ -1,0 +1,595 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.7
+date	98.02.19.19.31.25;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	97.03.05.17.49.59;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	97.03.03.19.46.32;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	97.02.27.15.56.17;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	97.02.16.06.58.59;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.02.08.00.57.56;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.13.15.13.56;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@ txt2bits.o now working, unbabble takes parameters like babble
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@/*
+ * Text to Bitstream Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: txt2bits.cc,v 1.6 1997/03/05 17:49:59 markc Exp markc $
+ *
+ * $Log: txt2bits.cc,v $
+ * Revision 1.6  1997/03/05 17:49:59  markc
+ * Added static char rcsid []  = "@@(#)$Id$";
+ *
+ * Revision 1.5  1997/03/03 19:46:32  markc
+ * Added -v for verbose error reporting
+ *
+ * Revision 1.4  1997/02/27 15:56:17  markc
+ * Added -s Small Mode
+ *
+ * Revision 1.3  1997/02/16 06:58:59  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.2  1996/02/08 00:57:56  markc
+ * do not warn if a word is not found in dictionary table
+ *
+// Revision 1.1  1996/01/13  15:13:56  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: txt2bits.cc,v 1.6 1997/03/05 17:49:59 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/dictrec.h"
+#include "../../gendict/include/typerec.h"
+#include "../../gendict/include/typearec.h"
+#include "../../gendict/include/lexword.h"
+#include "../../gendict/include/dconst.h"
+#include "../include/bitstrm.h"
+#include "../include/bitoutput.h"
+#include "../include/txt2bits.h"
+
+int zzlex();
+extern char *zztext;
+extern FILE *zzin;
+
+// constructor
+
+MTCtextToBits::MTCtextToBits()
+	: 	outputBitStream(NULL), inputStream(NULL), 
+		okay(TRUE), smallMode(FALSE), dictRecRAOF(NULL),
+		verboseMode(FALSE)
+{
+	return;
+}
+
+// destructor
+
+MTCtextToBits::~MTCtextToBits()
+{
+	if (outputBitStream!=NULL)
+	{
+		delete outputBitStream;
+		outputBitStream=NULL;
+	}
+
+	if (inputStream!=NULL)
+	{
+		if (inputStream!=stdin)
+		{
+			if (fclose(inputStream)==EOF)
+			{
+				perror(inputName.c_str());
+			}
+		}
+		inputStream=NULL;
+	}
+
+	if (dictRecRAOF!=NULL)
+	{
+		delete dictRecRAOF;
+		dictRecRAOF=NULL;
+	}
+
+	return;
+}
+
+// set dictionary raof file name and open it
+
+BOOL MTCtextToBits::openDictName(const MTCstring &aFileName, BOOL useSmallMode)
+{
+	// set small mode
+
+	setSmallMode(useSmallMode);
+
+	if (dictRecRAOF!=NULL)
+	{
+		delete dictRecRAOF;
+		dictRecRAOF=NULL;
+	}
+
+	// clear the dictRecRBT
+	dictRecRBT.clear();
+
+	// load the dictRecRBT from the RAOF
+
+	dictName=aFileName;
+
+
+	dictRecRAOF=new MTCreadRAOF <MTCdictRecord> (dictName);
+
+	if (dictRecRAOF==NULL)
+	{
+		errorMsg(EMT_ERROR, "I could not open the dictionary specified", "MTCtextToBits::openDictName()");
+		return FALSE;
+	}
+
+	if (dictRecRAOF->getOkay()==TRUE)
+	{
+		if (getSmallMode()==FALSE)
+		{
+			MTCraofToRBT <MTCdictRecord> loader;
+			loader.doIt(*dictRecRAOF, dictRecRBT);
+		}
+	}
+	else
+	{
+		errorMsg(EMT_ERROR, "I could not open the dictionary specified", "MTCtextToBits::openDictName()");
+		return FALSE;
+	}
+
+	if (((dictRecRBT.getCount()==0)&&(getSmallMode()==FALSE))
+	|| (dictRecRAOF->getCount()==0))
+	{
+		errorMsg(EMT_ERROR, "The dictionary specified is empty", "MTCtextToBits::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// set type RAOF name and open it
+
+BOOL MTCtextToBits::openTypeName(const MTCstring &aFileName)
+{
+	// clear the typeAltRecRBT
+	typeAltRecRBT.clear();
+
+	// assign type name
+	typeName=aFileName;
+
+	// load the typeAltRecRBT from the RAOF
+
+	MTCraofToRBT <MTCtypeAltRecord> loader;
+	MTCreadRAOF <MTCtypeAltRecord> typeAltRecRAOF(typeName);
+
+	if (typeAltRecRAOF.getOkay()==TRUE)
+	{
+		loader.doIt(typeAltRecRAOF, typeAltRecRBT);
+	}
+	else
+	{
+		errorMsg(EMT_ERROR, "I could not open the type table specified", "MTCtextToBits::openTypeName()");
+		return FALSE;
+	}
+
+	if (typeAltRecRBT.getCount()==0)
+	{
+		errorMsg(EMT_ERROR, "The type table specified is empty", "MTCtextToBits::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// open the output file bitstream
+
+BOOL MTCtextToBits::openOutputName(const MTCstring &aFileName)
+{
+	// close it if one is already open...
+
+	if (outputBitStream!=NULL)
+	{
+		delete outputBitStream;
+	}
+
+	// open the output file
+
+	outputName=aFileName;
+	outputBitStream=new MTCoutputBitStream(outputName);
+
+	return TRUE;
+}
+
+// open the input file 
+
+BOOL MTCtextToBits::openInputName(const MTCstring &aFileName)
+{
+	// close it if one is already open...
+
+	if ((inputStream!=NULL)&&(inputStream!=stdin))
+	{
+		delete inputStream;
+	}
+
+	// open the input file
+
+	inputName=aFileName;
+	inputStream=fopen(inputName.c_str(), "r");
+
+	if (inputStream==NULL)
+	{
+		errorMsg(EMT_WARNING, "I could not open the input file specified", "MTCtextToBits::openInputName()"); 
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// am I ready to doIt()?
+
+BOOL MTCtextToBits::isReady()
+{
+	if (getOkay()==FALSE)
+	{
+		errorMsg(EMT_ERROR, "I am not okay to convert.  See previous messages for a reason.", "MTCtextToBits::isReady()"); 
+		return FALSE;
+	}
+
+	if (dictName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a dictionary has not been assigned", "MTCtextToBits::isReady()"); 
+		return FALSE;
+	}
+
+	if (typeName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a type table name has not been assigned", "MTCtextToBits::isReady()"); 
+		return FALSE;
+	}
+
+	if (outputBitStream==NULL)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because an output bitstream has not been assigned", "MTCtextToBits::isReady()"); 
+		return FALSE;
+	}
+
+	if (inputStream==NULL)
+	{
+		inputStream=stdin;
+	}
+	
+	if (((dictRecRBT.getCount()==0)&&(getSmallMode()==FALSE))
+	|| (dictRecRAOF==NULL)||(dictRecRAOF->getCount()==0))
+	{
+		errorMsg(EMT_ERROR, "The dictionary specified is empty", "MTCtex
+tToBits::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// take bits and generate text
+
+BOOL MTCtextToBits::doIt(BOOL checkIfReady)
+{
+	if ((checkIfReady==TRUE)&&(isReady()==FALSE))
+	{
+		errorMsg(EMT_ERROR, "I am not ready", "MTCtextToBits::doIt()");
+		return FALSE;
+	}
+
+	const MTCdictRecord *foundDict;
+	MTCdictRecord tempDictRec;
+	MTCtypeAltRecord *foundType;
+	MTCtypeAltRecord tempTypeAltRec;
+	int retval;
+	zzin=inputStream;
+
+	for(;;)
+	{
+		retval=zzlex();		// read the next token from stdin
+
+		if (zztext[0]=='\0')	// is it eof?
+		{
+			break;
+		}
+
+		if (retval==END_OF_WORD)
+		{
+			// use lower case of word for now...
+
+			MTCstring zztextString(zztext);
+			zztextString.toLower();	
+			tempDictRec.setValue(zztextString);
+
+			// look up the word in the dictionary table
+
+			if (getSmallMode()==TRUE)
+			{
+				foundDict=dictRecRAOF->find(tempDictRec);
+			}
+			else
+			{
+				foundDict=dictRecRBT.find(tempDictRec);
+			}
+
+			if (foundDict!=NULL)
+			{
+				// look up the type
+
+				tempTypeAltRec.setIndex(foundDict->getTypeIndex());
+				if ((foundType=typeAltRecRBT.find(tempTypeAltRec))!=NULL)
+				{
+					outputBitStream->writeBits(foundDict->getBitString(), foundType->getBitCount());
+				}
+				else
+				{
+					errorMsg(EMT_WARNING, "ERROR: I could not find the type in the index.  DICTIONARY MAY BE CORRUPTED", "MTCtextToBits::doIt");
+					cerr << "\t" << *foundDict << endl;
+				}
+			}
+			else
+			{
+				if (getVerboseMode()==TRUE)
+				{
+					cerr << "Ignoring Undefined Word: " << zztextString << endl;
+				}
+			}
+		}
+		else
+		{
+			if ((retval!=END_OF_SENTENCE)&&(retval!=PUNCTUATION))
+			{
+				errorMsg(EMT_WARNING, "IGNORING INPUT: NOT AN END_OF_WORD! -- Is the lexword.o the one loaded in? ", "MTCtextToBits::doIt()");
+			}
+		}
+	}
+
+	outputBitStream->writeBits(0xFFFFFFFF, 32);
+
+	return TRUE;
+}
+@
+
+
+1.6
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d5 1
+a5 1
+ * $Id: txt2bits.cc,v 1.5 1997/03/03 19:46:32 markc Exp markc $
+d8 3
+d29 1
+a29 1
+static char rcsid []  = "@@(#)$Id$";
+d51 3
+a53 3
+int yylex();
+extern char *yytext;
+extern FILE *yyin;
+d287 1
+a287 1
+	yyin=inputStream;
+d291 1
+a291 1
+		retval=yylex();		// read the next token from stdin
+d293 1
+a293 1
+		if (yytext[0]=='\0')	// is it eof?
+d302 3
+a304 3
+			MTCstring yytextString(yytext);
+			yytextString.toLower();	
+			tempDictRec.setValue(yytextString);
+d336 1
+a336 1
+					cerr << "Ignoring Undefined Word: " << yytextString << endl;
+@
+
+
+1.5
+log
+@Added -v for verbose error reporting
+@
+text
+@d5 1
+a5 1
+ * $Id: txt2bits.cc,v 1.4 1997/02/27 15:56:17 markc Exp markc $
+d8 3
+d25 2
+@
+
+
+1.4
+log
+@Added -s Small Mode
+@
+text
+@d5 1
+a5 1
+ * $Id: txt2bits.cc,v 1.3 1997/02/16 06:58:59 markc Exp markc $
+d8 3
+d51 2
+a52 1
+		okay(TRUE), smallMode(FALSE), dictRecRAOF(NULL) 
+d320 2
+a321 1
+					cerr << "ERROR: I could not find type index" << endl;
+d326 4
+a329 1
+				cerr << "ERROR: I could not find word: " << yytextString << endl;
+d336 1
+a336 1
+				cerr << "IGNORING INPUT: NOT AN END_OF_WORD! -- Is the lexword.o the one loaded in? " << retval << ":" << endl;
+@
+
+
+1.3
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: txt2bits.cc,v 1.2 1996/02/08 00:57:56 markc Exp markc $
+d8 3
+d47 2
+a48 1
+	: 	outputBitStream(NULL), inputStream(NULL), okay(TRUE) 
+d75 6
+d86 1
+a86 1
+BOOL MTCtextToBits::openDictName(const MTCstring &aFileName)
+d88 10
+a104 2
+	MTCraofToRBT <MTCdictRecord> loader;
+	MTCreadRAOF <MTCdictRecord> dictRecRAOF(dictName+".dat", dictName+".alt");
+d106 9
+a114 1
+	if (dictRecRAOF.getOkay()==TRUE)
+d116 5
+a120 1
+		loader.doIt(dictRecRAOF, dictRecRBT);
+d128 2
+a129 1
+	if (dictRecRBT.getCount()==0)
+d249 8
+d270 1
+a270 1
+	MTCdictRecord *foundDict;
+d296 8
+a303 1
+			foundDict=dictRecRBT.find(tempDictRec);
+d321 1
+a321 1
+				// cerr << "ERROR: I could not find word: " << yytextString << endl;
+@
+
+
+1.2
+log
+@do not warn if a word is not found in dictionary table
+@
+text
+@d5 1
+a5 1
+ * $Id: txt2bits.cc,v 1.1 1996/01/13 15:13:56 markc Exp markc $
+d8 3
+d24 1
+a24 1
+#include "../../mtc++/include/bst.h"
+d27 1
+a27 1
+#include "../../mtc++/include/raof2bst.h"
+d78 2
+a79 2
+	// clear the dictRecBST
+	dictRecBST.clear();
+d81 1
+a81 1
+	// load the dictRecBST from the RAOF
+d85 1
+a85 1
+	MTCraofToBST <MTCdictRecord> loader;
+d90 1
+a90 1
+		loader.doIt(dictRecRAOF, dictRecBST);
+d98 1
+a98 1
+	if (dictRecBST.getCount()==0)
+d111 2
+a112 2
+	// clear the typeAltRecBST
+	typeAltRecBST.clear();
+d117 1
+a117 1
+	// load the typeAltRecBST from the RAOF
+d119 1
+a119 1
+	MTCraofToBST <MTCtypeAltRecord> loader;
+d124 1
+a124 1
+		loader.doIt(typeAltRecRAOF, typeAltRecBST);
+d132 1
+a132 1
+	if (typeAltRecBST.getCount()==0)
+d257 1
+a257 1
+			foundDict=dictRecBST.find(tempDictRec);
+d264 1
+a264 1
+				if ((foundType=typeAltRecBST.find(tempTypeAltRec))!=NULL)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d272 1
+a272 1
+				cerr << "ERROR: I could not find word: " << yytextString << endl;
+@

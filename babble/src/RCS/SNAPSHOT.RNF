@@ -1,0 +1,102 @@
+
+SNAPSHOT into ./babble/src/RCS/SNAPSHOT.RNF
+	When:	 Jan 10, 1996  20:43 
+	Who:	 Mark Chapman (on BERNIEDOG) 
+	Notes:	 gramtest in babble section now can parse a grammar.def file into rules.  What is left to do is   1.  makeModel()   2. stop coding and start making dicitonaries and grammars and such 3. enhancements... 
+
+1.8 	babble.cc,v
+1.2 	bitinput.cc,v
+1.3 	bitest.cc,v
+1.2 	bitoutput.cc,v
+1.1 	bitstrm.cc,v
+1.3 	unbabble.cc,v
+1.3 	lexgram.l,v
+1.3 	rule.cc,v
+1.4 	yaccgram.y,v
+1.2 	Makefile,v
+1.1 	gramtest.cc,v
+
+SNAPSHOT into ./babble/src/RCS/SNAPSHOT.RNF
+	When:	 Jan 13, 1996  7:45 am 
+	Who:	 markc 
+	Notes:	 Basic dynamic models work with babble, but sentence models are temporarily not implemented and there is not punctuation. 
+
+1.10 	babble.cc,v
+1.3 	bitinput.cc,v
+1.3 	bitest.cc,v
+1.2 	bitoutput.cc,v
+1.1 	bitstrm.cc,v
+1.4 	unbabble.cc,v
+1.4 	lexgram.l,v
+1.5 	rule.cc,v
+1.6 	yaccgram.y,v
+1.3 	Makefile,v
+1.3 	gramtest.cc,v
+1.3 	grammar.cc,v
+
+SNAPSHOT into ./babble/src/RCS/SNAPSHOT.RNF
+	When:	 March 21, 1996  11:30 
+	Who:	 markc 
+	Notes:	 Changed program names and messages i.e. (babble -> nicetext, unbabble->scramble) 
+
+1.4 	bitcp.cc,v
+1.3 	bitinput.cc,v
+1.3 	bitoutput.cc,v
+1.1 	bitstrm.cc,v
+1.6 	lexgram.l,v
+1.7 	rule.cc,v
+1.8 	yaccgram.y,v
+1.11 	Makefile,v
+1.4 	gramtest.cc,v
+1.6 	grammar.cc,v
+1.9 	bits2txt.cc,v
+1.2 	txt2bits.cc,v
+1.3 	expgram.cc,v
+1.16 	nicetext.cc,v
+1.6 	scramble.cc,v
+
+SNAPSHOT into ./babble/src/RCS/SNAPSHOT.RNF
+	When:	 Feb 23, 1997  11:00 p.m. 
+	Who:	 Mark T. Chapman 
+	Notes:	 A snapshot after statistics added and some clean-up 
+
+1.7 	scramble.cc,v
+1.5 	bitinput.cc,v
+1.5 	bitoutput.cc,v
+1.3 	bitstrm.cc,v
+1.6 	lexgram.l,v
+1.8 	rule.cc,v
+1.9 	yaccgram.y,v
+1.11 	Makefile,v
+1.5 	gramtest.cc,v
+1.9 	grammar.cc,v
+1.13 	bits2txt.cc,v
+1.3 	txt2bits.cc,v
+1.8 	expgram.cc,v
+1.20 	nicetext.cc,v
+1.6 	bitcp.cc,v
+1.1 	dumptype.awk,v
+1.2 	dumptype.sh,v
+
+SNAPSHOT into ./babble/src/RCS/SNAPSHOT.RNF
+	When:	 August 25, 1998  4:45pm CDT 
+	Who:	 Mark Chapman 
+	Notes:	 0.9 Version Ready for Packaging & Release 
+
+1.13 	scramble.cc,v
+1.6 	bitinput.cc,v
+1.6 	bitoutput.cc,v
+1.4 	bitstrm.cc,v
+1.8 	lexgram.l,v
+1.8 	rule.cc,v
+1.10 	yaccgram.y,v
+1.16 	Makefile,v
+1.7 	gramtest.cc,v
+1.9 	grammar.cc,v
+1.22 	bits2txt.cc,v
+1.7 	txt2bits.cc,v
+1.12 	expgram.cc,v
+1.26 	nicetext.cc,v
+1.8 	bitcp.cc,v
+1.1 	dumptype.awk,v
+1.6 	dumptype.sh,v

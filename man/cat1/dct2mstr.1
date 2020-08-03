@@ -1,0 +1,132 @@
+
+
+
+DCT2MSTR(1L)					     DCT2MSTR(1L)
+
+
+NNAAMMEE
+       dct2mstr
+
+SSYYNNOOPPSSIISS
+       ddcctt22mmssttrr -i inputFile [-d dictionary]
+
+DDEESSCCRRIIPPTTIIOONN
+       _d_c_t_2_m_s_t_r  formats  the  sorted type-word list from _s_o_r_t_d_c_t
+       into the proper dictionary database format for  the  NNIICCEE--
+       TTEEXXTT system.
+
+OOPPTTIIOONNSS
+       --ii iinnppuuttFFiillee
+	      The  name  of the file that contains a sorted type-
+	      word list that is the output of _s_o_r_t_d_c_t
+
+       --dd ddiiccttiioonnaarryy
+	      The output dictionary database prefix.  The default
+	      is mstr.
+
+FFIILLEESS
+       ( --dd would replace _m_s_t_r below with a new file prefix.)
+
+       mstrdict.dat
+	      Contains	one  dictionary  record  per  line.  Each
+	      record consists of the  type-index,  the	bit-code,
+	      the  frequency  (optional), and the string value of
+	      the word.
+
+       mstrdict.jmp
+	      A hash-table index that sorts mstrdict.dat  records
+	      in  alphabetical	order by word.	ssccrraammbbllee((11LL)) uses
+	      this index.
+
+       mstrdict.alt
+	      A hash-table index that sorts mstrdict.dat  records
+	      in  order  by  type-index,  bit-code.  nniicceetteexxtt((11LL))
+	      uses this index.
+
+       mstrtype.dat
+	      Contains one type definition record per line.   The
+	      purpose  is  to normalize the mstrdict.dat records.
+	      Each record consists of a type-index and a descrip-
+	      tion.
+
+       mstrtype.jmp
+	      A  hash-table  index that sorts the type records by
+	      type-index.
+
+EEXXAAMMPPLLEESS
+       It is strongly suggested that you try the examples in  the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+DCT2MSTR(1L)					     DCT2MSTR(1L)
+
+
+DDIIAAGGNNOOSSTTIICCSS
+       _d_c_t_2_m_s_t_r  returns  a  non-zero  value  if  it  detects any
+       errors.
+
+SSEEEE AALLSSOO
+       bitcp(1L),   dct2mstr(1L),   expgram(1L),    genmodel(1L),
+       gramtest(1L),   impkimmo(1L),   impmsc(1L),  impwbstr(1L),
+       listword(1L),  nicetext(1L),  printint(1L),  scramble(1L),
+       sortdct(1L), txt2dct(1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+

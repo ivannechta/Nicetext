@@ -1,0 +1,116 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	98.08.18.16.40.34;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" sort.1 by Mark T. Chapman
+.\"
+.TH SORTDCT 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+sortdct
+.SH SYNOPSIS
+.B sortdct
+.RB [\-e\ errorLevel]
+.RB [\-q\]
+.RB [\-r\]
+.RB [\-u\ updateFreq]
+.RB [\-x\] 
+.SH DESCRIPTION
+.I sortdct
+converts type-word lists into a sorted merged-type-word lists
+suitable for processing by the
+.B dct2mstr(1L)
+program in the
+.B NICETEXT
+system.  The purpose is to help create new dictionaries for use with
+.I nicetext(1L)
+and 
+.I scramble(1L)
+
+A type-word list is simply a text file where there is one record per line.
+The word follows the type definition of the word on each line. 
+.I sortdct
+makes sure that each word only occurs once on the output.  If a word is defined
+multiple times in the type-word list then 
+.I sortdct
+creates a new "merged-type" category for that word.  The way to merge types 
+is to simply concatenate the list of types for a word in alphabetical order
+separated by a comma.  For example, if the word "bill" is both a "male_name"
+and an "object", then the merged type would be "male_name,object".
+
+It reads input from stdin and sends the output to stdout.
+.SH "OPTIONS"
+.TP
+.BI \-e\ errorLevel
+Print error messages up to 
+.I errorlevel.  
+The default of 1 is probably best on a scale of 0 to 9.  (0 disables errors
+reporting.) The messages relate to words that cannot be parsed by the scanner used in both
+.B scramble
+and
+.B listword.
+.TP 
+.BI -q
+Be quiet.  Do NOT print status updates or errors.  This is the same as
+.B -u 0 -e 0.
+.TP
+.BI -r
+Rerun option: input should be the output of a previous run.  The difference
+is that the commas as interpreted as merged types in the input file.  Otherwise,
+it ignores the entries with commas in the type.
+.TP
+.BI \-u\ updateFreq
+Print a count of the number of input lines processed to stderr every
+.I updateFreq
+lines. 
+.TP
+.BI -x
+Expand the dictionary by adding suffixes to every word and type such as "s", 
+"ing", "ly", etc.  This was an experiment used early in the development of the
+.B NICETEXT
+system for English. It has since been replaced with the "import" concept of
+.I impkimmo(1L), impwbstr(1L), 
+etc. 
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+txt2dct(1L).
+
+@

@@ -1,0 +1,1154 @@
+head	1.18;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.18
+date	97.08.18.03.05.27;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	97.03.09.18.39.32;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	97.03.08.17.06.37;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	97.03.05.17.41.20;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	97.03.05.15.44.21;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	97.03.04.16.08.51;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	97.03.03.03.20.36;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.02.11.17.30.45;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.02.07.03.49.59;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.01.20.16.34.50;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.01.20.16.28.53;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.15.06.53.48;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.14.13.47.26;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.14.12.45.46;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.14.11.29.33;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.08.19.37.39;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.31.02.57.28;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.31.02.35.42;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Check-in
+@
+
+
+1.18
+log
+@Changed yy* to zz* to avoid multiple symbols for LEX parsers
+@
+text
+@/*
+ *
+ * Sort a set of raw dictionary entries by value
+ * Useful because MTCstring may sort things differently than /usr/bin/sort
+ *
+ * Copyright (c) Mark T. Chapman, 1995
+ *
+ * $Id: sortdct.cc,v 1.17 1997/03/09 18:39:32 markc Exp markc $
+ *
+ * $Log: sortdct.cc,v $
+ * Revision 1.17  1997/03/09 18:39:32  markc
+ * Fixed usage() for -r
+ *
+ * Revision 1.16  1997/03/08 17:06:37  markc
+ * Added Rerun [-r] option
+ *
+ * Revision 1.15  1997/03/05 17:41:20  markc
+ * Added static char rcsid []  = "@@(#)$Id: sortdct.cc,v 1.17 1997/03/09 18:39:32 markc Exp markc $";
+ *
+ * Revision 1.14  1997/03/05 15:44:21  markc
+ * Added nlAsPunct parameter.
+ *
+ * Revision 1.13  1997/03/04 16:08:51  markc
+ * Removed cerr << "Usage:" line
+ *
+ * Revision 1.12  1997/03/03 03:20:36  markc
+ * Added -e -u -q
+ * Added parsing by lexword.l instead of just ignoring punctuation lines
+ * Added modelset so that the order of the types no longer matters
+ *
+ * Revision 1.11  1996/02/11 17:30:45  markc
+ * added isSubset logic to properly tokenize type to reduce duplicates
+ * such as AD,N becoming AD,N,N if the word is defined twice as an N
+ *
+// Revision 1.10  1996/02/07  03:49:59  markc
+// don't merge if a word appears multiple times defined the same way!
+//
+// Revision 1.9  1996/01/20  16:34:50  markc
+// changed messages to every 1000 instead of every 100
+//
+// Revision 1.8  1996/01/20  16:28:53  markc
+// removed sleep(30) from end
+//
+// Revision 1.7  1996/01/15  06:53:48  markc
+// prototype with RBT support instead of BST
+//
+// Revision 1.6  1996/01/14  13:47:26  markc
+// Added - parms
+//
+// Revision 1.5  1996/01/14  12:45:46  markc
+// Only allow words such as [a-z0-9]+
+// Added count display
+//
+// Revision 1.4  1996/01/14  11:29:33  markc
+// added -x option
+// merge types of duplicate words using comma-delimited list of types
+//
+// Revision 1.3  1995/11/08  19:37:39  chapman
+// Updated to use rawdict.h instead of dictent.h
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: sortdct.cc,v 1.17 1997/03/09 18:39:32 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../include/rawdict.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/raof.h"
+#include "../include/lexword.h"
+
+int zzlex();
+extern char *zztext;
+extern short nlAsPunct;
+
+#define STATE_READY	0	// ready to read next line
+#define STATE_CODE	1	// we just read the code
+#define STATE_VALUE	2	// we just read the value
+#define STATE_BAD	3 	// something is amiss -- skip until next line
+
+#define DEFAULT_PRINTSTAT_FREQ 1000
+
+void dumpDictionary(MTCrawDictEnt *);
+BOOL isSubset(const MTCstring & code, const MTCstring & baseString);
+void usage();
+
+MTCRBT <MTCstring> codeSet;	// used to merge types
+MTCstring mergeTypeString;		// merged type result
+void dumpCodeSet(MTCstring *);	// used to merge types
+
+int main(int argc, char *argv[])
+{
+	cerr << "Sortdct Program Started..." << endl;
+
+	int ch;
+	BOOL expand=FALSE;
+	BOOL rerun=FALSE;
+	int errorReportingLevel=1;
+	int printStatFreq=DEFAULT_PRINTSTAT_FREQ;
+
+	nlAsPunct=1;	// tell lexword.l to return \n as punctuation
+	
+	while ((ch = getopt(argc, argv, "xe:u:qr")) != EOF)
+	{
+		switch(ch) 
+		{
+			case 'x':
+				expand=TRUE;
+				break;
+			case 'e':
+				errorReportingLevel=atoi(optarg);
+				break;
+			case 'u':
+				printStatFreq=atoi(optarg);
+				break;
+			case 'q':
+				errorReportingLevel=0;
+				printStatFreq=0;
+				break;
+			case 'r':
+				rerun=TRUE;
+				break;
+			case 'h':
+			default:
+				usage();
+				return (-1);
+		}
+	}
+
+	argc -= optind;
+ 	argv += optind;
+
+	MTCRBT <MTCrawDictEnt> dictionary;
+	MTCrawDictEnt inputDE, morphDE;
+	MTCrawDictEnt *found;
+
+	cerr << "Step 1: Process Dictionary..." << endl;
+	cerr << "\tOutput to standard output" << endl;
+	cerr << "\tReading from standard input" << endl;
+	cerr << "\tPrint Status Every " << printStatFreq << " good entries" << endl;
+	cerr << "\tError Reporting Level: " << errorReportingLevel << endl;
+
+	if (expand==TRUE)
+	{
+		cerr << "\t * * * Suffix Expansion Enabled." << endl;
+	}
+
+	if (rerun==TRUE)
+	{
+		cerr << "\tRerun [-r] enabled. Input assumed to be output of a previous run." << endl;
+	}
+
+	BOOL good; 
+	int count=0;
+	int l;
+	int retval;
+ 	int state=STATE_READY;
+	int errorLevel=0;
+
+        for(;;)
+        {
+                retval=zzlex();
+
+                if (zztext[0]=='\0')
+		{
+                        break;
+		}
+
+		MTCstring zztextString(zztext);
+
+                switch (retval)
+                {
+		case END_OF_WORD:
+			switch (state)
+			{
+			case STATE_READY:
+				if (rerun==TRUE)
+				{
+					MTCstring tempStr(inputDE.getCode());
+					inputDE.setCode(tempStr+zztextString);
+				}
+				else
+				{
+					inputDE.setCode(zztextString);
+				}
+				state=STATE_CODE;
+				break;
+			case STATE_CODE:
+				zztextString.toLower();	
+				inputDE.setValue(zztextString);
+				state=STATE_VALUE;
+				break;
+			case STATE_VALUE:
+				if (errorLevel++<errorReportingLevel)
+				{
+					errorMsg(EMT_WARNING, "I parsed two words on a single line\nI will EXCLUDE this entry from the dictionary.", "main()");
+					cerr << "\tPrevious:" << inputDE.getValue() << endl;
+					cerr << "\tNext: " << zztextString << endl;
+				}
+				state=STATE_BAD;
+				break;
+
+			default:
+				if (errorLevel++<errorReportingLevel)
+				{
+					errorMsg(EMT_WARNING, "I am ignoring this word because the entry is bad", "main()");
+					cerr << "\tWord: " << zztextString << endl;
+				}
+				state=STATE_BAD;
+				break;
+			}
+			break;
+
+		case PUNCTUATION:
+			if (zztextString=="\n") 
+			{
+				switch (state)
+				{
+				case STATE_VALUE:
+					// is the word undefined -- if so define it
+
+					if ((found=dictionary.find(inputDE))==NULL)
+					{
+						dictionary.add(inputDE);
+					}
+					else	// otherwise merge the type
+					{
+						// don't expand if a word appears multi-times
+						// defined the same way!
+
+						if (isSubset(found->getCode(), inputDE.getCode())==FALSE)
+						{
+							found->setCode(mergeTypeString);
+	
+							if (expand==TRUE)
+							{
+								inputDE.setCode(mergeTypeString);
+							}
+						}
+					}
+
+					if (expand==TRUE)
+					{
+						morphDE.setValue(inputDE.getValue()+"ary");
+						morphDE.setCode(inputDE.getCode()+"-ARY");
+						dictionary.add(morphDE, TRUE);
+
+						morphDE.setValue(inputDE.getValue()+"s");
+						morphDE.setCode(inputDE.getCode()+"-PLURAL");
+						dictionary.add(morphDE, TRUE);
+	
+						morphDE.setValue(inputDE.getValue()+"es");
+						morphDE.setCode(inputDE.getCode()+"-PLURAL");
+						dictionary.add(morphDE, TRUE);
+
+						morphDE.setValue(inputDE.getValue()+"ing");
+						morphDE.setCode(inputDE.getCode()+"-GERUND");
+						dictionary.add(morphDE, TRUE);
+
+						morphDE.setValue(inputDE.getValue()+"ism");
+						morphDE.setCode(inputDE.getCode()+"-ISM");
+						dictionary.add(morphDE, TRUE);
+
+						morphDE.setValue(inputDE.getValue()+"ly");
+						morphDE.setCode(inputDE.getCode()+"-LY");
+						dictionary.add(morphDE, TRUE);
+					}
+
+					if ((printStatFreq!=0)&&((++count%printStatFreq)==0))
+					{
+  						cerr << "sd: " << count << "    \r";   
+					}
+
+					errorLevel=0;
+
+					state=STATE_READY;
+
+					inputDE.setCode("");
+					inputDE.setValue("");
+					break;
+					
+				case STATE_READY:
+					if (errorLevel++<errorReportingLevel)
+					{
+						errorMsg(EMT_WARNING, "Empty line ignored", "main()");
+					}
+					break;
+
+				case STATE_CODE:
+					if (errorLevel++<errorReportingLevel)
+					{
+						errorMsg(EMT_WARNING, "A code was read, but there was no word found", "main()");
+						cerr << "\tCode:" << inputDE.getCode() << endl;
+					}
+					state=STATE_READY;
+					inputDE.setCode("");
+					inputDE.setValue("");
+					break;
+		
+				default:
+					if (errorLevel++<errorReportingLevel)
+					{
+						errorMsg(EMT_WARNING, "The input state is being reset because of errors.", "main()");
+						cerr << "\tPrevious: " << inputDE << endl;
+					}
+					state=STATE_READY;
+					inputDE.setCode("");
+					inputDE.setValue("");
+					break;
+				}
+			}
+			else
+			{
+				if ((zztextString==",")
+				&&  (rerun==TRUE)
+				&&  (state==STATE_CODE)) 
+				{
+					MTCstring tempStr(inputDE.getCode());
+					inputDE.setCode(tempStr+zztextString);
+					state=STATE_READY;
+					// note: do NOT clear code here!
+					inputDE.setValue("");
+					break;
+				}
+
+				if (errorLevel++<errorReportingLevel)
+				{
+					errorMsg(EMT_WARNING, "I read some unparseable punctuation.  It is not part of a word nor is it a valid end-of-line. I am excluding this entry from the dictionary", "main()");
+					cerr << "\tPunctuation:" << zztextString <<  ":" << endl;
+					cerr << "\tPrevious or Current Entry: " << inputDE << endl;
+				}
+				state=STATE_BAD;
+			}
+
+			break;
+
+		case END_OF_SENTENCE:
+			if (errorLevel++<errorReportingLevel)
+			{
+				errorMsg(EMT_WARNING, "The punctuation within a word or type was mis-interpretable as an END-OF-SENTENCE marker.  I will ignore the current entry.", "main()"); 
+				cerr << "\tPrevious or Current Entry: " << inputDE << endl;
+			}
+			state=STATE_BAD;
+                        break;
+
+                default:
+			if (errorLevel++<errorReportingLevel)
+			{
+				errorMsg(EMT_WARNING, "The punctuation within a word or type was mis-interpretable as an UNDEFINED-PARSER-STATE.  I will ignore the current entry.", "main()"); 
+				cerr << "\tPrevious or Current Entry: " << inputDE << endl;
+			}
+			state=STATE_BAD;
+                        break;
+                }
+        }
+
+	cerr << "Dumping " << dictionary.getCount() << " words." << endl;
+
+	dictionary.forEach(dumpDictionary);
+
+	cerr << "That's All Folks!" << endl;
+
+	return 0;
+}
+
+void dumpDictionary(MTCrawDictEnt *aRawDictEnt)
+{
+	cout << (*aRawDictEnt);
+}
+
+// is the baseString a subset of the code?
+
+BOOL isSubset(const MTCstring & code, const MTCstring & baseString)
+{
+	if (code==baseString)
+	{
+		return TRUE;
+	}
+
+	MTCRBT <MTCstring> codeSet;
+	MTCstring tempStr;
+
+	codeSet.clear();
+
+	char buffer[code.length()+1];
+
+	strcpy(buffer, code.c_str());
+	
+	char *p;
+
+	p=strtok(buffer, ",");
+	tempStr=p;
+	codeSet.add(tempStr);
+
+	while (p!=NULL)
+	{
+		if (baseString==p)
+		{
+			codeSet.clear();
+			return TRUE;
+		}
+
+		p=strtok(NULL, ",");
+		tempStr=p;
+		codeSet.add(tempStr);
+	}
+
+	tempStr=baseString;
+	codeSet.add(tempStr);
+
+	mergeTypeString="";
+
+	codeSet.forEach(dumpCodeSet);
+
+	codeSet.clear();
+
+	return FALSE;
+}
+
+void dumpCodeSet(MTCstring *aString)
+{
+	if (mergeTypeString.length()==0)
+	{
+		mergeTypeString=*aString;
+	}
+	else
+	{
+		mergeTypeString+=",";
+		mergeTypeString+=(*aString);
+	}
+}
+
+void usage()
+{
+	cerr << "Usage: sortdict [-x] [-e errorLevel] [-u updateFreq] [-q] [-r] " << endl;
+	cerr << "\t-e\tPrint error messages up to this level (0-9). Default is 1." << endl;
+	cerr << "\t-q\tDo NOT print status updates or errors (same as [-u 0] [-e 0]" << endl;
+	cerr << "\t-r\tRerun option: input should be the output of previous run." << endl;
+	cerr << "\t \t(commas are interpreted as merging types)." << endl;
+	cerr << "\t-u\tPrint status update every 'updateFreq' successful lines " << endl;
+	cerr << "\t-x\tExpand dictionary with suffixes (experimental)" << endl;
+}
+@
+
+
+1.17
+log
+@Fixed usage() for -r
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.16 1997/03/08 17:06:37 markc Exp markc $
+d11 3
+d18 1
+a18 1
+ * Added static char rcsid []  = "@@(#)$Id: sortdct.cc,v 1.16 1997/03/08 17:06:37 markc Exp markc $";
+d64 1
+a64 1
+static char rcsid []  = "@@(#)$Id: sortdct.cc,v 1.16 1997/03/08 17:06:37 markc Exp markc $";
+d79 2
+a80 2
+int yylex();
+extern char *yytext;
+d169 1
+a169 1
+                retval=yylex();
+d171 1
+a171 1
+                if (yytext[0]=='\0')
+d176 1
+a176 1
+		MTCstring yytextString(yytext);
+d187 1
+a187 1
+					inputDE.setCode(tempStr+yytextString);
+d191 1
+a191 1
+					inputDE.setCode(yytextString);
+d196 2
+a197 2
+				yytextString.toLower();	
+				inputDE.setValue(yytextString);
+d205 1
+a205 1
+					cerr << "\tNext: " << yytextString << endl;
+d214 1
+a214 1
+					cerr << "\tWord: " << yytextString << endl;
+d222 1
+a222 1
+			if (yytextString=="\n") 
+d321 1
+a321 1
+				if ((yytextString==",")
+d326 1
+a326 1
+					inputDE.setCode(tempStr+yytextString);
+d336 1
+a336 1
+					cerr << "\tPunctuation:" << yytextString <<  ":" << endl;
+@
+
+
+1.16
+log
+@Added Rerun [-r] option
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.15 1997/03/05 17:41:20 markc Exp markc $
+d11 3
+d15 1
+a15 1
+ * Added static char rcsid []  = "@@(#)$Id$";
+d61 1
+a61 1
+static char rcsid []  = "@@(#)$Id: sortdct.cc,v 1.15 1997/03/05 17:41:20 markc Exp markc $";
+d442 1
+a442 1
+	cerr << "\t-r\tRerun option: the input is assumed to be the output of another run." << endl;
+@
+
+
+1.15
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.14 1997/03/05 15:44:21 markc Exp markc $
+d11 3
+d58 1
+a58 1
+static char rcsid []  = "@@(#)$Id$";
+d98 1
+d104 1
+a104 1
+	while ((ch = getopt(argc, argv, "xe:u:q")) != EOF)
+d121 3
+d146 1
+a146 1
+		cerr << "Suffix Expansion Enabled." << endl;
+d149 4
+d178 9
+a186 1
+				inputDE.setCode(yytextString);
+a287 1
+					state=STATE_READY;
+d297 2
+d308 2
+d315 12
+d436 1
+a436 1
+	cerr << "Usage: sortdict [-x] [-e errorLevel] [-u updateFreq] [-q] " << endl;
+d439 2
+@
+
+
+1.14
+log
+@Added nlAsPunct parameter.
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.13 1997/03/04 16:08:51 markc Exp markc $
+d11 3
+d54 2
+@
+
+
+1.13
+log
+@Removed cerr << "Usage:" line
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.12 1997/03/03 03:20:36 markc Exp markc $
+d11 3
+d67 1
+d92 2
+@
+
+
+1.12
+log
+@Added -e -u -q
+Added parsing by lexword.l instead of just ignoring punctuation lines
+Added modelset so that the order of the types no longer matters
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdct.cc,v 1.11 1996/02/11 17:30:45 markc Exp markc $
+d11 5
+a82 2
+
+	cerr << "Usage: sortdict [-x] [-e errorLevel] [-u updateFreq] [-q] " << endl;
+@
+
+
+1.11
+log
+@added isSubset logic to properly tokenize type to reduce duplicates
+such as AD,N becoming AD,N,N if the word is defined twice as an N
+@
+text
+@d8 6
+a13 1
+ * $Id: sortdict.cc,v 1.10 1996/02/07 03:49:59 markc Exp markc $
+a14 1
+ * $Log: sortdict.cc,v $
+d47 1
+d55 11
+d71 4
+d77 1
+a77 1
+	BOOL expand=FALSE;
+d79 1
+a79 5
+	if (argc>2)
+	{
+		usage();
+		return -1;
+	}
+d81 6
+a86 1
+	if (argc==2)
+d88 1
+a88 1
+		if (strcmp(argv[1], "-x")==0)
+d90 17
+a106 6
+			expand=TRUE;
+		}
+		else
+		{
+			usage();
+			return -1;
+d110 3
+d117 5
+a121 4
+	cerr << "Processing Dictionary - Please Wait..." << endl;
+	cerr << "(output to stdout)" << endl;
+
+	cerr << "Reading from stdin..." << endl;
+a127 1
+	cin >> inputDE;
+d132 7
+d140 1
+a140 12
+	while (cin.eof()==0)
+	{
+		MTCstring lower(inputDE.getValue());
+		lower.toLower();
+		inputDE.setValue(lower);
+
+		// ignore any multi-word entries or any words with punctuation 
+
+		const char *c=lower.c_str();
+		good=TRUE;
+
+		if ((l=lower.length())==0)
+d142 1
+a142 1
+			good=FALSE;
+d145 6
+a150 4
+		for(int i=0; i<l; i++)
+		{
+			if (!(((c[i]>='a')&&(c[i]<='z'))
+			||  (c[i]>='0')&&(c[i]<='9')))
+d152 26
+a177 1
+				good=FALSE;
+d180 1
+a180 1
+		}
+d182 7
+a188 2
+		if (good==TRUE)
+		{
+d190 8
+a197 8
+			if ((found=dictionary.find(inputDE))==NULL)
+			{
+				dictionary.add(inputDE);
+			}
+			else
+			{
+				// don't expand if a word appears multi-times
+				// defined the same way!
+d199 3
+a201 6
+				if (isSubset(found->getCode(), inputDE.getCode())==FALSE)
+				{
+					MTCstring merge(found->getCode());
+					merge+=",";
+					merge+=inputDE.getCode();
+					found->setCode(merge);
+d203 7
+d212 60
+a271 1
+						inputDE.setCode(merge);
+d273 11
+d285 1
+d288 4
+a291 1
+			if (expand==TRUE)
+d293 2
+a294 23
+				morphDE.setValue(inputDE.getValue()+"ary");
+				morphDE.setCode(inputDE.getCode()+"-ARY");
+				dictionary.add(morphDE);
+
+				morphDE.setValue(inputDE.getValue()+"s");
+				morphDE.setCode(inputDE.getCode()+"-PLURAL");
+				dictionary.add(morphDE);
+	
+				morphDE.setValue(inputDE.getValue()+"es");
+				morphDE.setCode(inputDE.getCode()+"-PLURAL");
+				dictionary.add(morphDE);
+
+				morphDE.setValue(inputDE.getValue()+"ing");
+				morphDE.setCode(inputDE.getCode()+"-GERUND");
+				dictionary.add(morphDE);
+
+				morphDE.setValue(inputDE.getValue()+"ism");
+				morphDE.setCode(inputDE.getCode()+"-ISM");
+				dictionary.add(morphDE);
+
+				morphDE.setValue(inputDE.getValue()+"ly");
+				morphDE.setCode(inputDE.getCode()+"-LY");
+				dictionary.add(morphDE);
+d296 2
+a297 1
+		}
+d299 10
+a308 7
+		cin >> inputDE;
+
+		if (++count%1000==0)
+		{
+  			cerr << "sd: " << count << "    \r";   
+		}
+	} 
+d333 5
+d345 2
+d352 1
+d357 2
+d361 9
+d373 13
+d388 5
+a392 2
+	cerr << "Usage: sortdict [-x]" << endl;
+	cerr << "\t-x\texpand dictionary with suffixes" << endl;
+@
+
+
+1.10
+log
+@don't merge if a word appears multiple times defined the same way!
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.9 1996/01/20 16:34:50 markc Exp markc $
+d11 3
+d52 1
+d136 1
+a136 1
+				if (found->getCode()!=inputDE.getCode())
+d198 30
+@
+
+
+1.9
+log
+@changed messages to every 1000 instead of every 100
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.8 1996/01/20 16:28:53 markc Exp markc $
+d11 3
+d129 2
+a130 4
+				MTCstring merge(found->getCode());
+				merge+=",";
+				merge+=inputDE.getCode();
+				found->setCode(merge);
+d132 1
+a132 1
+				if (expand==TRUE)
+d134 9
+a142 1
+					inputDE.setCode(merge);
+@
+
+
+1.8
+log
+@removed sleep(30) from end
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.7 1996/01/15 06:53:48 markc Exp markc $
+d11 3
+d167 1
+a167 1
+		if (++count%100==0)
+@
+
+
+1.7
+log
+@prototype with RBT support instead of BST
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.6 1996/01/14 13:47:26 markc Exp markc $
+d11 3
+a174 4
+
+	cerr << "sleeping 30 seconds before exiting..." << endl;
+
+	sleep(30);
+@
+
+
+1.6
+log
+@Added - parms
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.5 1996/01/14 12:45:46 markc Exp markc $
+d11 3
+d31 1
+a31 1
+#include <String.h>
+d36 1
+a36 1
+#include "../../mtc++/include/bst.h"
+d65 1
+a65 1
+	MTCBST <MTCrawDictEnt> dictionary;
+d172 4
+@
+
+
+1.5
+log
+@Only allow words such as [a-z0-9]+
+Added count display
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.4 1996/01/14 11:29:33 markc Exp markc $
+d11 4
+d79 2
+a80 1
+	int i=0;
+d88 1
+a88 4
+		if (lower.length()==0)
+		{
+			break;
+		}
+d90 1
+d93 4
+a96 3
+		// ignore any multi-word entries or any words with punctuation 
+
+		const char *c=lower.c_str();
+d98 1
+a98 1
+		for(int i=0; i<lower.length(); i++)
+d158 4
+a161 2
+		if (++i%1000==0)
+			cerr << i << endl;
+@
+
+
+1.4
+log
+@added -x option
+merge types of duplicate words using comma-delimited list of types
+@
+text
+@d8 1
+a8 1
+ * $Id: sortdict.cc,v 1.3 1995/11/08 19:37:39 chapman Exp markc $
+d11 4
+d63 3
+a65 2
+	cerr << "Reading from stdin." << endl;
+	cerr << "Dumping to stdout." << endl;
+a74 1
+	const char *buffer;
+a75 1
+	int j;
+d79 9
+a88 1
+		buffer=inputDE.getValue().c_str();
+d90 3
+a92 1
+		// ignore any multi-word entries
+d94 1
+a94 1
+		for(j=0; j<strlen(buffer); j++)
+d96 2
+a97 1
+			if (buffer[j]==' ')
+d99 1
+a99 1
+				good=FALSE;	
+a105 5
+			MTCstring lower(inputDE.getValue());
+
+			lower.toLower();
+
+			inputDE.setValue(lower);
+d158 2
+d162 1
+a162 1
+	cerr << "Done Converging Dictionary." << endl;
+@
+
+
+1.3
+log
+@Updated to use rawdict.h instead of dictent.h
+@
+text
+@d8 1
+a8 1
+ * $Id$
+d10 4
+a13 1
+ * $Log$
+d29 1
+d31 1
+a31 1
+int main()
+d33 21
+d56 1
+d59 7
+d79 2
+d92 3
+a94 1
+			dictionary.add(inputDE, TRUE);
+d96 28
+a123 7
+			morphDE.setValue(inputDE.getValue()+"ary");
+			morphDE.setCode(inputDE.getCode()+"-ARY");
+			dictionary.add(morphDE);
+
+			morphDE.setValue(inputDE.getValue()+"s");
+			morphDE.setCode(inputDE.getCode()+"-PLURAL");
+			dictionary.add(morphDE);
+d125 16
+a140 15
+			morphDE.setValue(inputDE.getValue()+"es");
+			morphDE.setCode(inputDE.getCode()+"-PLURAL");
+			dictionary.add(morphDE);
+
+			morphDE.setValue(inputDE.getValue()+"ing");
+			morphDE.setCode(inputDE.getCode()+"-GERUND");
+			dictionary.add(morphDE);
+
+			morphDE.setValue(inputDE.getValue()+"ism");
+			morphDE.setCode(inputDE.getCode()+"-ISM");
+			dictionary.add(morphDE);
+
+			morphDE.setValue(inputDE.getValue()+"ly");
+			morphDE.setCode(inputDE.getCode()+"-LY");
+			dictionary.add(morphDE);
+a148 1
+
+d159 6
+@
+
+
+1.2
+log
+@Added suffix generation
+@
+text
+@d1 13
+d21 1
+a21 1
+#include "../include/dictent.h"
+d25 1
+a25 1
+void dumpDictionary(MTCdictEnt *);
+d29 2
+a30 2
+	MTCBST <MTCdictEnt> dictionary;
+	MTCdictEnt inputDE, morphDE;
+d98 1
+a98 1
+void dumpDictionary(MTCdictEnt *aDictEnt)
+d100 1
+a100 1
+	cout << (*aDictEnt);
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d17 1
+a17 1
+	MTCdictEnt temp;
+d21 1
+a21 1
+	cin >> temp;
+d31 1
+a31 1
+		buffer=temp.getValue().c_str();
+d43 27
+a69 1
+			dictionary.add(temp);
+d71 1
+a71 1
+		cin >> temp;
+@

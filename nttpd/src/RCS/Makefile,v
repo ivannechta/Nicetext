@@ -1,0 +1,210 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.6
+date	98.08.19.22.44.43;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	98.08.19.16.14.57;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	98.07.13.17.31.37;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	98.03.13.03.48.17;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	98.02.19.19.33.16;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	97.08.18.03.50.57;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@#
+# Makefile
+# Mark T. Chapman
+# 
+
+LIBDEPEND=../../babble/lib/libbabb.a ../../gendict/lib/libgndct.a ../../mtc++/lib/libmtc++.a 
+
+CFLAGS+=$(CDEBUG) -I../include -I../../gendict/include -I../../mtc++/include 
+LFLAGS= -L../lib -L../../babble/lib -L../../mtc++/lib -L../../gendict/lib -lbabb -lgndct -lmtc++ 
+
+SRCS=nttpd.cc
+CC=g++
+LEX=flex -f -p $(LDEBUG)  
+YACC=yacc -d -v $(YDEBUG) 
+
+.cc.o:
+	$(CC) $(CFLAGS) -c -o $@@ $<
+
+all: nttpd
+
+depend:
+	makedepend -- $(CFLAGS) -- $(SRCS)
+
+clean:
+	rm -f *.o *.core $(LIBTARGET) nttpd 
+	rm -f ../bin/nttpd ../../bin/nttpd
+
+install: all
+	cp nttpd ../../bin
+	strip ../../bin/nttpd
+
+nttpd: nttpd.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o nttpd nttpd.o $(LFLAGS) 
+
+# DO NOT DELETE
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d9 1
+a9 1
+LFLAGS= -L../lib -L ../../babble/lib -L../../mtc++/lib -L../../gendict/lib -lbabb -lgndct -lmtc++ 
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d30 1
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@a7 6
+#ifdef DEBUG
+#CDEBUG=-g -DDEBUG_YACC_VERBOSE
+#YDEBUG= -l 
+#LDEBUG= -L -d 
+#endif
+
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d14 1
+a14 1
+CFLAGS+=$(CDEBUG) -I../include -I../../gendict/include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+a40 27
+
+nttpd.o: /usr/include/stdio.h /usr/include/sys/types.h
+nttpd.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+nttpd.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+nttpd.o: /usr/include/stdlib.h /usr/include/errno.h /usr/include/string.h
+nttpd.o: /usr/include/netinet/in.h /usr/include/sys/socket.h
+nttpd.o: /usr/include/sys/wait.h /usr/include/arpa/inet.h
+nttpd.o: /usr/include/sys/time.h /usr/include/sys/time.h
+nttpd.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+nttpd.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+nttpd.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+nttpd.o: /usr/include/g++/fstream.h /usr/include/g++/strstream.h
+nttpd.o: /usr/include/g++/strfile.h /usr/include/signal.h
+nttpd.o: /usr/include/sys/signal.h /usr/include/machine/signal.h
+nttpd.o: /usr/include/machine/trap.h ../../mtc++/include/MTC++.h
+nttpd.o: /usr/include/ctype.h /usr/include/runetype.h /usr/include/sys/stat.h
+nttpd.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+nttpd.o: ../../mtc++/include/rbt.h ../../mtc++/include/list.h
+nttpd.o: ../../mtc++/include/raof.h ../../mtc++/include/raof2rbt.h
+nttpd.o: ../../gendict/include/dictrec.h ../../gendict/include/dictarec.h
+nttpd.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+nttpd.o: ../../gendict/include/sentnode.h ../../gendict/include/sentmdl.h
+nttpd.o: ../../gendict/include/dconst.h ../../babble/include/bitstrm.h
+nttpd.o: ../../babble/include/bitinput.h ../../babble/include/bitoutput.h
+nttpd.o: ../../babble/include/rule.h ../../babble/include/grammar.h
+nttpd.o: ../../babble/include/bits2txt.h ../../babble/include/txt2bits.h
+nttpd.o: ../include/postdata.h
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d17 1
+a17 1
+SRCS=nttp.cc
+d25 1
+a25 1
+all: nttp
+d31 2
+a32 2
+	rm -f *.o *.core $(LIBTARGET) nttp 
+	rm -f ../bin/nttp
+d35 1
+a35 1
+	cp nttp ../../bin
+d37 2
+a38 2
+nttp: nttp.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o nttp nttp.o $(LFLAGS) 
+d42 26
+a67 26
+nttp.o: /usr/include/stdio.h /usr/include/sys/cdefs.h
+nttp.o: /usr/include/machine/ansi.h /usr/include/stdlib.h
+nttp.o: /usr/include/machine/types.h /usr/include/errno.h
+nttp.o: /usr/include/string.h /usr/include/sys/types.h
+nttp.o: /usr/include/machine/endian.h /usr/include/netinet/in.h
+nttp.o: /usr/include/sys/socket.h /usr/include/sys/wait.h
+nttp.o: /usr/include/arpa/inet.h /usr/include/sys/time.h
+nttp.o: /usr/include/sys/time.h /usr/include/unistd.h
+nttp.o: /usr/include/sys/unistd.h /usr/include/g++/iostream.h
+nttp.o: /usr/include/g++/streambuf.h /usr/include/g++/libio.h
+nttp.o: /usr/include/g++/_G_config.h /usr/include/g++/fstream.h
+nttp.o: /usr/include/signal.h /usr/include/sys/signal.h
+nttp.o: /usr/include/machine/signal.h /usr/include/machine/trap.h
+nttp.o: ../../mtc++/include/MTC++.h /usr/include/ctype.h
+nttp.o: /usr/include/runetype.h /usr/include/sys/stat.h
+nttp.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+nttp.o: ../../mtc++/include/rbt.h ../../mtc++/include/list.h
+nttp.o: ../../mtc++/include/raof.h ../../mtc++/include/raof2rbt.h
+nttp.o: ../../gendict/include/dictrec.h ../../gendict/include/dictarec.h
+nttp.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+nttp.o: ../../gendict/include/sentnode.h ../../gendict/include/sentmdl.h
+nttp.o: ../../gendict/include/dconst.h ../../babble/include/bitstrm.h
+nttp.o: ../../babble/include/bitinput.h ../../babble/include/bitoutput.h
+nttp.o: ../../babble/include/rule.h ../../babble/include/grammar.h
+nttp.o: ../../babble/include/bits2txt.h ../../babble/include/txt2bits.h
+nttp.o: ../include/postdata.h
+@

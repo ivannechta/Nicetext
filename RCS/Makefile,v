@@ -1,0 +1,671 @@
+head	1.27;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.27
+date	98.08.19.21.37.40;	author markc;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	98.08.19.17.46.00;	author markc;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	98.08.19.16.14.32;	author markc;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	98.08.19.02.08.42;	author markc;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	98.06.27.02.44.33;	author markc;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	98.06.22.18.02.29;	author markc;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	98.02.19.19.34.27;	author markc;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	98.02.19.19.27.11;	author root;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	96.10.12.15.15.02;	author chapman;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	96.07.09.14.03.18;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	96.07.07.15.49.37;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	96.04.24.15.05.12;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	96.04.24.14.53.12;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	96.04.18.16.41.33;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	96.02.14.01.32.33;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	96.02.14.01.19.21;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.02.14.01.09.53;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.02.12.16.19.57;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.02.07.04.01.13;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.01.20.19.00.32;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.16.22.55.30;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.15.13.11.25;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.14.23.01.02;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.12.23.53.09;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.10.20.43.22;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.09.20.30.04;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.09.19.19.38;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.27
+log
+@*** empty log message ***
+@
+text
+@# Master Makefile
+# NiceText
+
+all: 
+	cd rinfo; gmake
+	cd mtc++/src; gmake 
+	cd gendict/src; gmake 
+	cd babble/src; gmake 
+	cd import/src; gmake 
+	cd nttpd/src; gmake
+
+database:
+	cd examples/database; gmake
+
+depend: 
+	cd mtc++/src; gmake depend 
+	cd gendict/src; gmake depend 
+	cd babble/src; gmake depend 
+	cd import/src; gmake depend 
+	cd nttpd/src; gmake depend
+
+clean:
+	cd mtc++/src; gmake clean 
+	cd gendict/src; gmake clean 
+	cd babble/src; gmake clean 
+	cd nttpd/src; gmake clean
+	cd import/src; gmake clean 
+	cd rinfo; gmake clean 
+	rm -f bin/qstart-nttpd
+
+backup: clean
+	rm -f ../nicetext.zip; zip -9 -r ../nicetext.zip *; 
+
+snapshot: RINFO
+	rinfo/rinfo -s
+
+RINFO:  
+	cd rinfo; gmake 
+
+tarball: clean
+	rm -f ../nicetext-0.9.tar ../nicetext-0.9.tar.gz
+	@@echo "Creating tar archive..."
+	cd ..; tar -cvf nicetext-0.9.tar nicetext-0.9; 
+	@@echo "Compressing tar archive..."
+	cd ..; gzip --best nicetext-0.9.tar
+
+install: quickstart
+	cd rinfo; gmake install
+	cd mtc++/src; gmake install 
+	cd gendict/src; gmake install 
+	cd babble/src; gmake install 
+	cd import/src; gmake install 
+	cd nttpd/src; gmake install
+
+quickstart:
+	@@echo "#!/bin/sh" > bin/qstart-nttpd
+	@@echo `pwd`/bin/"nttpd -b `pwd`"/examples/database >> bin/qstart-nttpd
+	chmod a+rx bin/qstart-nttpd
+@
+
+
+1.26
+log
+@*** empty log message ***
+@
+text
+@d57 1
+a57 1
+	@@echo `pwd`/bin/"nttpd -b "../examples/database >> bin/qstart-nttpd
+@
+
+
+1.25
+log
+@*** empty log message ***
+@
+text
+@d29 1
+a29 1
+	rm bin/qstart-nttpd
+@
+
+
+1.24
+log
+@*** empty log message ***
+@
+text
+@d10 1
+d20 1
+d26 1
+a27 1
+	cd examples; gmake clean 
+d29 1
+d47 1
+a47 1
+install:
+d53 6
+a58 1
+	strip bin/*
+@
+
+
+1.23
+log
+@*** empty log message ***
+@
+text
+@d5 1
+d11 3
+a19 6
+debug: 
+	cd mtc++/src; gmake 
+	cd gendict/src; gmake 
+	cd babble/src; gmake 
+	cd import/src; gmake 
+	
+d25 1
+a25 2
+	cd database; gmake clean 
+	cd words; gmake clean 
+a26 1
+	cd tutorial; gmake clean 
+d39 4
+a42 1
+	cd ..; tar -cvf nicetext-0.9.tar nicetext-0.9; gzip --fast nicetext-0.9.tar
+d45 1
+@
+
+
+1.22
+log
+@*** empty log message ***
+@
+text
+@a2 1
+# (see COPYRIGHT file) 
+d5 4
+a8 4
+	cd mtc++/src; make 
+	cd gendict/src; make 
+	cd babble/src; make 
+	cd import/src; make 
+d11 4
+a14 4
+	cd mtc++/src; make depend 
+	cd gendict/src; make depend 
+	cd babble/src; make depend 
+	cd import/src; make depend 
+d17 4
+a20 4
+	cd mtc++/src; make 
+	cd gendict/src; make 
+	cd babble/src; make 
+	cd import/src; make 
+d23 8
+a30 7
+	cd mtc++/src; make clean 
+	cd gendict/src; make clean 
+	cd babble/src; make clean 
+	cd import/src; make clean 
+	cd data; make clean 
+	cd rinfo; make clean 
+	cd tutorial; make clean 
+d39 1
+a39 1
+	cd rinfo; make 
+d46 4
+a49 4
+	cd mtc++/src; make install 
+	cd gendict/src; make install 
+	cd babble/src; make install 
+	cd import/src; make install 
+@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@a0 1
+
+d2 2
+a3 7
+# 	To enable debugging: setenv DEBUG yes
+
+ifdef PGMAKE 
+FAST=$(PGMAKE)
+else
+FAST=-j2 -l4.0
+endif 
+d6 4
+a9 4
+	cd mtc++/src; gmake $(FAST) 
+	cd gendict/src; gmake $(FAST)
+	cd babble/src; gmake $(FAST)
+	cd import/src; gmake $(FAST)
+d12 4
+a15 4
+	cd mtc++/src; gmake depend $(FAST)
+	cd gendict/src; gmake depend $(FAST)
+	cd babble/src; gmake depend $(FAST)
+	cd import/src; gmake depend $(FAST)
+d18 4
+a21 4
+	cd mtc++/src; gmake $(FAST)
+	cd gendict/src; gmake $(FAST)
+	cd babble/src; gmake $(FAST)
+	cd import/src; gmake $(FAST)
+d24 7
+a30 8
+	cd mtc++/src; gmake clean $(FAST)
+	cd gendict/src; gmake clean $(FAST)
+	cd babble/src; gmake clean $(FAST)
+	cd import/src; gmake clean $(FAST)
+	cd data; gmake clean $(FAST)
+	cd rinfo; gmake clean $(FAST)
+	cd thesis; gmake clean $(FAST)
+	cd sample; gmake clean $(FAST)
+d39 5
+a43 1
+	cd rinfo; gmake $(FAST)
+d46 5
+a50 5
+	cd mtc++/src; gmake install $(FAST)
+	cd gendict/src; gmake install $(FAST)
+	cd babble/src; gmake install $(FAST)
+	cd import/src; gmake install $(FAST)
+
+@
+
+
+1.20
+log
+@*** empty log message ***
+@
+text
+@d8 1
+a8 1
+FAST=-j4 -l4.0
+@
+
+
+1.19
+log
+@*** empty log message ***
+@
+text
+@a37 1
+#	find . \( -name "*.cc.ps" -or -name "*.h.ps" \) -exec rm -f {} \;
+a46 3
+
+pretty:
+	find . \( \( -name "*.cc" -or -name "*.h" \) -and \! \( -name "*,v" \) \) -exec etc/pretty {} \;
+@
+
+
+1.18
+log
+@removed simos, nlp -- they are not part of the system
+@
+text
+@d38 1
+a38 1
+	find . \( -name "*.cc.ps" -or -name "*.h.ps" \) -exec rm -f {} \;
+d41 1
+a41 1
+	rm -f ../babble.sav; zip -9 -r ../babble.sav *; 
+@
+
+
+1.17
+log
+@added sample
+@
+text
+@a34 2
+	cd nlp/src; gmake clean $(FAST)
+	cd simos/src; gmake clean $(FAST)
+@
+
+
+1.16
+log
+@fixed clean target for *.h.ps -or *.cc.ps instead of *.ps
+@
+text
+@d38 2
+a39 1
+	cd doc; gmake clean $(FAST)
+d43 1
+a43 1
+	rm -f /tmp/babble.sav; zip -9 -r /tmp/babble.sav *; mv /tmp/babble.sav ~
+@
+
+
+1.15
+log
+@added pretty target
+@
+text
+@d39 1
+a39 1
+	find . -name "*.ps" -exec rm -f {} \;
+@
+
+
+1.14
+log
+@added doc
+@
+text
+@d39 1
+d49 3
+@
+
+
+1.13
+log
+@rinfo->RINFO
+@
+text
+@d38 1
+@
+
+
+1.12
+log
+@added rinfo
+@
+text
+@d42 1
+a42 1
+snapshot: rinfo
+d45 1
+a45 1
+rinfo:
+@
+
+
+1.11
+log
+@cel
+@
+text
+@d11 1
+a11 1
+all:
+d17 1
+a17 1
+depend:
+d23 1
+a23 1
+debug:
+d37 1
+d42 5
+a46 2
+snapshot:
+	rinfo -s
+@
+
+
+1.10
+log
+@allowed backup target to work in parallel
+@
+text
+@d15 1
+d21 1
+d27 1
+d33 1
+d48 1
+@
+
+
+1.9
+log
+@added data to clean target
+@
+text
+@d35 1
+a35 2
+	rm -f ~/babble.sav 
+	zip -9 -r ~/babble.sav *
+@
+
+
+1.8
+log
+@use PGMAKE setenv
+@
+text
+@d30 1
+@
+
+
+1.7
+log
+@added $(FAST) option -j -l
+@
+text
+@d5 3
+d9 1
+@
+
+
+1.6
+log
+@converted from bsd make to gmake
+@
+text
+@d5 2
+d8 3
+a10 3
+	cd mtc++/src; gmake 
+	cd gendict/src; gmake 
+	cd babble/src; gmake 
+d13 3
+a15 3
+	cd mtc++/src; gmake depend
+	cd gendict/src; gmake depend
+	cd babble/src; gmake depend
+d18 3
+a20 3
+	cd mtc++/src; gmake 
+	cd gendict/src; gmake 
+	cd babble/src; gmake 
+d23 5
+a27 4
+	cd mtc++/src; gmake clean
+	cd gendict/src; gmake clean
+	cd babble/src; gmake clean
+	cd nlp/src; gmake clean
+d37 4
+a40 3
+	cd mtc++/src; gmake install
+	cd gendict/src; gmake install
+	cd babble/src; gmake install
+@
+
+
+1.5
+log
+@fixed install to include mtc++
+@
+text
+@d2 2
+a3 3
+.ifdef DEBUG
+DEBUG=-DDEBUG
+.endif
+d6 3
+a8 3
+	cd mtc++/src; make $(DEBUG)
+	cd gendict/src; make $(DEBUG)
+	cd babble/src; make $(DEBUG)
+d11 3
+a13 3
+	cd mtc++/src; make depend
+	cd gendict/src; make depend
+	cd babble/src; make depend
+d16 3
+a18 3
+	cd mtc++/src; make -DDEBUG
+	cd gendict/src; make -DDEBUG
+	cd babble/src; make -DDEBUG
+d21 4
+a24 4
+	cd mtc++/src; make clean
+	cd gendict/src; make clean
+	cd babble/src; make clean
+	cd nlp/src; make clean
+d34 3
+a36 3
+	cd mtc++/src; make $(DEBUG) install
+	cd gendict/src; make $(DEBUG) install
+	cd babble/src; make $(DEBUG) install
+@
+
+
+1.4
+log
+@added depend targets
+@
+text
+@d35 1
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d11 5
+@
+
+
+1.2
+log
+@Added backup and snapshot
+@
+text
+@d20 1
+d23 1
+a23 1
+	mv ~/babble.sav ~/babble.sav.old
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d21 7
+@

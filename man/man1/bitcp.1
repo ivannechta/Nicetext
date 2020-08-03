@@ -1,0 +1,39 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" bitcp.1 by Mark T. Chapman
+.\"
+.TH BITCP 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+bitcp
+.SH SYNOPSIS
+.B bitcp inputFile outputFile
+.SH DESCRIPTION
+.I bitcp
+is a cpu-intensive way to copy the contents of one file into another
+by shifting a random number of bits at a time.
+
+The purpose is to test the bits2txt and txt2bits objects when porting the
+.B NICETEXT 
+system. 
+.SH "EXAMPLES"
+.IP
+\fCbitcp /etc/passwd /tmp/passwd\fP
+.LP
+copies the contents of /etc/passwd into /tmp/passwd.
+.SH "DIAGNOSTICS"
+.I bitcp
+returns a non-zero value if it detects any errors.
+.SH "SEE ALSO"
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).
+

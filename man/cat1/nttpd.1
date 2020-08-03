@@ -1,0 +1,132 @@
+
+
+
+NTTPD(1L)						NTTPD(1L)
+
+
+NNAAMMEE
+       nttpd
+
+SSYYNNOOPPSSIISS
+       nnttttppdd [-b dataBaseDir] [-t tempDir] [-p port] [-w]
+
+DDEESSCCRRIIPPTTIIOONN
+       _n_t_t_p_d  is a program that provides an EEXXPPEERRIIMMEENNTTAALL HTTP/1.0
+       interface to the NNIICCEETTEEXXTT system.  The idea is to  provide
+       a  quick  and  dirty way to do the _n_i_c_e_t_e_x_t_(_1_L_) and _s_c_r_a_m_-
+       _b_l_e_(_1_L_) transformations through a standard web browser.
+
+       The _q_s_t_a_r_t_-_n_t_t_p_d shell-script may help you with	a  quick-
+       start of the nttp-daemon.
+
+WWAARRNNIINNGG
+       The  _n_t_t_p_d  program is EEXXPPEERRIIMMEENNTTAALL - which is another way
+       of saying it is a terrible hack of a program.
+
+       Assume that it will be a rreessoouurrccee hhoogg and a sseeccuurriittyy  rriisskk
+       on your system.
+
+       IITT  IISS NNOOTT RREEPPRREESSEENNTTAATTIIVVEE OOFF TTHHEE RREESSTT OOFF TTHHEE NNIICCEETTEEXXTT SSYYSS--
+       TTEEMM,, which is quite robust.
+
+
+OOPPTTIIOONNSS
+       --bb ddaattaaBBaasseeDDiirr
+	      This is the location of the dictionary  and  style-
+	      source   files.	You  should  point  this  to  the
+	      _d_a_t_a_b_a_s_e directory of the standard NNIICCEETTEEXXTT distri-
+	      bution.
+
+	      The default is the current working directory.
+
+       --pp ppoorrtt
+	      The  TCP/IP port number that the server will lliisstteenn
+	      for new connections.
+
+	      The default is 2119.
+
+       --tt tteemmppDDiirr
+	      The  location  where  the  temporary  _n_i_c_e_t_e_x_t  and
+	      _s_c_r_a_m_b_l_e_'_d text will be placed during processing.
+
+	      The default is /tmp.
+
+       --ww     Allow  connection  from  any  machine on the World-
+	      Wide-Web.  Otherwise, _n_t_t_p_d  only  accepts  connec-
+	      tions from localhost (127.0.0.1).
+
+SSEEEE AALLSSOO
+       bitcp(1L),    dct2mstr(1L),   expgram(1L),   genmodel(1L),
+       gramtest(1L),  impkimmo(1L),   impmsc(1L),   impwbstr(1L),
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+NTTPD(1L)						NTTPD(1L)
+
+
+       listword(1L),  nicetext(1L),  printint(1L),  scramble(1L),
+       sortdct(1L), txt2dct(1L).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+

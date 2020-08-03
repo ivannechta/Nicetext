@@ -1,0 +1,189 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" genmodel.1 by Mark T. Chapman
+.\"
+.TH GENMODEL 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+genmodel
+.SH SYNOPSIS
+.B genmodel
+.RB [\-b\ badWordFile] 
+.RB [\-d\ inputDictionary]
+.RB [\-g\ grammar]
+.RB [\-i\ inputFile] 
+.RB [\-j\ jumpOverFirstLineCount] 
+.RB [\-m\ model]
+.RB [\-o\ outputDictionary]
+.RB [\-s\]
+.RB [[\-u\ updateFreq] | [\-q\]]
+.SH DESCRIPTION
+.I genmodel
+creates style sources from sample natural-language texts for use with the
+.B NICETEXT
+system.
+.SH "OPTIONS"
+.TP
+.BI \-b\ badWordFile
+Output a list of words that occurred in the input file but were not defined
+in the input dictionary. 
+.TP
+.BI \-d\ inputDictionary
+Use 
+.I inputDictionary
+as the prefix to select the input dictionary definition database.  
+.I genmodel
+uses the input dictionary to assign types to words in the 
+.I inputFile.  
+
+For example:
+.I mstr
+specifies the database in the files 
+.I mstrdict.dat 
+.I mstrdict.alt 
+.I mstrdict.jmp 
+.I mstrtype.dat 
+.I mstrtype.alt 
+and  
+.I mstrtype.jmp 
+You may also include directory information in the prefix: 
+.I ~/mydict/shak 
+would point to 
+.I ~/mydict/shakdict.dat 
+.I ~/mydict/shakdict.jmp 
+etc.
+
+The default 
+.I input dictionary
+is 
+.I mstr
+
+See 
+.RI sortdct(1L)  
+and 
+.RI dct2mstr(1L)
+, to learn how to create the proper format dictionary tables.
+.TP
+.BI \-g\ grammar
+Output the generated style source into this 
+.I grammar
+definition file.
+The grammar will consist of one rule with as many RHS rewrites as
+there are sentence models.  This makes for a 
+.B very
+inefficient use of the grammar-rule format.  The reason for having
+the
+.B -g
+option is to assist in manual grammar definition. 
+
+(To accomplish this, send individual sentences or fragments through
+.I genmodel
+to view the generated rules.)
+.TP
+.BI \-i\ inputFile
+Read sample natural-language texts from
+.I inputFile.
+The default is stdin.
+.TP
+.BI \-j\ jumpOverFirstLineCount
+Skip the first
+.B -j
+lines in the
+.I inputFile.
+NOTE: THIS OPTION MAY NOT BE AVAILABLE.
+.TP
+.BI \-m\ model
+Output the generated style-source into the sentence-model database
+with the
+.I model
+prefix.
+
+For example:
+.I mstr
+generates the database in the files 
+.I mstrmodel.dat 
+and  
+.I mstrmodel.jmp
+You may also include directory information in the prefix: 
+.I ~/mymodels/shak 
+would point to 
+.I ~/mymodels/shakmodel.dat 
+and
+.I ~/mymodels/shakmodel.jmp
+
+The generation of sentence-model databases is the primary use of the 
+.I genmodel
+program.
+.TP
+.BI \-o\ outputDictionary
+Create a new dictionary that is the subset of words in the
+.I inputDictionary
+that were defined in the
+.I inputFile. 
+.I outputDictionary
+is the prefix for the distribution dictionary. 
+.TP
+.BI -s 
+Normally, the software loads all database tables into RAM before processing.
+The 
+.B -s
+option instructs the software to read each record from the database
+tables on disk during analysis.  The primary advantage is that the 
+software has a significantly
+smaller memory footprint.  Another advantage is that you do not need to wait
+to load the dictionary into RAM - which can take some time.  The disadvantage
+is that processing of large input files is significantly slower.  
+
+Use this option if you are processing a relatively small input file or if you 
+get memory errors when running without 
+.B -s 
+set.
+.TP
+.BI \-u\ updateFreq 
+Print status updates to stderr every
+.I updateFreq
+sentences.  Use zero to disable updates.
+
+The following is the definition of the status information: 
+
+.RS
+.IP SR:
+Number of sentences read from the 
+.I inputFile
+.IP US:
+Number of unique sentence-models read.
+.IP WR: 
+Number of words read.
+.IP UW:
+Number of unique words read.
+.IP BWR:
+Number of bad (undefined) words read. 
+.IP UBW:
+Number of unique bad words.
+.RE
+.TP
+.BI -q
+Be quiet.  This is the same as
+.B -u 0
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1L).
+

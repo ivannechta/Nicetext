@@ -1,0 +1,658 @@
+head	1.19;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.19
+date	98.08.19.16.14.41;	author markc;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	98.06.25.20.09.28;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	98.06.22.18.16.12;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	98.03.13.03.44.50;	author root;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	97.08.18.03.18.17;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	97.08.18.03.05.27;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	97.02.16.15.41.24;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	96.03.21.17.18.32;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.02.14.01.09.10;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.02.13.19.51.38;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.01.20.17.39.56;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.01.20.17.30.03;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.15.13.03.58;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.14.13.59.37;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.14.11.30.15;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.13.09.41.42;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.11.21.19.06;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.10.20.43.37;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.09.19.21.11;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial check in
+@
+
+
+1.19
+log
+@*** empty log message ***
+@
+text
+@#
+# Makefile
+# Mark T. Chapman
+# 
+
+LIBTARGET=../lib/libgndct.a
+LIBOBJS= rawdict.o lexword.o dictrec.o typerec.o sentmdl.o sentnode.o 
+LIBDEPEND=$(LIBTARGET) ../../mtc++/lib/libmtc++.a
+
+CFLAGS+=$(CDEBUG) -I../include -I../../mtc++/include
+LFLAGS= -L../../mtc++/lib -L../lib -lmtc++ -lgndct   
+
+CC=g++
+#LEX=lex -fp
+
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc sentnode.cc txt2dct.cc listword.cc sortdct.cc
+
+.cc.o:
+	$(CC) $(CFLAGS) -c -o $@@ $<
+
+
+all: $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdct 
+
+install: all
+	cp dct2mstr ../../bin
+	cp genmodel ../../bin
+	cp listword ../../bin
+	cp sortdct ../../bin
+	cp txt2dct  ../../bin
+	strip ../../bin/dct2mstr ../../bin/genmodel ../../bin/listword ../../bin/sortdct ../../bin/txt2dct
+
+
+depend:
+	makedepend -- $(CFLAGS) -- $(SRCS)
+
+clean:
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdct txt2dct *.core 
+	rm -f ../bin/dct2mstr ../bin/genmodel ../bin/listword ../bin/sortdct ../../bin/dct2mstr ../../bin/genmodel ../../bin/listword ../../bin/sortdct ../bin/txt2dct ../../bin/txt2dct
+
+master: dct2mstr
+	dct2mstr
+
+$(LIBTARGET): $(LIBOBJS)
+	ar -rc $(LIBTARGET) $(LIBOBJS)
+	ranlib $(LIBTARGET)
+
+dct2mstr: dct2mstr.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o dct2mstr dct2mstr.o $(LFLAGS) 
+
+listword: listword.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o listword listword.o $(LFLAGS)
+
+sortdct: sortdct.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o sortdct sortdct.o $(LFLAGS)
+
+txt2dct: txt2dct.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o txt2dct txt2dct.o $(LFLAGS)
+
+genmodel: genmodel.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o genmodel genmodel.o $(LFLAGS)
+
+lexword.cc: lexword.l
+	rm -f lex.yy.c
+	$(LEX) lexword.l 
+	sed s/yy/zz/g < lex.yy.c | sed s/YY/ZZ/g > lexword.cc
+	rm -f lex.yy.c
+
+@
+
+
+1.18
+log
+@*** empty log message ***
+@
+text
+@d30 2
+@
+
+
+1.17
+log
+@*** empty log message ***
+@
+text
+@d13 3
+a16 2
+CC=g++
+LEX=lex
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@a9 4
+ifdef DEBUG
+CDEBUG=-g
+endif 
+
+d15 1
+a15 1
+LEX=flex -f -p  
+@
+
+
+1.15
+log
+@YY -> ZZ for lex
+@
+text
+@d14 1
+a14 1
+CFLAGS+=$(CDEBUG) -I../include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+d38 1
+a38 1
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdct txt2dct *.core lexword.cc
+a68 133
+# DO NOT DELETE
+
+dct2mstr.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+dct2mstr.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+dct2mstr.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+dct2mstr.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+dct2mstr.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+dct2mstr.o: /usr/include/stdio.h /usr/include/stdlib.h
+dct2mstr.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+dct2mstr.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+dct2mstr.o: /usr/include/ctype.h /usr/include/runetype.h
+dct2mstr.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+dct2mstr.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+dct2mstr.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+dct2mstr.o: ../../mtc++/include/rbt.h ../../mtc++/include/raof.h
+dct2mstr.o: ../../mtc++/include/raofalt.h ../../mtc++/include/list.h
+dct2mstr.o: ../include/rawdict.h ../include/dictrec.h ../include/dictarec.h
+dct2mstr.o: ../include/typerec.h ../include/dconst.h
+rawdict.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+rawdict.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+rawdict.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+rawdict.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+rawdict.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+rawdict.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+rawdict.o: /usr/include/string.h /usr/include/unistd.h
+rawdict.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+rawdict.o: /usr/include/runetype.h /usr/include/sys/stat.h
+rawdict.o: /usr/include/sys/time.h /usr/include/sys/time.h
+rawdict.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+rawdict.o: ../include/rawdict.h
+genmodel.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+genmodel.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+genmodel.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+genmodel.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+genmodel.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+genmodel.o: /usr/include/stdio.h /usr/include/stdlib.h
+genmodel.o: /usr/include/g++/String.h /usr/include/g++/Regex.h
+genmodel.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+genmodel.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+genmodel.o: /usr/include/ctype.h /usr/include/runetype.h
+genmodel.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+genmodel.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+genmodel.o: ../../mtc++/include/errormsg.h ../../mtc++/include/rbt.h
+genmodel.o: ../../mtc++/include/bst.h ../../mtc++/include/list.h
+genmodel.o: ../../mtc++/include/raof.h ../../mtc++/include/raofalt.h
+genmodel.o: ../../mtc++/include/raof2bst.h ../include/lexword.h
+genmodel.o: ../include/dictrec.h ../include/typerec.h ../include/typearec.h
+genmodel.o: ../include/dictarec.h ../include/sentnode.h ../include/sentmdl.h
+genmodel.o: ../include/dconst.h
+lexword.o: /usr/include/stdio.h /usr/include/sys/types.h
+lexword.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+lexword.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+lexword.o: /usr/include/stdlib.h
+dictrec.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+dictrec.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+dictrec.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+dictrec.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+dictrec.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+dictrec.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+dictrec.o: /usr/include/string.h /usr/include/unistd.h
+dictrec.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+dictrec.o: /usr/include/runetype.h /usr/include/sys/stat.h
+dictrec.o: /usr/include/sys/time.h /usr/include/sys/time.h
+dictrec.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+dictrec.o: ../../mtc++/include/raof.h ../include/dictrec.h
+typerec.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+typerec.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+typerec.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+typerec.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+typerec.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+typerec.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+typerec.o: /usr/include/string.h /usr/include/unistd.h
+typerec.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+typerec.o: /usr/include/runetype.h /usr/include/sys/stat.h
+typerec.o: /usr/include/sys/time.h /usr/include/sys/time.h
+typerec.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+typerec.o: ../include/typerec.h
+sentmdl.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+sentmdl.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+sentmdl.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+sentmdl.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+sentmdl.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+sentmdl.o: /usr/include/stdlib.h ../../mtc++/include/MTC++.h
+sentmdl.o: /usr/include/stdio.h /usr/include/string.h /usr/include/unistd.h
+sentmdl.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+sentmdl.o: /usr/include/runetype.h /usr/include/sys/stat.h
+sentmdl.o: /usr/include/sys/time.h /usr/include/sys/time.h
+sentmdl.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+sentmdl.o: ../../mtc++/include/raof.h ../../mtc++/include/list.h
+sentmdl.o: ../include/sentnode.h ../include/sentmdl.h
+sentnode.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+sentnode.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+sentnode.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+sentnode.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+sentnode.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+sentnode.o: /usr/include/stdlib.h ../../mtc++/include/MTC++.h
+sentnode.o: /usr/include/stdio.h /usr/include/string.h /usr/include/unistd.h
+sentnode.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+sentnode.o: /usr/include/runetype.h /usr/include/sys/stat.h
+sentnode.o: /usr/include/sys/time.h /usr/include/sys/time.h
+sentnode.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+sentnode.o: ../../mtc++/include/list.h ../include/sentnode.h
+sentnode.o: ../include/sentmdl.h
+txt2dct.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+txt2dct.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+txt2dct.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+txt2dct.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+txt2dct.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+txt2dct.o: /usr/include/stdio.h
+listword.o: /usr/include/stdio.h /usr/include/sys/types.h
+listword.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+listword.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+listword.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+listword.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+listword.o: /usr/include/g++/fstream.h ../../mtc++/include/MTC++.h
+listword.o: /usr/include/string.h /usr/include/unistd.h
+listword.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+listword.o: /usr/include/runetype.h /usr/include/sys/stat.h
+listword.o: /usr/include/sys/time.h /usr/include/sys/time.h
+listword.o: ../../mtc++/include/errormsg.h ../../mtc++/include/mstring.h
+listword.o: ../../mtc++/include/rbt.h ../include/lexword.h
+sortdct.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+sortdct.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+sortdct.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+sortdct.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+sortdct.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+sortdct.o: /usr/include/stdio.h /usr/include/unistd.h
+sortdct.o: /usr/include/sys/unistd.h ../../mtc++/include/MTC++.h
+sortdct.o: /usr/include/string.h /usr/include/ctype.h /usr/include/runetype.h
+sortdct.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+sortdct.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+sortdct.o: ../../mtc++/include/errormsg.h ../include/rawdict.h
+sortdct.o: ../../mtc++/include/rbt.h ../../mtc++/include/raof.h
+@
+
+
+1.14
+log
+@Changed yy* to zz* to avoid multiple symbols for LEX parsers
+@
+text
+@d66 1
+a66 1
+	sed s/yy/zz/g < lex.yy.c > lexword.cc
+@
+
+
+1.13
+log
+@removed ../bin as install target
+@
+text
+@d66 2
+a67 1
+	mv lex.yy.c lexword.cc
+@
+
+
+1.12
+log
+@changed program names
+@
+text
+@a27 5
+	cp dct2mstr ../bin
+	cp genmodel ../bin
+	cp listword ../bin
+	cp sortdct ../bin
+	cp txt2dct  ../bin
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d17 1
+a17 1
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc sentnode.cc txt2dct.cc listword.cc sortdict.cc
+d25 1
+a25 1
+all: $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdict 
+d31 1
+a31 1
+	cp sortdict ../bin
+d36 1
+a36 1
+	cp sortdict ../../bin
+d43 2
+a44 2
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdict txt2dct *.core lexword.cc
+	rm -f ../bin/dct2mstr ../bin/genmodel ../bin/listword ../bin/sortdict ../../bin/dct2mstr ../../bin/genmodel ../../bin/listword ../../bin/sortdict ../bin/txt2dct ../../bin/txt2dct
+d59 2
+a60 2
+sortdict: sortdict.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o sortdict sortdict.o $(LFLAGS)
+d122 4
+d194 12
+a205 13
+sortdict.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+sortdict.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+sortdict.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+sortdict.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+sortdict.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+sortdict.o: /usr/include/stdio.h /usr/include/unistd.h
+sortdict.o: /usr/include/sys/unistd.h ../../mtc++/include/MTC++.h
+sortdict.o: /usr/include/string.h /usr/include/ctype.h
+sortdict.o: /usr/include/runetype.h /usr/include/sys/stat.h
+sortdict.o: /usr/include/sys/time.h /usr/include/sys/time.h
+sortdict.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+sortdict.o: ../include/rawdict.h ../../mtc++/include/rbt.h
+sortdict.o: ../../mtc++/include/raof.h
+@
+
+
+1.10
+log
+@added listword.cc
+@
+text
+@d17 1
+a17 1
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc sentnode.cc wordclass.cc txt2dct.cc listword.cc sortdict.cc
+d25 1
+a25 1
+all: $(LIBTARGET) dct2mstr genmodel txt2dct listword sortdict wordclass 
+a32 1
+	cp wordclass ../bin
+a37 1
+	cp wordclass ../../bin
+d43 2
+a44 2
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel wordclass txt2dct listword sortdict wordclass txt2dct *.core lexword.cc
+	rm -f ../bin/dct2mstr ../bin/genmodel ../bin/listword ../bin/sortdict ../../bin/dct2mstr ../../bin/genmodel ../../bin/listword ../../bin/sortdict ../bin/wordclass ../../bin/wordclass ../bin/txt2dct ../../bin/txt2dct
+a67 3
+wordclass: wordclass.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o wordclass wordclass.o -ll $(LFLAGS)
+
+a72 7
+wordclass.cc: wordclass.l
+	rm -f lex.yy.c
+	$(LEX) wordclass.l  
+	mv lex.yy.c wordclass.cc
+
+dictionary: webster-words.Z wordclass
+
+d80 8
+a87 7
+dct2mstr.o: /usr/include/stdio.h ../../mtc++/include/MTC++.h
+dct2mstr.o: /usr/include/string.h /usr/include/unistd.h
+dct2mstr.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+dct2mstr.o: /usr/include/runetype.h /usr/include/sys/stat.h
+dct2mstr.o: /usr/include/sys/time.h /usr/include/sys/time.h
+dct2mstr.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+dct2mstr.o: ../../mtc++/include/bst.h ../../mtc++/include/raof.h
+d115 7
+a121 10
+genmodel.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+genmodel.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+genmodel.o: ../../mtc++/include/raofalt.h ../../mtc++/include/raof2bst.h
+genmodel.o: ../include/lexword.h ../include/dictrec.h ../include/typerec.h
+genmodel.o: ../include/typearec.h ../include/dictarec.h ../include/sentnode.h
+genmodel.o: ../include/sentmdl.h ../include/dconst.h
+lexword.o: /usr/include/stdio.h /usr/include/sys/types.h
+lexword.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+lexword.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+lexword.o: /usr/include/stdlib.h
+a171 6
+wordclass.o: /usr/include/stdio.h /usr/include/sys/types.h
+wordclass.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+wordclass.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+wordclass.o: /usr/include/string.h /usr/include/ctype.h
+wordclass.o: /usr/include/runetype.h ../include/wordclass.h
+wordclass.o: /usr/include/stdlib.h
+d178 12
+d195 3
+a197 4
+sortdict.o: /usr/include/stdio.h /usr/include/g++/String.h
+sortdict.o: /usr/include/g++/Regex.h ../../mtc++/include/MTC++.h
+sortdict.o: /usr/include/string.h /usr/include/unistd.h
+sortdict.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+d201 1
+a201 1
+sortdict.o: ../include/rawdict.h ../../mtc++/include/bst.h
+@
+
+
+1.9
+log
+@back to 1.7
+@
+text
+@d17 1
+a17 1
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc sentnode.cc wordclass.cc txt2dct.cc sortdict.cc
+d25 1
+a25 1
+all: $(LIBTARGET) dct2mstr genmodel txt2dct sortdict wordclass 
+d30 1
+d36 1
+d45 2
+a46 2
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel wordclass txt2dct sortdict wordclass txt2dct *.core lexword.cc
+	rm -f ../bin/dct2mstr ../bin/genmodel ../bin/sortdict ../../bin/dct2mstr ../../bin/genmodel ../../bin/sortdict ../bin/wordclass ../../bin/wordclass ../bin/txt2dct ../../bin/txt2dct
+d57 3
+@
+
+
+1.8
+log
+@added -O -pipe
+@
+text
+@d14 1
+a14 1
+CFLAGS+=$(CDEBUG) -O -pipe -I../include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+@
+
+
+1.7
+log
+@gmake
+removed wordclass.o from LIBTARGET
+@
+text
+@d14 1
+a14 1
+CFLAGS+=$(CDEBUG) -I../include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+@
+
+
+1.6
+log
+@added wordclass and txt2dct to clean:
+@
+text
+@d7 1
+a7 1
+LIBOBJS= rawdict.o lexword.o dictrec.o typerec.o sentmdl.o sentnode.o wordclass.o
+d10 1
+a10 1
+.ifdef DEBUG
+d12 1
+a12 1
+.endif 
+d19 1
+a19 1
+LEX=lex -f -p  
+@
+
+
+1.5
+log
+@added txt2dct
+@
+text
+@d43 2
+a44 2
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel wordclass txt2dct sortdict *.core lexword.cc
+	rm -f ../bin/dct2mstr ../bin/genmodel ../bin/sortdict ../../bin/dct2mstr ../../bin/genmodel ../../bin/sortdict
+@
+
+
+1.4
+log
+@added sentnode.cc
+@
+text
+@d17 1
+a17 1
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc sentnode.cc wordclass.cc sortdict.cc
+d25 1
+a25 1
+all: $(LIBTARGET) dct2mstr genmodel sortdict wordclass 
+d31 2
+d36 2
+d43 1
+a43 1
+	rm -f *.o $(LIBTARGET) dct2mstr genmodel wordclass sortdict *.core lexword.cc
+d59 3
+d187 6
+@
+
+
+1.3
+log
+@added sortdict to the install and clean targets
+@
+text
+@d7 1
+a7 1
+LIBOBJS= rawdict.o lexword.o dictrec.o typerec.o sentmdl.o wordclass.o
+d17 1
+a17 1
+SRCS=dct2mstr.cc rawdict.cc genmodel.cc lexword.cc dictrec.cc typerec.cc sentmdl.cc wordclass.cc sortdict.cc
+d118 2
+a119 2
+genmodel.o: ../include/typearec.h ../include/dictarec.h ../include/sentmdl.h
+genmodel.o: ../include/dconst.h
+d160 14
+a173 1
+sentmdl.o: ../include/sentmdl.h
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d30 1
+d33 1
+d40 1
+a40 1
+	rm -f ../bin/dct2mstr ../bin/genmodel ../../bin/dct2mstr ../../bin/genmodel
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d38 1
+@

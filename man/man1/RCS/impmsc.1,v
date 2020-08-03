@@ -1,0 +1,63 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	98.08.18.15.36.00;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" impmsc.1 by Mark T. Chapman
+.\"
+.TH IMPMSC 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+impmsc
+.SH SYNOPSIS
+.B impmsc 
+.SH DESCRIPTION
+.I impmsc
+creates type-word lists for the
+.B NICETEXT 
+system from word-type lists. 
+The output is suitable for processing by the
+.B sortdct(1L)
+program.
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).
+
+@

@@ -1,0 +1,670 @@
+head	1.10;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.10
+date	96.07.03.18.43.34;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.02.08.00.51.20;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.01.14.19.36.29;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.13.09.41.51;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.12.23.53.35;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.10.21.57.33;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.11.08.19.07.11;	author chapman;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.08.26.21.27.48;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.24.20.14.09;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.24.18.32.49;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Check-in
+@
+
+
+1.10
+log
+@Fixed isEqual() method -- it didn't work if the getCounts() were equal
+@
+text
+@/*
+ * Sentence Model Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: sentmdl.cc,v 1.9 1996/02/08 00:51:20 markc Exp markc $
+ *
+ * $Log: sentmdl.cc,v $
+ * Revision 1.9  1996/02/08 00:51:20  markc
+ * allow multiple punctuation calls using SENTMDL_MORE_PUNCT
+ * instead of a merged recursive call -- this lets {low} {shift}, etc
+ * be treated like commands
+ *
+// Revision 1.8  1996/01/14  19:36:29  markc
+// relaxed const
+//
+// Revision 1.7  1996/01/13  09:41:51  markc
+// added sentnode logic instead of pure MTCstrings
+//
+// Revision 1.6  1996/01/12  23:53:35  markc
+// optimized for numbers
+//
+// Revision 1.5  1996/01/10  21:57:33  markc
+// Added default value for freq in constructor
+// Modified copy ctor to use MTClist::MTClist(MTClist &) copy ctor instead
+// of the for() loop.
+//
+// Revision 1.4  1995/11/08  19:07:11  chapman
+// removed #include "distdict.h"
+//
+// Revision 1.3  1995/08/26  21:27:48  markc
+// Added a clear() call within the stream extractor -
+// otherwise it would just append to the list, which is incorrect for problem
+// domain.
+//
+// Revision 1.2  1995/08/24  20:14:09  markc
+// working version
+//
+// Revision 1.1  1995/08/24  18:32:49  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.9 1996/02/08 00:51:20 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdlib.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/list.h"
+#include "../include/sentnode.h"
+#include "../include/sentmdl.h"
+
+// constructor
+
+MTCsentenceModel::MTCsentenceModel() 
+	: firstGetNext(TRUE), freq(0)
+{
+}
+
+// copy constructor
+
+MTCsentenceModel::MTCsentenceModel(MTCsentenceModel &aSrc) 
+	: firstGetNext(TRUE), freq(aSrc.freq), list(aSrc.list)
+{
+}
+
+// append a value to the sentence model 
+
+void MTCsentenceModel::appendPunctuation(const MTCstring &aString)
+{
+	MTCsentenceNode node;
+
+	node.setTypeIndex(-1);
+	node.setPunctuation(aString);
+
+	list.add(node);
+}
+
+// append a value to the sentence model
+
+void MTCsentenceModel::appendTypeIndex(long aNum)
+{
+	MTCsentenceNode node;
+
+	node.setTypeIndex(aNum);
+
+	list.add(node);
+}
+
+// clear the sentence model
+
+void MTCsentenceModel::clear()
+{
+	list.clear();
+	firstGetNext=TRUE;
+}
+
+// get the next value from the sentence model
+// fill in aPunctStr if there is punctuation _BEFORE_ current type
+
+long MTCsentenceModel::getNext(MTCstring *aPunctStr)
+{
+	MTCsentenceNode *node;
+
+	if (firstGetNext==TRUE)
+	{
+		firstGetNext=FALSE;
+		node=list.getFirst();
+	}
+	else
+	{
+		node=list.getNext();
+	}
+
+	if (node==NULL)
+	{
+		return SENTMDL_GETNEXT_DONE;
+	}
+
+	if (node->getTypeIndex()==-1)
+	{
+	 	(*aPunctStr)=node->getPunctuation();
+		return SENTMDL_MORE_PUNCT;
+	}
+
+	return node->getTypeIndex();
+}
+
+// sentenceModel stream insertor operator
+
+ostream & operator<<(ostream & anOStream, MTCsentenceModel & aSrc)
+{
+	MTCsentenceNode *current;
+
+	for(current=aSrc.list.getFirst(); current!=NULL; current=aSrc.list.getNext())
+	{
+		anOStream << *current << ' ';
+	}
+
+	anOStream << SENTMDL_EOS << ' ' << aSrc.getFreq() << endl;
+
+	return anOStream;
+}
+
+// sentenceModel stream extractor operator
+
+istream & operator>>(istream & anIStream, MTCsentenceModel & aSrc)
+{
+	aSrc.clear();
+
+	MTCsentenceNode current;
+
+	for(;;)
+	{
+		anIStream >> current;
+
+		if (current.getPunctuation()==SENTMDL_EOS)
+		{
+			break;
+		}
+
+		aSrc.list.add(current);
+	};
+
+	long number;
+
+	anIStream >> number;
+
+	aSrc.setFreq(number);
+
+	return anIStream;
+}
+
+// < comparison
+
+int MTCsentenceModel::isLessThan(MTCsentenceModel & aSrc) 
+{
+	BOOL retVal=FALSE;
+	MTCsentenceNode *str1=NULL;
+	MTCsentenceNode *str2=NULL;
+
+	if (aSrc.list.getCount()==list.getCount())
+	{
+		for(str1=aSrc.list.getFirst(), str2=list.getFirst(); str1!=NULL, str2!=NULL; str1=aSrc.list.getNext(), str2=list.getNext())
+		{
+			if (*str1<*str2)
+			{
+				retVal=TRUE;
+				break;
+			}
+			if (*str1>*str2)
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		retVal=(aSrc.list.getCount()<list.getCount());
+	}
+
+	return retVal;
+}
+
+// equivalence test
+
+int MTCsentenceModel::isEqual(MTCsentenceModel & aSrc) 
+{
+	BOOL retVal=FALSE;
+	MTCsentenceNode *str1;
+	MTCsentenceNode *str2;
+
+	if (aSrc.list.getCount()==list.getCount())
+	{
+		retVal=TRUE;
+
+		for(str1=aSrc.list.getFirst(), str2=list.getFirst(); str1!=NULL, str2!=NULL; str1=aSrc.list.getNext(), str2=list.getNext())
+		{
+			if (*str1!=*str2)
+			{
+				retVal=FALSE;
+				break;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+// == operator
+
+BOOL MTCsentenceModel::operator==(MTCsentenceModel & aSrc) 
+{
+	return (isEqual(aSrc));
+}
+
+// != operator
+
+BOOL MTCsentenceModel::operator!=(MTCsentenceModel & aSrc) 
+{
+	return (!isEqual(aSrc));
+}
+
+// DictEnt < operator
+
+BOOL MTCsentenceModel::operator<(MTCsentenceModel & aSrc) 
+{
+	return (isLessThan(aSrc));
+}
+
+// DictEnt <= operator
+
+BOOL MTCsentenceModel::operator<=(MTCsentenceModel & aSrc) 
+{
+	return (isLessThan(aSrc)||isEqual(aSrc));
+}
+
+// DictEnt > operator
+
+BOOL MTCsentenceModel::operator>(MTCsentenceModel & aSrc) 
+{
+	return (!(isLessThan(aSrc)||(isEqual(aSrc))));
+}
+
+// DictEnt >= operator
+
+BOOL MTCsentenceModel::operator>=(MTCsentenceModel & aSrc) 
+{
+	return (!(isLessThan(aSrc)));
+}
+
+// overloaded = operator
+
+MTCsentenceModel & MTCsentenceModel::operator=(MTCsentenceModel &aSrc)
+{ 
+	for(MTCsentenceNode *current=aSrc.list.getFirst(); current!=NULL; current=aSrc.list.getNext())
+	{
+		list.add(*current);
+	}
+
+	freq=aSrc.freq;
+
+        return *this;
+}
+
+@
+
+
+1.9
+log
+@allow multiple punctuation calls using SENTMDL_MORE_PUNCT
+instead of a merged recursive call -- this lets {low} {shift}, etc
+be treated like commands
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.8 1996/01/14 19:36:29 markc Exp markc $
+d8 5
+d44 1
+a44 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.8 1996/01/14 19:36:29 markc Exp markc $";
+d183 2
+a184 2
+	MTCsentenceNode *str1;
+	MTCsentenceNode *str2;
+d219 2
+d225 1
+a228 2
+
+		retVal=TRUE;
+@
+
+
+1.8
+log
+@relaxed const
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.7 1996/01/13 09:41:51 markc Exp markc $
+d8 3
+d39 1
+a39 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.7 1996/01/13 09:41:51 markc Exp markc $";
+d121 2
+a122 5
+		if (aPunctStr!=NULL)
+		{
+			(*aPunctStr)+=(node->getPunctuation());
+		}
+		return getNext(aPunctStr);
+@
+
+
+1.7
+log
+@added sentnode logic instead of pure MTCstrings
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.6 1996/01/12 23:53:35 markc Exp markc $
+d8 3
+d36 1
+a36 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.6 1996/01/12 23:53:35 markc Exp markc $";
+d175 1
+a175 1
+int MTCsentenceModel::isLessThan(MTCsentenceModel & aSrc) const 
+a177 2
+	MTCsentenceModel &one=aSrc; 	// an ugly way to get around "const"
+	MTCsentenceModel &two=*this;	// "conceptually" getFirst(), getNext() are const 
+d181 1
+a181 1
+	if (one.list.getCount()==two.list.getCount())
+d183 1
+a183 1
+		for(str1=one.list.getFirst(), str2=two.list.getFirst(); str1!=NULL, str2!=NULL; str1=one.list.getNext(), str2=two.list.getNext())
+d198 1
+a198 1
+		retVal=(one.list.getCount()<two.list.getCount());
+d206 1
+a206 1
+int MTCsentenceModel::isEqual(MTCsentenceModel & aSrc) const 
+a208 2
+	MTCsentenceModel &one=aSrc; 	// an ugly way to get around "const"
+	MTCsentenceModel &two=*this;	// "conceptually" getFirst(), getNext() are const 
+d212 1
+a212 1
+	if (one.list.getCount()==two.list.getCount())
+d214 1
+a214 1
+		for(str1=one.list.getFirst(), str2=two.list.getFirst(); str1!=NULL, str2!=NULL; str1=one.list.getNext(), str2=two.list.getNext())
+d230 1
+a230 1
+BOOL MTCsentenceModel::operator==(MTCsentenceModel & aSrc) const
+d237 1
+a237 1
+BOOL MTCsentenceModel::operator!=(MTCsentenceModel & aSrc) const 
+d244 1
+a244 1
+BOOL MTCsentenceModel::operator<(MTCsentenceModel & aSrc) const  
+d251 1
+a251 1
+BOOL MTCsentenceModel::operator<=(MTCsentenceModel & aSrc) const 
+d258 1
+a258 1
+BOOL MTCsentenceModel::operator>(MTCsentenceModel & aSrc) const  
+d265 1
+a265 1
+BOOL MTCsentenceModel::operator>=(MTCsentenceModel & aSrc) const
+@
+
+
+1.6
+log
+@optimized for numbers
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.5 1996/01/10 21:57:33 markc Exp markc $
+d8 3
+d33 1
+a33 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.5 1996/01/10 21:57:33 markc Exp markc $";
+d43 1
+d62 1
+a62 1
+void MTCsentenceModel::append(const MTCstring &aString)
+d64 6
+a69 1
+	list.add(aString);
+d74 1
+a74 1
+void MTCsentenceModel::append(long aNum)
+d76 1
+a76 3
+	char buffer[10];
+
+	sprintf(buffer, "%ld", aNum);
+d78 1
+a78 1
+	MTCstring bufferStr(buffer);
+d80 1
+a80 1
+	list.add(bufferStr);
+d96 1
+a96 1
+	MTCstring *buffer;
+d101 1
+a101 1
+		buffer=list.getFirst();
+d105 1
+a105 1
+		buffer=list.getNext();
+d108 1
+a108 1
+	if (buffer==NULL)
+d113 1
+a113 4
+	long answer;
+	answer=atol(buffer->c_str());
+
+	if ((answer==0)&&(buffer!="0"))
+d117 1
+a117 1
+			*aPunctStr+=*buffer;
+d122 1
+a122 1
+	return answer;
+d129 1
+a129 1
+	MTCstring *current;
+d147 1
+a147 1
+	MTCstring current;
+d149 2
+a150 1
+	do {
+d152 6
+d159 1
+a159 1
+	} while (current!=SENTMDL_EOS);
+d177 2
+a178 2
+	MTCstring *str1;
+	MTCstring *str2;
+d195 4
+d210 2
+a211 2
+	MTCstring *str1;
+	MTCstring *str2;
+d275 1
+a275 1
+	for(MTCstring *current=aSrc.list.getFirst(); current!=NULL; current=aSrc.list.getNext())
+@
+
+
+1.5
+log
+@Added default value for freq in constructor
+Modified copy ctor to use MTClist::MTClist(MTClist &) copy ctor instead
+of the for() loop.
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.4 1995/11/08 19:07:11 chapman Exp markc $
+d8 5
+d30 1
+a30 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.4 1995/11/08 19:07:11 chapman Exp markc $";
+d106 4
+a109 1
+	if (buffer->c_str()[0]>'9'||buffer->c_str()[0]<'0')
+a116 4
+
+	long answer;
+
+	answer=atol(buffer->c_str());
+@
+
+
+1.4
+log
+@removed #include "distdict.h"
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.3 1995/08/26 21:27:48 markc Exp chapman $
+d8 3
+d25 1
+a25 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.3 1995/08/26 21:27:48 markc Exp chapman $";
+d39 2
+a40 1
+MTCsentenceModel::MTCsentenceModel() : firstGetNext(TRUE)
+d46 2
+a47 1
+MTCsentenceModel::MTCsentenceModel(MTCsentenceModel &aSrc) : firstGetNext(TRUE)
+a48 8
+	MTCstring *current;
+
+	for(current=aSrc.list.getFirst(); current!=NULL; current=aSrc.list.getNext())
+	{
+		list.add(*current);
+	}
+
+	freq=aSrc.freq;
+d256 1
+a256 3
+	MTCstring *current;
+
+	for(current=aSrc.list.getFirst(); current!=NULL; current=aSrc.list.getNext())
+@
+
+
+1.3
+log
+@Added a clear() call within the stream extractor -
+otherwise it would just append to the list, which is incorrect for problem
+domain.
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.2 1995/08/24 20:14:09 markc Exp markc $
+d8 5
+d22 1
+a22 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.2 1995/08/24 20:14:09 markc Exp markc $";
+d26 1
+a31 1
+#include "../include/distdict.h"
+@
+
+
+1.2
+log
+@working version
+@
+text
+@d5 1
+a5 1
+ * $Id: sentmdl.cc,v 1.1 1995/08/24 18:32:49 markc Exp markc $
+d8 3
+d17 1
+a17 1
+static char rcsid []  = "@@(#)$Id: sentmdl.cc,v 1.1 1995/08/24 18:32:49 markc Exp markc $";
+d135 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d120 1
+a120 1
+		anOStream << *current << " ";
+d123 1
+a123 1
+	anOStream << SENTMDL_EOS << aSrc.getFreq() << endl;
+@

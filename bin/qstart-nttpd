@@ -1,0 +1,2 @@
+#!/bin/sh
+/home/user/nicetext-0.9/bin/nttpd -b /home/user/nicetext-0.9/examples/database

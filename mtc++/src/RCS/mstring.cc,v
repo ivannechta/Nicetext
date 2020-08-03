@@ -1,0 +1,767 @@
+head	1.8;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.8
+date	98.08.25.18.11.50;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	98.08.23.03.48.26;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	98.08.22.20.12.56;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.07.25.18.36.15;	author chapman;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.07.25.14.28.39;	author chapman;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.07.24.23.02.52;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.06.30.23.30.17;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.06.07.01.43.55;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@MTC++ Character String Class
+@
+
+
+1.8
+log
+@added truncateLength()
+@
+text
+@/*
+ * MTC++ Character String Class
+ * Copyright (c) Mark T. Chapman 1993, 1995
+ *
+ * $Id: mstring.cc,v 1.7 1998/08/23 03:48:26 markc Exp markc $
+ *
+ * $Log: mstring.cc,v $
+ * Revision 1.7  1998/08/23 03:48:26  markc
+ * added lc=0 to deleteValue
+ *
+ * Revision 1.6  1998/08/22 20:12:56  markc
+ * Added lc logic
+ * Added default c-tor instead of using default parameter for char*=NULL
+ *
+ * Revision 1.5  1995/07/25 18:36:15  chapman
+ * *** empty log message ***
+ *
+// Revision 1.4  1995/07/25  14:28:39  chapman
+// Replaced NULL with '\0' to remove warning
+//
+// Revision 1.3  1995/07/24  23:02:52  markc
+// Added toUpper() & toLower()
+//
+// Revision 1.2  1995/06/30  23:30:17  markc
+// Updated for general MTC++.h
+//
+// Revision 1.1  1995/06/07  01:43:55  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: mstring.cc,v 1.7 1998/08/23 03:48:26 markc Exp markc $";
+
+#include "../include/MTC++.h"
+#include "../include/mstring.h"
+#include "../include/errormsg.h"
+
+// default constructor
+
+MTCstring::MTCstring() : value(NULL), lc(0)
+{
+	return;
+}
+
+// copy constructor
+
+MTCstring::MTCstring(const MTCstring & aString)
+{
+	init(aString.c_str());
+}
+
+// assignment constructor 
+
+MTCstring::MTCstring(const char * aCharPtr)
+{
+	init(aCharPtr);
+}
+
+// shared constructor code
+
+void MTCstring::init(const char * aCharPtr)
+{
+	// is this an empty string?
+
+	if (aCharPtr==NULL)
+	{
+		aCharPtr = "";
+	}
+
+	// get the length 
+	lc = strlen(aCharPtr);
+
+	// allocate memory for a new copy of the aCharPtr string
+				
+	value=new char [lc+1];
+
+	if (value==NULL)
+	{
+		errorMsg(EMT_ERROR, "I just ran out of memory", "MTCstring::MTCstring");
+	}
+	else
+	{
+		strcpy(value, aCharPtr);
+	}
+}
+
+// constructor
+
+MTCstring::MTCstring(char aChar)
+{
+	char buffer[2];
+
+	buffer[0]=aChar;
+	buffer[1]='\0';
+
+	init(buffer);
+}
+
+// virtual destructor
+
+MTCstring::~MTCstring()
+{
+	deleteValue();
+}
+
+// delete the memory pointed to by _value
+
+void MTCstring::deleteValue()
+{
+	if (value!=NULL)
+	{
+		delete[] value;
+		value=NULL;
+		lc=0;
+	}
+}
+
+// stream insertor
+
+void MTCstring::print(ostream & s) const
+{
+	if (value!=NULL)
+	{
+		s << value;
+	}
+}
+
+// stream extractor
+
+void MTCstring::input(istream & s)
+{
+	// input a string
+
+	char buffer[MAX_MSTRING_LENGTH+1];
+
+	s >> buffer;
+
+	if (strlen(buffer)>MAX_MSTRING_LENGTH)
+	{
+		errorMsg(EMT_ABORT, "The input stream has a string that is too long.  Programmer must increase MAX_MSTRING_LENGTH");
+	}
+					
+	// create a new value equal to buffer
+
+	deleteValue();
+	init(buffer);
+}
+
+// string stream insertor operator
+
+ostream & operator<<(ostream & anOStream, const MTCstring & aString)
+{
+	aString.print(anOStream); return anOStream;
+}
+
+// string stream extractor operator
+
+istream & operator>>(istream & anIStream, MTCstring & aString)
+{
+	aString.input(anIStream); return anIStream;
+}
+
+// < comparison
+
+int MTCstring::isLessThan(const MTCstring & aString) const
+{
+	if (aString.is_null())
+	{
+		return FALSE;
+	}
+					
+	return value ? (strcmp(value, aString.value)<0) : TRUE;
+}
+
+// equivalence test
+
+int MTCstring::isEqual(const MTCstring & aString) const
+{
+	if (aString.is_null())
+	{
+		if (is_null())
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+
+	return (value ? (strcmp(value, aString.value)==0) : FALSE);
+}
+
+// == operator
+
+BOOL MTCstring::operator==(const MTCstring & aString) const
+{
+	return (isEqual(aString));
+}
+
+// != operator
+
+BOOL MTCstring::operator!=(const MTCstring & aString) const
+{
+	return (!isEqual(aString));
+}
+
+// String < operator
+
+BOOL MTCstring::operator<(const MTCstring & aString)  const
+{
+	return (isLessThan(aString));
+}
+
+// String <= operator
+
+BOOL MTCstring::operator<=(const MTCstring & aString) const
+{
+	return (isLessThan(aString)||isEqual(aString));
+}
+
+// String > operator
+
+BOOL MTCstring::operator>(const MTCstring & aString)  const
+{
+	return (!(isLessThan(aString)||(isEqual(aString))));
+}
+
+// String >= operator
+
+BOOL MTCstring::operator>=(const MTCstring & aString) const
+{
+	return (!(isLessThan(aString)));
+}
+
+
+// overloaded = operator
+
+MTCstring & MTCstring::operator=(const char * aCharPtr)
+{
+	deleteValue();
+	init(aCharPtr);
+
+	return *this;
+}
+
+// overloaded = operator
+
+MTCstring & MTCstring::operator=(const MTCstring &aString)
+{
+	deleteValue();
+	init(aString.c_str());
+
+	return *this;
+}
+
+// < comparison
+
+int MTCstring::isLessThan(char aChar) const
+{
+	return value ? (value[0] < aChar) : TRUE;
+}
+
+// equivalence test
+
+int MTCstring::isEqual(char aChar) const
+{
+	return value ? (value[0]==aChar) : FALSE;
+}
+
+// == operator
+
+BOOL MTCstring::operator==(char aChar) const
+{
+	return (isEqual(aChar));
+}
+
+// != operator
+
+BOOL MTCstring::operator!=(char aChar) const
+{
+	return (!isEqual(aChar));
+}
+
+// String < operator
+
+BOOL MTCstring::operator<(char aChar)  const
+{
+	return (isLessThan(aChar));
+}
+
+// String <= operator
+
+BOOL MTCstring::operator<=(char aChar) const
+{
+	return (isLessThan(aChar)||isEqual(aChar));
+}
+
+// String > operator
+
+BOOL MTCstring::operator>(char aChar)  const
+{
+	return (!(isLessThan(aChar)||(isEqual(aChar))));
+}
+
+// String >= operator
+
+BOOL MTCstring::operator>=(char aChar) const
+{
+	return (!(isLessThan(aChar)));
+}
+
+// < comparison
+
+int MTCstring::isLessThan(const char * aCharPtr) const
+{
+	return value ? (strcmp(value, aCharPtr)<0) : TRUE;
+}
+
+// equivalence test
+
+int MTCstring::isEqual(const char * aCharPtr) const
+{
+	return value ? (strcmp(value, aCharPtr)==0) : FALSE;
+}
+
+// == operator
+
+BOOL MTCstring::operator==(const char * aCharPtr) const
+{
+	return (isEqual(aCharPtr));
+}
+
+// != operator
+
+BOOL MTCstring::operator!=(const char * aCharPtr) const
+{
+	return (!isEqual(aCharPtr));
+}
+
+// String < operator
+
+BOOL MTCstring::operator<(const char * aCharPtr)  const
+{
+	return (isLessThan(aCharPtr));
+}
+
+// String <= operator
+
+BOOL MTCstring::operator<=(const char * aCharPtr) const
+{
+	return (isLessThan(aCharPtr)||isEqual(aCharPtr));
+}
+
+// String > operator
+
+BOOL MTCstring::operator>(const char * aCharPtr)  const
+{
+	return (!(isLessThan(aCharPtr)||(isEqual(aCharPtr))));
+}
+
+// String >= operator
+
+BOOL MTCstring::operator>=(const char * aCharPtr) const
+{
+	return (!(isLessThan(aCharPtr)));
+}
+
+// overloaded + operator
+
+MTCstring MTCstring::operator+(const MTCstring & aString) const
+{
+	// allocate memory for a temporary buffer
+
+	char * buffer = new char [length()+aString.length()+1];
+
+	if (buffer==NULL)
+	{
+		errorMsg(EMT_ERROR, "I just ran out of memory", "MTCstring::operator+");
+		return *this;
+	} 
+
+	// perform the addition
+	
+	if ((value)&&(aString.value))
+	{
+		// sprintf(buffer, "%s%s", value, aString.value);
+		strcpy(buffer, value);
+		strcpy(&buffer[length()], aString.value);
+	}
+	else
+	{
+		if (value)
+		{
+			strcpy(buffer, value);
+		}
+		else
+		{
+			if (aString.value)
+			{
+				strcpy(buffer, aString.value);
+			}
+			else
+			{
+				buffer[0]='\0';
+			}
+		}
+	}
+	
+	// create the new string
+	
+	MTCstring temp(buffer);
+
+	// don't forget to clean up the buffer!
+	
+	delete[] buffer;
+	
+	return temp;
+}
+
+// overloaded + operator
+
+MTCstring MTCstring::operator+(const char * aCharPtr) const
+{
+	MTCstring temp(aCharPtr);
+
+	return ((*this)+temp);
+}
+
+// overloaded += operator
+
+MTCstring &MTCstring::operator+=(const MTCstring &aString)
+{
+	// create a temp copy of this
+
+	MTCstring old(*this);
+
+	// set my value to the sum
+
+	deleteValue();
+	init((old+aString).c_str());
+
+	// return the current value
+
+	return *this;
+}
+
+// operator +=
+
+MTCstring & MTCstring::operator+=(const char * aCharPtr)
+{
+	MTCstring temp(aCharPtr);
+
+	(*this)+=temp;
+
+	return *this;
+}
+
+// return the current value as a const char *
+
+const char * MTCstring::c_str() const
+{
+	return value;
+}
+
+// casting operator -- to const char *
+/*
+MTCstring::operator const char * () const
+{
+	return value;
+}
+*/
+
+// convert to upper case
+
+void MTCstring::toUpper()
+{
+	if (value!=NULL)
+	{
+		for(int i=0; i<length(); i++)
+		{
+			value[i]=toupper(value[i]);
+		}
+	}
+}
+
+
+// convert to lower case
+
+void MTCstring::toLower()
+{
+	if (value!=NULL)
+	{
+		for(int i=0; i<length(); i++)
+		{
+			value[i]=tolower(value[i]);
+		}
+	}
+}
+
+// truncate the length of the string
+
+unsigned MTCstring::truncateLength(unsigned aNum)
+{
+	if (aNum<length())
+	{
+		value[aNum] = (char)NULL;
+		lc=aNum;
+	}
+
+	return length();
+}
+
+@
+
+
+1.7
+log
+@added lc=0 to deleteValue
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc,v 1.6 1998/08/22 20:12:56 markc Exp markc $
+d8 3
+d33 1
+a33 1
+static char rcsid []  = "@@(#)$Id: mstring.cc,v 1.6 1998/08/22 20:12:56 markc Exp markc $";
+d501 14
+@
+
+
+1.6
+log
+@Added lc logic
+Added default c-tor instead of using default parameter for char*=NULL
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc,v 1.5 1995/07/25 18:36:15 chapman Exp markc $
+d8 4
+d30 1
+a30 1
+static char rcsid []  = "@@(#)$Id: mstring.cc,v 1.5 1995/07/25 18:36:15 chapman Exp markc $";
+d40 1
+d111 2
+a113 2
+
+	value=NULL;
+d189 1
+a189 3
+	int r= value ? (strcmp(value, aString.value)==0) : FALSE;
+
+	return r;
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc,v 1.4 1995/07/25 14:28:39 chapman Exp chapman $
+d8 3
+d26 1
+a26 1
+static char rcsid []  = "@@(#)$Id: mstring.cc,v 1.4 1995/07/25 14:28:39 chapman Exp chapman $";
+d32 1
+a32 1
+// constructor 
+d34 1
+a34 1
+MTCstring::MTCstring(const char * aCharPtr)
+a35 1
+	init(aCharPtr);
+d45 7
+d63 3
+d68 1
+a68 1
+	value=new char [strlen(aCharPtr)+1];
+d71 1
+d73 1
+d75 1
+d77 1
+a77 1
+
+d104 1
+d106 1
+a110 7
+// return the length of the string
+
+unsigned MTCstring::length() const
+{
+	return value ? (strlen(value)) : 0;
+}
+
+d116 1
+d118 1
+d161 1
+d163 1
+d175 1
+d177 1
+d179 1
+d181 1
+d375 1
+a375 2
+      MTCstring temp;
+		return temp;
+d381 2
+a382 3
+		sprintf(buffer, "%s%s", value, aString.value);
+	else
+	if (value)
+d384 2
+d387 17
+a403 4
+	if (aString.value)
+		strcpy(buffer, aString.value);
+	else
+		buffer[0]='\0';
+d429 1
+a429 1
+	// create a temp containing the sum
+d433 1
+a433 1
+	// set value = aString
+d475 1
+a475 1
+		for(int i=0; i<strlen(value); i++)
+d489 1
+a489 1
+		for(int i=0; i<strlen(value); i++)
+@
+
+
+1.4
+log
+@Replaced NULL with '\0' to remove warning
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc,v 1.3 1995/07/24 23:02:52 markc Exp chapman $
+d8 3
+d23 1
+a23 1
+static char rcsid []  = "@@(#)$Id: mstring.cc,v 1.3 1995/07/24 23:02:52 markc Exp chapman $";
+@
+
+
+1.3
+log
+@Added toUpper() & toLower()
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc 1.2 1995/06/30 23:30:17 markc Exp markc $
+d7 4
+a10 1
+ * $Log: mstring.cc $
+d20 1
+a20 1
+static char rcsid []  = "@@(#)$Id: mstring.cc 1.2 1995/06/30 23:30:17 markc Exp markc $";
+d69 1
+a69 1
+	buffer[1]=NULL;
+d369 1
+a369 1
+		buffer[0]=NULL;
+@
+
+
+1.2
+log
+@Updated for general MTC++.h
+@
+text
+@d5 1
+a5 1
+ * $Id: mstring.cc 1.1 1995/06/07 01:43:55 markc Exp markc $
+d8 3
+d17 1
+a17 1
+static char rcsid []  = "@@(#)$Id: mstring.cc 1.1 1995/06/07 01:43:55 markc Exp markc $";
+d431 27
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d17 2
+@

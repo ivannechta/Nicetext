@@ -1,0 +1,99 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.11.04.19.10.52;	author chapman;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.06.07.01.49.36;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Version
+@
+
+
+1.3
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@/*
+ * Error Message Processing Routines 
+ * Copyright (c) Mark T. Chapman 1993, 1994, 1995
+ * 
+ * $Id: errormsg.h,v 1.2 1995/11/04 19:10:52 chapman Exp markc $
+ *
+ * $Log: errormsg.h,v $
+ * Revision 1.2  1995/11/04 19:10:52  chapman
+ * added const to char * parms
+ *
+ * Revision 1.1  1995/06/07  01:49:36  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __ERRORMSG_H_
+#define __ERRORMSG_H_
+
+static char rcsid__ERRORMSG_H_ []  = "@@(#)$Id$";
+
+#define EMT_DEBUG  -1	// Debug Messages Only 
+#define EMT_MESSAGE 0 	// Just Display the message and continue
+#define EMT_WARNING 1	// The message is a warning -- Option to Cancel
+#define EMT_ERROR   2 	// An error occurred -- recommend canclation 
+#define EMT_ABORT   3	// Immediately Abort the program -- critical error
+ 
+int errorMsg(short EMT, const char *Message, const char *FunctionName=NULL);
+
+#endif // __ERRORMSG_H_
+@
+
+
+1.2
+log
+@added const to char * parms
+@
+text
+@d5 1
+a5 1
+ * $Id: errormsg.h,v 1.1 1995/06/07 01:49:36 markc Exp chapman $
+d8 3
+d17 4
+a20 2
+#ifndef __ERRORMSG_H
+#define __ERRORMSG_H
+d30 1
+a30 1
+#endif // __ERRORMSG_H
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 5
+a9 1
+ * $Id$
+a10 1
+ * $Log$
+d23 1
+a23 1
+int errorMsg(short EMT, char *Message, char *FunctionName=NULL);
+@

@@ -1,0 +1,40 @@
+----- NICETEXT -- How to PORT ------
+
+********* Where does it work now? ***********
+
+This system was developed on FreeBSD using GNU C++.
+
+It is also known to compile and run on LINUX (x86) and 
+Digital UNIX using gcc and gmake.
+
+********* I want to compile it on another UNIX ***********
+
+If you want to port it to another UNIX-like operating system,
+simply get gmake and gcc.  It will probably compile and run with 
+no modifications.
+
+If you do not have gmake but have gcc it will probably work with some simple
+changes to the makefiles -- (i.e. call "make" instead of "gmake"...). 
+
+The "lex" and "yacc" programs were used to create several ".cc" files.
+The dependencies on the ".l" and ".y" programs still exist but the
+"clean" target should not delete the resulting ".cc" files.  
+
+If you do not have gcc then it should compile with minor modifications
+using any ANSI-C++ compiler.   (For example, the mtc++ module has been
+ported to DOS with minimal effort!)
+
+********* I want to compile it on my non-UNIX desktop-OS ***********
+
+If there is enough demand, we will port it to the Windows and NT platforms.
+It should not be that difficult, but we want to try this on the UNIX population
+first.  
+
+********* Are there static-binaries available for my platform? **********
+
+If you successfully port the software then please send us a copy of the
+steps you took to make it happen along with any patches.  If there is enough 
+interest then we may provide user-compiled binaries for many architectures. 
+
+Note: All copyrights and trademarks referred to above belong to their owners.
+

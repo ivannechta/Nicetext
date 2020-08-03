@@ -1,0 +1,21 @@
+
+SNAPSHOT into ./man/man1/RCS/SNAPSHOT.RNF
+	When:	 August 25, 1998  4:45pm CDT 
+	Who:	 Mark Chapman 
+	Notes:	 0.9 Version Ready for Packaging & Release 
+
+1.4 	nicetext.1,v
+1.2 	bitcp.1,v
+1.2 	dct2mstr.1,v
+1.2 	expgram.1,v
+1.2 	genmodel.1,v
+1.1 	impkimmo.1,v
+1.1 	impmsc.1,v
+1.1 	impwbstr.1,v
+1.1 	listword.1,v
+1.2 	scramble.1,v
+1.1 	gramtest.1,v
+1.1 	printint.1,v
+1.1 	sortdct.1,v
+1.1 	txt2dct.1,v
+1.3 	nttpd.1,v

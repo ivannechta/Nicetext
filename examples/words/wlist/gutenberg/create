@@ -1,0 +1,7 @@
+#!/bin/sh
+# This script reads all words from the .txt files in a directory
+# we choose to use the texts from Project Gutenberg 
+# see ftp://ftp.cdrom.com/pub/gutenberg
+#
+
+cat `find /u2/gutenberg/ -name "*.txt"` | ../../../bin/listword -x -u 100000 > words.out 

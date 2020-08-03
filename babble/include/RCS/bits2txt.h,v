@@ -1,0 +1,505 @@
+head	1.14;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.14
+date	98.02.19.19.32.59;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	97.03.05.17.44.52;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	97.02.27.17.52.37;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	97.02.27.13.35.54;	author chapman;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	97.02.24.04.28.29;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	97.02.24.00.12.42;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	97.02.16.06.58.07;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.02.14.15.07.11;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.02.08.01.39.59;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.02.08.00.53.21;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.20.18.40.39;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.13.13.34.11;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.13.02.53;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.12.23.51.25;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@y
+initail
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@/*
+ * Bitstream to Text Enging Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * "The engine for the babble process"
+ *
+ * $Id: bits2txt.h,v 1.13 1997/03/05 17:44:52 markc Exp markc $
+ *
+ * $Log: bits2txt.h,v $
+ * Revision 1.13  1997/03/05 17:44:52  markc
+ * Added static char rcsid []  = "@@(#)$Id$";
+ *
+ * Revision 1.12  1997/02/27 17:52:37  markc
+ * Added statFreq
+ *
+ * Revision 1.11  1997/02/27 13:35:54  chapman
+ * Enabled -s parameter for smaller memory usage
+ *
+ * Revision 1.10  1997/02/24 04:28:29  markc
+ *  Added bit-input and output statistics
+ *
+ * Revision 1.9  1997/02/24 00:12:42  markc
+ * Added maxModelLength() and printStats
+ *
+ * Revision 1.8  1997/02/16 06:58:07  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.7  1996/02/14 15:07:11  markc
+ * added BOOL space
+ *
+ * Revision 1.6  1996/02/08  01:39:59  markc
+ * added freshModel -- keep generating until end of current sentence
+ *
+ * Revision 1.5  1996/02/08  00:53:21  markc
+ * added {low} {cap} {shift} to models
+ *
+ * Revision 1.4  1996/01/20  18:40:39  markc
+ * added eolAfterModel
+ *
+ * Revision 1.3  1996/01/13  13:34:11  markc
+ * -m option for babble added -- both models and grammars work!
+ * ,
+ *
+ * Revision 1.2  1996/01/13  13:02:53  markc
+ * cap first letter of first word of each sentence
+ *
+ * Revision 1.1  1996/01/12  23:51:25  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __BITS2TXT_H_
+#define __BITS2TXT_H_
+
+static char rcsid__BITS2TXT_H_ []  = "@@(#)$Id: bits2txt.h,v 1.13 1997/03/05 17:44:52 markc Exp markc $";
+
+#define DEFAULT_PRINTSTAT_FREQ  100L	// printStat every x models 
+
+// forward reference
+class MTCbitsToTextBase;
+class MTCbitsToTextGrammar;
+class MTCbitsToTextModel;
+
+// abstract class for conversion objects
+
+class MTCbitsToTextBase
+{
+private:
+	MTCstring dictName;
+	MTCstring typeName;
+	MTCstring outputName;
+	MTCstring inputName;
+	MTCRBT <MTCdictAltRecord> dictAltRecRBT;
+	MTCRBT <MTCtypeAltRecord> typeAltRecRBT;
+	MTCreadRAOF <MTCdictAltRecord> *dictAltRecRAOF;
+	MTCinputBitStream *inputBitStream;
+	ostream *outputStream;
+	BOOL okay;
+	BOOL capFirstWord;
+	BOOL firstWord;
+	BOOL eolAfterModel;
+	BOOL space;
+	BOOL cap;
+	BOOL shift;
+	int maxModelLength;
+	long modelsSkipped;
+	long modelsUsed;
+	long totalLengthUsed;
+	long inputBits;
+	long extraBits;
+	long outputBytes;
+	long statFreq;
+	BOOL smallMode;
+
+	virtual void getNextModel()=0;// pure virtual used by getNextType()
+	long getNextType();
+	void printPunctuation(MTCstring &);
+
+protected:
+	BOOL freshModel;
+	MTCsentenceModel *model;
+	void setOkay(BOOL aBOOL) 		{ okay=(aBOOL!=FALSE); };
+	void setModelsSkipped(long aLong) 	{ modelsSkipped=aLong; };
+	void setModelsUsed(long aLong) 		{ modelsUsed=aLong; };
+	void setTotalLengthUsed(long aLong) 	{ totalLengthUsed=aLong; };
+	void incModelsSkipped()			{ modelsSkipped++; };
+	void incModelsUsed()			{ modelsUsed++; };
+	void incTotalLengthUsed(long aLong)	{ totalLengthUsed+=aLong; };
+	void incInputBits(int anInt)		{ inputBits+=anInt; };
+	void incExtraBits(int anInt)		{ extraBits+=anInt; };
+	void incOutputBytes(int anInt)		{ outputBytes+=anInt; };
+	void incOutputBytes()			{ outputBytes++; };
+	void setSmallMode(BOOL aBOOL)		{ smallMode=aBOOL; };
+	const MTCreadRAOF <MTCdictAltRecord> *getDictAltRecRAOF() const 
+		{ return dictAltRecRAOF; };
+
+public:
+	// constructors and destructors
+	MTCbitsToTextBase();
+	~MTCbitsToTextBase();
+
+	// open data structures methods
+	BOOL openDictName(const MTCstring &, BOOL smallMode=FALSE);
+	BOOL openTypeName(const MTCstring &);
+	BOOL openOutputName(const MTCstring &);
+	BOOL openInputName(const MTCstring &);
+
+	// attribute access methods
+	BOOL getOkay() const 			{ return okay; };
+	const MTCstring & getDictName() const	{ return dictName; };
+	const MTCstring & getTypeName() const	{ return typeName; };
+	const MTCstring & getOutputName() const	{ return outputName; };
+	const MTCstring & getInputName() const	{ return inputName; };
+	BOOL getCapFirstWord() const		{ return capFirstWord; };
+	void setCapFirstWord(BOOL aBool) 	{ capFirstWord=aBool; };
+	BOOL getEOLAfterModel() const		{ return eolAfterModel; };
+	void setEOLAfterModel(BOOL aBool)	{ eolAfterModel=aBool; };
+	void setMaxModelLength(int anInt)	
+	{ if (anInt>0) maxModelLength=anInt; };
+	int getMaxModelLength() const 		{ return maxModelLength; };
+	long getModelsSkipped() const 		{ return modelsSkipped; };
+	long getModelsUsed() const		{ return modelsUsed; };
+	long getTotalLengthUsed() const		{ return totalLengthUsed; };
+	long getInputBits() const		{ return inputBits; };
+	long getExtraBits() const		{ return extraBits; };
+	long getOutputBytes() const		{ return outputBytes; };
+	BOOL getSmallMode() const		{ return smallMode; };
+	void setStatFreq(long aLong)		
+	{ statFreq = (((statFreq==1)||(statFreq==-1)) ? 2 : aLong); };
+	long getStatFreq() const		{ return statFreq; };
+		
+	// do it
+	virtual BOOL isReady(); 		// am I ready to doIt?
+	BOOL doIt(BOOL checkIfReady=TRUE);	// babble away!
+	void printStats();			// print statistics
+};
+
+// concrete class for converting using a probabilistic grammar file
+
+class MTCbitsToTextGrammar : public MTCbitsToTextBase
+{
+private:
+	virtual void getNextModel();	// used by getNextType()
+	MTCstring gramName;
+	MTCgrammar *grammar;		// the grammar
+protected:
+public:
+	// constructors and destructors
+	MTCbitsToTextGrammar();
+	~MTCbitsToTextGrammar();
+
+	// open data structures methods
+	BOOL openGrammarName(const MTCstring &aFileName);
+
+	// get attribute methods
+	const MTCstring & getGramName() const { return gramName; };
+
+	// am I ready to doIt?
+	virtual BOOL isReady();
+};
+
+// concreate class for converting using a model.dat raof
+
+class MTCbitsToTextModel : public MTCbitsToTextBase
+{
+private:
+	MTCstring modelName;
+	MTCreadRAOF <MTCsentenceModel> *modelRAOF;
+
+	virtual void getNextModel();	// used by getNextType()
+protected:
+public:
+	// constructors and destructors
+	MTCbitsToTextModel();
+	~MTCbitsToTextModel();
+
+	// open data structures methods
+	BOOL openModelName(const MTCstring &aFileName);
+
+	// get attribute methods
+	const MTCstring & getModelName() const { return modelName; };
+
+	// am I ready to doIt?
+	virtual BOOL isReady();
+};
+
+#endif // __BITS2TXT_H_
+@
+
+
+1.13
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.12 1997/02/27 17:52:37 markc Exp markc $
+d10 3
+d56 1
+a56 1
+static char rcsid__BITS2TXT_H_ []  = "@@(#)$Id$";
+a57 1
+#define EXTRA_BITS 0 
+@
+
+
+1.12
+log
+@Added statFreq
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.11 1997/02/27 13:35:54 chapman Exp markc $
+d10 3
+d52 2
+@
+
+
+1.11
+log
+@Enabled -s parameter for smaller memory usage
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.10 1997/02/24 04:28:29 markc Exp chapman $
+d10 3
+d51 1
+d86 1
+d142 3
+@
+
+
+1.10
+log
+@ Added bit-input and output statistics
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.9 1997/02/24 00:12:42 markc Exp markc $
+d10 3
+d65 1
+d82 1
+d102 3
+d112 1
+a112 1
+	BOOL openDictName(const MTCstring &);
+d136 1
+@
+
+
+1.9
+log
+@Added maxModelLength() and printStats
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.8 1997/02/16 06:58:07 markc Exp markc $
+d10 3
+d44 1
+a44 1
+#define EXTRA_BITS 128
+d75 3
+d93 4
+d125 3
+@
+
+
+1.8
+log
+@BST replaced with RBT
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.7 1996/02/14 15:07:11 markc Exp markc $
+d10 3
+d68 4
+d80 7
+a86 1
+	void setOkay(BOOL aBOOL) { okay=(aBOOL!=FALSE); };
+d109 6
+a115 1
+
+d119 1
+@
+
+
+1.7
+log
+@added BOOL space
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.6 1996/02/08 01:39:59 markc Exp markc $
+d10 3
+d54 2
+a55 2
+	MTCBST <MTCdictAltRecord> dictAltRecBST;
+	MTCBST <MTCtypeAltRecord> typeAltRecBST;
+@
+
+
+1.6
+log
+@added freshModel -- keep generating until end of current sentence
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.5 1996/02/08 00:53:21 markc Exp markc $
+d10 3
+d59 1
+@
+
+
+1.5
+log
+@added {low} {cap} {shift} to models
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.4 1996/01/20 18:40:39 markc Exp markc $
+d10 3
+d64 1
+@
+
+
+1.4
+log
+@added eolAfterModel
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.3 1996/01/13 13:34:11 markc Exp markc $
+d10 3
+d53 2
+@
+
+
+1.3
+log
+@-m option for babble added -- both models and grammars work!
+,
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.2 1996/01/13 13:02:53 markc Exp markc $
+d10 4
+d49 1
+d76 1
+a76 1
+	const BOOL getCapFirstWord() const	{ return capFirstWord; };
+d78 3
+@
+
+
+1.2
+log
+@cap first letter of first word of each sentence
+@
+text
+@d7 1
+a7 1
+ * $Id: bits2txt.h,v 1.1 1996/01/12 23:51:25 markc Exp markc $
+d10 3
+d108 3
+d117 6
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 5
+a11 1
+ * $Id$
+a12 1
+ * $Log$
+d40 2
+d62 1
+a62 1
+	// attribute get methods
+d68 2
+@

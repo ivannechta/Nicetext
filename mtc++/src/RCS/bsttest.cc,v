@@ -1,0 +1,193 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.5
+date	97.03.05.15.51.25;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.20.16.55.11;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.20.16.52.13;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.14.22.52.18;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.14.22.34.55;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.5
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@/*
+ * Sample MTC++ program.
+ *
+ * Input Strings into a tree
+ *
+ * $Id: bsttest.cc,v 1.4 1996/01/20 16:55:11 markc Exp markc $
+ *
+ * $Log: bsttest.cc,v $
+ * Revision 1.4  1996/01/20 16:55:11  markc
+ * removed \t from output
+ *
+// Revision 1.3  1996/01/20  16:52:13  markc
+// modified output to use cerr and cout with one dump
+//
+// Revision 1.2  1996/01/14  22:52:18  markc
+// added check for eof
+//
+// Revision 1.1  1996/01/14  22:34:55  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id$";
+
+#include "../include/MTC++.h"
+#include "../include/mstring.h"
+#include "../include/errormsg.h"
+#include "../include/bst.h"
+
+void dumpString(MTCstring *aString);
+
+int main()
+{
+	MTCstring string;
+	MTCBST <MTCstring> BST;
+
+	// title 
+
+	cerr << "MTC++ Binary Search Tree Object Test Utility" << endl;
+        cerr << "Copyright (c) 1995, Mark T. Chapman" << endl;
+	cerr << endl;
+	cerr << "Please enter a bunch of strings.  End with Control-D." << endl;
+
+	cin >> string;
+
+	while (!cin.eof())
+	{
+		BST.add(string);
+
+		cin >> string;
+	}
+
+	cerr << "Dumping " << BST.getCount() << " sorted strings to stdout..." << endl;
+
+	BST.forEach(dumpString);
+
+	cerr << "That's All Folks!" << endl;
+
+	return 0;
+}
+
+void dumpString(MTCstring *aString)
+{
+	cout << *aString << endl;
+}
+@
+
+
+1.4
+log
+@removed \t from output
+@
+text
+@d6 1
+a6 1
+ * $Id: bsttest.cc,v 1.3 1996/01/20 16:52:13 markc Exp markc $
+d9 3
+d23 2
+@
+
+
+1.3
+log
+@modified output to use cerr and cout with one dump
+@
+text
+@d6 1
+a6 1
+ * $Id: bsttest.cc,v 1.2 1996/01/14 22:52:18 markc Exp markc $
+d9 3
+d35 1
+a35 1
+	cerr << "MTC++ Tree Object Test Utility" << endl;
+d60 1
+a60 1
+	cout << '\t' << *aString << endl;
+@
+
+
+1.2
+log
+@added check for eof
+@
+text
+@d6 1
+a6 1
+ * $Id: bsttest.cc,v 1.1 1996/01/14 22:34:55 markc Exp markc $
+d9 3
+d32 4
+a35 4
+	cout << "MTC++ Tree Object Test Utility" << endl;
+        cout << "Copyright (c) 1995, Mark T. Chapman" << endl;
+	cout << endl;
+	cout << "Please enter a bunch of strings.  End with QUIT." << endl;
+d39 1
+a39 1
+	while ((string!="QUIT")&&(!cin.eof()))
+d43 2
+a44 1
+		cout << " * * * * Start Dump" << endl;
+d46 1
+a46 1
+		BST.forEach(dumpString);
+d48 1
+a48 1
+		cout << " * * * * End Dump" << endl;
+d50 1
+a50 3
+		cin >> string;
+
+	}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 1
+a6 1
+ * $Id$
+d8 4
+a11 1
+ * $Log$
+d36 1
+a36 1
+	while (string!="QUIT")
+@

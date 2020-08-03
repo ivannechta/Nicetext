@@ -1,0 +1,153 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	97.03.02.03.30.08;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	97.02.16.06.03.30;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.20.17.13.24;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.4
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+/*
+ * Optimally Load a Sorted RAOF into a RBT
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * Note: this class template should really be a function template
+ *
+ * $Id: raof2rbt.h,v 1.3 1997/03/02 03:30:08 markc Exp markc $
+ *
+ * $Log: raof2rbt.h,v $
+ * Revision 1.3  1997/03/02 03:30:08  markc
+ * Added return FALSE; if the counts are not okay
+ *
+ * Revision 1.2  1997/02/16 06:03:30  markc
+ * fixed redundant load()'s
+ *
+ * Revision 1.1  1996/01/20 17:13:24  markc
+ * Initial revision
+ *
+ * Revision 1.3  1996/01/14  19:38:56  markc
+ * relaxed const
+ *
+ * Revision 1.2  1995/11/12  18:17:05  chapman
+ * Removed verbose output
+ * Fixed (.,->) problems.
+ *
+ * Revision 1.1  1995/11/12  18:02:54  chapman
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef  __RAOF2RBT_H_
+#define  __RAOF2RBT_H_
+
+static char rcsid__RAOF2RBT_H_ []  = "@@(#)$Id$";
+
+// class template to load a sorted raof into a rbt
+
+template <class T>
+class MTCraofToRBT {
+private:
+	MTCreadRAOF <T> * raof;
+	MTCRBT <T> 	* rbt;
+	void load(long low, long high)
+	{
+		for(long i=low; i<=high; i++)
+		{
+			rbt->add(*raof->read(i));
+		}
+	}
+protected:
+public:
+	BOOL doIt(MTCreadRAOF <T> &aRAOF, MTCRBT <T> &aRBT)
+		{
+			raof=&aRAOF;
+			rbt=&aRBT;
+			load(0,raof->getCount()-1);
+
+			if (raof->getCount()!=rbt->getCount())
+			{
+				errorMsg(EMT_ERROR, "I do not have as many nodes in the RBT as were in the raof.", "MTCraofToRBT::doIt()"); 
+				return FALSE;
+
+			}
+			
+			return TRUE;
+		}
+
+};
+
+#endif __ROAFALT_H_
+@
+
+
+1.3
+log
+@Added return FALSE; if the counts are not okay
+@
+text
+@d8 1
+a8 1
+ * $Id: raof2rbt.h,v 1.2 1997/02/16 06:03:30 markc Exp markc $
+d11 3
+d35 2
+@
+
+
+1.2
+log
+@fixed redundant load()'s
+@
+text
+@d8 1
+a8 1
+ * $Id: raof2rbt.h,v 1.1 1996/01/20 17:13:24 markc Exp markc $
+d11 3
+d58 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+ * $Id: raof2rbt.h,v 1.3 1996/01/14 19:38:56 markc Exp $
+d11 3
+a42 3
+
+		load(low, middle-1);
+		load(middle+1, high);
+@

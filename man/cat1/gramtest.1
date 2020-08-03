@@ -1,0 +1,66 @@
+
+
+
+GRAMTEST(1L)					     GRAMTEST(1L)
+
+
+NNAAMMEE
+       gramtest
+
+SSYYNNOOPPSSIISS
+       ggrraammtteesstt [-c sampleCount] [-d dictionary] [-g grammar]
+
+DDEESSCCRRIIPPTTIIOONN
+       The  _g_r_a_m_t_e_s_t  program tests the syntax of _g_r_a_m_m_a_r_s in the
+       NNIICCEETTEEXXTT system.  It also  can  generate  sample  sentence
+       models from the grammar definition.
+
+       The  purpose  of  the tool is to assist in writing grammar
+       style-sources.
+
+OOPPTTIIOONNSS
+       --cc ssaammpplleeCCoouunntt
+	      Generate _s_a_m_p_l_e_C_o_u_n_t example sentence  models  from
+	      the grammar.  These are sent to stdout.
+
+       --dd ddiiccttiioonnaarryy
+	      The  prefix for the input dictionary database.  The
+	      default is mstr.	The only information loaded  from
+	      the  dictionary  is the type-table.  The purpose is
+	      to check the terminals in the grammar to make  sure
+	      they  are  either  valid types in the dictionary or
+	      punctuation.
+
+       --gg ggrraammmmaarr
+	      The file name of the grammar definition file.   The
+	      default is _g_r_a_m_m_a_r_._d_e_f_.
+
+EEXXAAMMPPLLEESS
+       It  is strongly suggested that you try the examples in the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+DDIIAAGGNNOOSSTTIICCSS
+       _g_r_a_m_t_e_s_t returns  a  non-zero  value  if  it  detects  any
+       errors.
+
+SSEEEE AALLSSOO
+       bitcp(1L),  dct2mstr(1L),  expgram(1L), genmodel(1L), imp-
+       kimmo(1L), impmsc(1L), impwbstr(1L),  listword(1L),  nice-
+       text(1L),    printint(1L),    scramble(1L),   sortdct(1L),
+       txt2dct(1).
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+

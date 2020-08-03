@@ -1,0 +1,198 @@
+
+
+
+GENMODEL(1L)					     GENMODEL(1L)
+
+
+NNAAMMEE
+       genmodel
+
+SSYYNNOOPPSSIISS
+       ggeennmmooddeell  [-b badWordFile]  [-d inputDictionary] [-g gram-
+       mar] [-i inputFile] [-j jumpOverFirstLineCount] [-m model]
+       [-o outputDictionary] [-s] [[-u updateFreq]||[-q]]
+
+DDEESSCCRRIIPPTTIIOONN
+       _g_e_n_m_o_d_e_l  creates  style  sources from sample natural-lan-
+       guage texts for use with the NNIICCEETTEEXXTT system.
+
+OOPPTTIIOONNSS
+       --bb bbaaddWWoorrddFFiillee
+	      Output a list of words that occurred in  the  input
+	      file  but were not defined in the input dictionary.
+
+       --dd iinnppuuttDDiiccttiioonnaarryy
+	      Use _i_n_p_u_t_D_i_c_t_i_o_n_a_r_y as the  prefix  to  select  the
+	      input  dictionary  definition  database.	 _g_e_n_m_o_d_e_l
+	      uses the input dictionary to assign types to  words
+	      in the _i_n_p_u_t_F_i_l_e_.
+
+	      For  example:  _m_s_t_r  specifies  the database in the
+	      files _m_s_t_r_d_i_c_t_._d_a_t _m_s_t_r_d_i_c_t_._a_l_t _m_s_t_r_d_i_c_t_._j_m_p  _m_s_t_r_-
+	      _t_y_p_e_._d_a_t _m_s_t_r_t_y_p_e_._a_l_t and _m_s_t_r_t_y_p_e_._j_m_p You may also
+	      include  directory  information  in   the   prefix:
+	      _~_/_m_y_d_i_c_t_/_s_h_a_k  would point to _~_/_m_y_d_i_c_t_/_s_h_a_k_d_i_c_t_._d_a_t
+	      _~_/_m_y_d_i_c_t_/_s_h_a_k_d_i_c_t_._j_m_p etc.
+
+	      The default _i_n_p_u_t _d_i_c_t_i_o_n_a_r_y is _m_s_t_r
+
+	      See sortdct(1L) and dct2mstr(1L) , to learn how  to
+	      create the proper format dictionary tables.
+
+       --gg ggrraammmmaarr
+	      Output the generated style source into this _g_r_a_m_m_a_r
+	      definition file.	The grammar will consist  of  one
+	      rule  with  as  many RHS rewrites as there are sen-
+	      tence models.  This makes for  a	vveerryy  inefficient
+	      use  of  the  grammar-rule  format.  The reason for
+	      having the --gg option is to assist in manual grammar
+	      definition.
+
+	      (To  accomplish  this, send individual sentences or
+	      fragments through _g_e_n_m_o_d_e_l to  view  the	generated
+	      rules.)
+
+       --ii iinnppuuttFFiillee
+	      Read  sample natural-language texts from _i_n_p_u_t_F_i_l_e_.
+	      The default is stdin.
+
+       --jj jjuummppOOvveerrFFiirrssttLLiinneeCCoouunntt
+	      Skip the first --jj lines in  the  _i_n_p_u_t_F_i_l_e_.   NOTE:
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+GENMODEL(1L)					     GENMODEL(1L)
+
+
+	      THIS OPTION MAY NOT BE AVAILABLE.
+
+       --mm mmooddeell
+	      Output  the  generated  style-source  into the sen-
+	      tence-model database with the _m_o_d_e_l prefix.
+
+	      For example: _m_s_t_r generates  the	database  in  the
+	      files  _m_s_t_r_m_o_d_e_l_._d_a_t and _m_s_t_r_m_o_d_e_l_._j_m_p You may also
+	      include  directory  information  in   the   prefix:
+	      _~_/_m_y_m_o_d_e_l_s_/_s_h_a_k  would  point  to  _~_/_m_y_m_o_d_e_l_s_/_s_h_a_k_-
+	      _m_o_d_e_l_._d_a_t and _~_/_m_y_m_o_d_e_l_s_/_s_h_a_k_m_o_d_e_l_._j_m_p
+
+	      The generation of sentence-model databases  is  the
+	      primary use of the _g_e_n_m_o_d_e_l program.
+
+       --oo oouuttppuuttDDiiccttiioonnaarryy
+	      Create a new dictionary that is the subset of words
+	      in the _i_n_p_u_t_D_i_c_t_i_o_n_a_r_y that  were  defined  in  the
+	      _i_n_p_u_t_F_i_l_e_.   _o_u_t_p_u_t_D_i_c_t_i_o_n_a_r_y is the prefix for the
+	      distribution dictionary.
+
+       --ss     Normally, the software loads  all  database  tables
+	      into   RAM   before   processing.   The  --ss  option
+	      instructs the software to read each record from the
+	      database	tables on disk during analysis.  The pri-
+	      mary advantage is that the software has a  signifi-
+	      cantly smaller memory footprint.	Another advantage
+	      is that you do not need to wait to load the dictio-
+	      nary into RAM - which can take some time.  The dis-
+	      advantage is that processing of large  input  files
+	      is significantly slower.
+
+	      Use  this option if you are processing a relatively
+	      small input file or if you get memory  errors  when
+	      running without --ss set.
+
+       --uu uuppddaatteeFFrreeqq
+	      Print  status  updates  to  stderr every _u_p_d_a_t_e_F_r_e_q
+	      sentences.  Use zero to disable updates.
+
+	      The following  is  the  definition  of  the  status
+	      information:
+
+
+	      SR:    Number of sentences read from the _i_n_p_u_t_F_i_l_e
+
+	      US:    Number of unique sentence-models read.
+
+	      WR:    Number of words read.
+
+	      UW:    Number of unique words read.
+
+	      BWR:   Number of bad (undefined) words read.
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+
+
+
+
+GENMODEL(1L)					     GENMODEL(1L)
+
+
+	      UBW:   Number of unique bad words.
+
+       --qq     Be quiet.  This is the same as --uu 00
+
+EEXXAAMMPPLLEESS
+       It  is strongly suggested that you try the examples in the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+SSEEEE AALLSSOO
+       bitcp(1L), dct2mstr(1L), expgram(1L),  gramtest(1L),  imp-
+       kimmo(1L),  impmsc(1L),	impwbstr(1L), listword(1L), nice-
+       text(1L),   printint(1L),    scramble(1L),    sortdct(1L),
+       txt2dct(1L).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			3
+
+

@@ -1,0 +1,339 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.7
+date	97.04.22.16.35.48;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	97.04.22.16.25.18;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	97.02.16.06.58.59;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.13.10.18.10;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.12.23.48.19;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.10.22.15.49;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.08.22.07.07;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.7
+log
+@Fixed usage();
+@
+text
+@/*
+ * Test the Grammar Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: gramtest.cc,v 1.6 1997/04/22 16:25:18 markc Exp markc $
+ *
+ * $Log: gramtest.cc,v $
+ * Revision 1.6  1997/04/22 16:25:18  markc
+ * Added -g, -d, -c
+ *
+ * Revision 1.5  1997/02/16 06:58:59  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.4  1996/01/13 10:18:10  markc
+ * use new sentnode enabled sentence models
+ *
+// Revision 1.3  1996/01/12  23:48:19  markc
+// dynamic grammars work system wide -- next step, constant expressions
+//
+// Revision 1.2  1996/01/10  22:15:49  markc
+// makeModel() works
+//
+// Revision 1.1  1996/01/08  22:07:07  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.6 1997/04/22 16:25:18 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../gendict/include/sentnode.h"
+#include "../../gendict/include/sentmdl.h"
+#include "../../gendict/include/typerec.h"
+#include "../include/rule.h"
+#include "../include/grammar.h"
+
+void usage();
+
+int main(int argc, char *argv[])
+{
+	MTCstring fileName("grammar.def");
+	MTCstring typeName("mstr");
+	char ch;
+	int sampleCount=10;
+
+        while ((ch = getopt(argc, argv, "g:d:c:h")) != EOF)
+        {
+                switch(ch) 
+                {
+                        case 'g':
+                                fileName=optarg;
+                                break;
+			case 'd':
+				typeName=optarg;
+				break;
+			case 'h':
+				usage();
+				return 0;
+			case 'c':
+				sampleCount=atoi(optarg);
+				break;
+			default:
+				usage();
+				return -1;
+		}
+	}
+
+	argc -= optind;
+	argv += optind;
+
+	cout << "Testing Grammar Object" << endl;
+
+	cout << "\tgrammar:  " << fileName << endl;
+	cout << "\tdictionary: " << typeName << endl;
+	cout << "\tloading..." << endl;
+
+	typeName+="type";
+
+	MTCgrammar grammar(fileName, typeName);
+
+	grammar.allPunct();
+
+	cout << "Dumping grammar to stdout..." << endl;
+
+	cout << grammar << endl;
+
+	cout << "Generating " << sampleCount << " random sentence models (each ends with 'e 0')..." << endl;
+
+	if (grammar.isReady()==FALSE)
+	{
+		cout << "*** WARNING: Although the grammar is not ready, I will try to make models anyway" << endl;
+		cout << "*** THIS MAY HAVE UNPREDICTABLE RESULTS!!!" << endl;
+		cout << endl;
+	}
+
+	for(int i=0; i<sampleCount; i++)
+	{
+		MTCsentenceModel *model=grammar.makeModel(25, FALSE);
+
+		if (model==NULL)
+		{
+			break;
+		}
+		else
+		{
+			cout << *model << endl;
+		}
+	}
+
+	cout << "That's All Folks!" << endl;
+
+	return 0;
+}
+
+void usage()
+{
+	cerr << "Usage: gramtest [-g grammarFile] [-d dictionary] [-c sampleCount]" << endl;
+	cerr << "\t-g GrammarFile -- the name of the grammar definition file." << endl; 
+	cerr << "\t   (defaults to grammar.def)" << endl;
+	cerr << "\t-d Dictionary -- the name of the dictionary prefix" << endl;
+ 	cerr << "\t   (defaults to 'mstr')" << endl;
+	cerr << "\t-c SampleCount -- print this number of sample sentence models" << endl;
+}
+@
+
+
+1.6
+log
+@Added -g, -d, -c
+@
+text
+@d5 1
+a5 1
+ * $Id: gramtest.cc,v 1.5 1997/02/16 06:58:59 markc Exp markc $
+d8 3
+d29 1
+a29 1
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.5 1997/02/16 06:58:59 markc Exp markc $";
+d68 1
+a68 1
+				break;
+d74 1
+a74 1
+				break;
+d128 5
+a132 3
+	cerr << "\t-g GrammarFile -- the name of the grammar definition file (defaults to grammar.def)." << endl;
+	cerr << "\t-d Dictionary -- the name of the dictionary prefix (defaults to 'mstr')" << endl;
+	cerr << "\t-c SampleCount -- the number of sample sentence models to print on stdout" << endl;
+@
+
+
+1.5
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: gramtest.cc,v 1.4 1996/01/13 10:18:10 markc Exp markc $
+d8 3
+d26 1
+a26 1
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.4 1996/01/13 10:18:10 markc Exp markc $";
+d30 3
+d44 2
+d49 25
+a73 1
+	MTCstring typeName("mstrtype");
+d75 2
+a76 6
+	switch (argc) {
+	case 2:		fileName=argv[1];
+	case 1: 	break;
+	default:	cerr << "Usage: " << argv[0] << " [definition-file-name] " << endl;
+			return -1;
+	}
+d80 5
+a84 1
+	cout << "loading..." << endl;
+d90 1
+a90 1
+	cout << "dumping grammar to stdout" << endl;
+d94 1
+a94 1
+	cout << "generating 100 random sentence models (each ends with 'e 0')" << endl;
+d103 1
+a103 1
+	for(int i=0; i<100; i++)
+d120 8
+@
+
+
+1.4
+log
+@use new sentnode enabled sentence models
+@
+text
+@d5 1
+a5 1
+ * $Id: gramtest.cc,v 1.3 1996/01/12 23:48:19 markc Exp markc $
+d8 3
+d23 1
+a23 1
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.3 1996/01/12 23:48:19 markc Exp markc $";
+d31 1
+a31 1
+#include "../../mtc++/include/bst.h"
+@
+
+
+1.3
+log
+@dynamic grammars work system wide -- next step, constant expressions
+@
+text
+@d5 1
+a5 1
+ * $Id: gramtest.cc,v 1.2 1996/01/10 22:15:49 markc Exp markc $
+d8 3
+d20 1
+a20 1
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.2 1996/01/10 22:15:49 markc Exp markc $";
+d29 1
+d52 2
+@
+
+
+1.2
+log
+@makeModel() works
+@
+text
+@d5 1
+a5 1
+ * $Id: gramtest.cc,v 1.1 1996/01/08 22:07:07 markc Exp markc $
+d8 3
+d17 1
+a17 1
+static char rcsid []  = "@@(#)$Id: gramtest.cc,v 1.1 1996/01/08 22:07:07 markc Exp markc $";
+d25 1
+d27 1
+a28 1
+#include "../../mtc++/include/bst.h"
+d34 1
+d47 1
+a47 1
+	MTCgrammar grammar(fileName.c_str());
+d55 7
+d64 10
+a73 2
+		MTCsentenceModel &model=grammar.makeModel(25);
+		cout << model << endl;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d22 1
+a24 1
+#include "../../gendict/include/sentmdl.h"
+d38 4
+d43 14
+@

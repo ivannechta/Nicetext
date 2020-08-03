@@ -1,0 +1,1511 @@
+head	1.26;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.26
+date	98.08.18.21.34.14;	author markc;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	97.05.03.16.30.38;	author markc;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	97.03.05.17.49.59;	author markc;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	97.02.27.17.52.25;	author markc;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	97.02.27.16.55.03;	author markc;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	97.02.27.13.35.31;	author chapman;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	97.02.24.04.27.49;	author markc;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	97.02.24.00.12.19;	author markc;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	97.02.16.06.58.59;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	96.07.03.22.02.42;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	96.02.08.01.09.38;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	96.01.13.14.30.01;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	96.01.13.14.25.21;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	96.01.13.13.56.22;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	96.01.13.13.33.36;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.01.13.10.18.10;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.01.12.23.50.20;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.01.12.16.37.37;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.11.13.11.04.27;	author markc;	state Exp;
+branches
+	1.8.1.1;
+next	1.7;
+
+1.7
+date	95.11.13.01.50.26;	author chapman;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.11.13.01.06.22;	author chapman;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.11.07.18.54.30;	author chapman;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.11.04.18.46.16;	author chapman;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.09.25.03.12.15;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.26.21.34.58;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.24.20.14.57;	author markc;	state Exp;
+branches;
+next	;
+
+1.8.1.1
+date	96.01.12.23.52.31;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial check in
+@
+
+
+1.26
+log
+@babble -> nicetext
+@
+text
+@/*
+ * NiceText Program 
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: nicetext.cc,v 1.25 1997/05/03 16:30:38 markc Exp markc $
+ *
+ * $Log: nicetext.cc,v $
+ * Revision 1.25  1997/05/03 16:30:38  markc
+ * Added stats doc to usage()
+ *
+ * Revision 1.24  1997/03/05 17:49:59  markc
+ * Added static char rcsid []  = "@@(#)$Id: nicetext.cc,v 1.25 1997/05/03 16:30:38 markc Exp markc $";
+ *
+ * Revision 1.23  1997/02/27 17:52:25  markc
+ * Fixed usage()
+ *
+ * Revision 1.22  1997/02/27 16:55:03  markc
+ * Fixed small mode comments
+ *
+ * Revision 1.21  1997/02/27 13:35:31  chapman
+ * Enabled -s parameter for smaller memory usage
+ *
+ * Revision 1.20  1997/02/24 04:27:49  markc
+ * Added bit-input and output statistics
+ *
+ * Revision 1.19  1997/02/24 00:12:19  markc
+ * Added printStats and fixed maxModelLength
+ *
+ * Revision 1.18  1997/02/16 06:58:59  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.17  1996/07/03 22:02:42  markc
+ * added stub for small mode (-s)
+ *
+ * Revision 1.16  1996/02/08 01:09:38  markc
+ * added srandom() call
+ *
+// Revision 1.15  1996/01/13  14:30:01  markc
+// fixed usage()
+//
+// Revision 1.14  1996/01/13  14:25:21  markc
+// removed -t from getopts call
+//
+// Revision 1.13  1996/01/13  13:56:22  markc
+// merged -d to mean -t and -d -- it must be this way
+//
+// Revision 1.12  1996/01/13  13:33:36  markc
+// -m option for babble added -- both models and grammars work!
+//
+// Revision 1.11  1996/01/13  10:18:10  markc
+// use new sentnode enabled sentence models
+//
+// Revision 1.10  1996/01/12  23:50:20  markc
+// dynamic grammar makeModel() workds -- cleaned up parameters in babble.cc
+// next step, punctuation, etc.
+//
+// Revision 1.9  1996/01/12  16:37:37  markc
+// BAD BAD BAD -- REMOVE REMOVE REMOVE THIS EDIT
+//
+// Revision 1.8  1995/11/13  11:04:27  markc
+// Added option for stdout if no outfileName specified on command line
+//
+// Revision 1.7  1995/11/13  01:50:26  chapman
+// Added HugeMode -- significant speed improvement!!!!
+//
+// Revision 1.6  1995/11/13  01:06:22  chapman
+// Converted to use new output from genmodel.
+// Added extrabits -- otherwise the last byte of input stream was not used
+// for some reason.
+//
+// Revision 1.5  1995/11/07  18:54:30  chapman
+// Added MTCinputBitStream logic and file selection
+//
+// Revision 1.4  1995/11/04  18:46:16  chapman
+// removed #include <String>
+//
+// Revision 1.3  1995/09/25  03:12:15  markc
+// Check it in
+//
+// Revision 1.2  1995/08/26  21:34:58  markc
+// Just about working for a first cut...
+//
+// Revision 1.1  1995/08/24  20:14:57  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: nicetext.cc,v 1.25 1997/05/03 16:30:38 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/dictrec.h"
+#include "../../gendict/include/dictarec.h"
+#include "../../gendict/include/typerec.h"
+#include "../../gendict/include/typearec.h"
+#include "../../gendict/include/sentnode.h"
+#include "../../gendict/include/sentmdl.h"
+#include "../../gendict/include/dconst.h"
+#include "../include/bitstrm.h"
+#include "../include/bitinput.h"
+#include "../include/rule.h"
+#include "../include/grammar.h"
+#include "../include/bits2txt.h"
+
+#define DEFAULT_MAX_MODEL_LENGTH 1024
+
+void usage();
+void randomize();
+
+int main(int argc, char * argv[])
+{
+	// check command line arguments
+	extern char *optarg;
+	extern int optind;
+	int ch;
+	BOOL smallMode=FALSE;
+	BOOL grammarMode=TRUE;
+	long statFreq=DEFAULT_PRINTSTAT_FREQ;
+	MTCstring grammarFile("grammar.def");
+	MTCstring modelFile("model");
+	MTCstring dictFile("mstrdict");
+	MTCstring typeFile("mstrtype");
+	MTCstring outputFileName;
+	MTCstring inputFileName;
+	int maxModelLength=DEFAULT_MAX_MODEL_LENGTH; 
+
+	while ((ch = getopt(argc, argv, "g:m:d:sho:i:l:qu:")) != EOF)
+	{
+		switch(ch) 
+		{
+			case 'g':
+				grammarMode=TRUE;
+				grammarFile=optarg;
+				break;
+			case 'm':
+				grammarMode=FALSE;
+				modelFile=optarg;
+				modelFile+="model";
+				break;
+			case 'd':
+				dictFile=optarg;
+				dictFile+="dict";
+				typeFile=optarg;
+				typeFile+="type";
+				break;
+			case 'o':
+				outputFileName=optarg;
+				break;
+			case 'i':
+				inputFileName=optarg;
+				break;
+			case 's':
+				smallMode=TRUE;
+				break;
+			case 'q': 
+				statFreq=0;
+				break;
+			case 'u':
+				statFreq=atoi(optarg);
+				break;
+			case 'l':
+				maxModelLength=atoi(optarg);
+
+				if (maxModelLength<=0)
+				{
+					errorMsg(EMT_WARNING, "Invalid maximum model length specified, setting back to default", "main()"); 
+					maxModelLength=DEFAULT_MAX_MODEL_LENGTH;
+				}
+
+				break;
+
+			default:
+				usage();
+				return (-1);
+		}
+	}
+
+	argc -= optind;
+ 	argv += optind;
+
+	cerr << "Converting input file into nicetext..." << endl;
+
+	MTCbitsToTextBase *converter;
+
+	if (grammarMode==TRUE)
+	{
+		converter=new MTCbitsToTextGrammar;
+	}
+	else
+	{
+		converter=new MTCbitsToTextModel;
+	}
+
+	if (converter==NULL)
+	{
+		errorMsg(EMT_ABORT, "I could not allocate a converter object", "main()"); 
+	}
+
+	cerr << "Stage 1: Setup"<< endl;
+
+	if (inputFileName.length()==0)
+	{
+		cerr << endl;
+		errorMsg(EMT_ABORT, "I was not given an input file to process (use -i inputFile)", "main()");
+	}
+	else
+	{
+		cerr << "\tOpening input file: " << inputFileName << endl;
+
+		if (converter->openInputName(inputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+
+	if (outputFileName.length()==0)
+	{
+		cerr << "\tUsing stdout for output." << endl;
+	}
+	else
+	{
+		cerr << "\tOpening output file: " << outputFileName << endl;
+
+		if (converter->openOutputName(outputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+
+	cerr << "\tOpening type table: " << typeFile << endl;
+
+	if (converter->openTypeName(typeFile)==FALSE)
+	{
+		exit(-1);
+	}
+
+	if (grammarMode==TRUE)
+	{
+		cerr << "\tOpening grammar definition file: " << grammarFile << endl;
+
+		if (((MTCbitsToTextGrammar *)converter)->openGrammarName(grammarFile)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+	else
+	{
+		cerr << "\tOpening model table: " << modelFile << endl;
+
+		if (((MTCbitsToTextModel *)converter)->openModelName(modelFile)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+
+	cerr << "\tOpening dictionary table: " << dictFile << endl;
+
+	if (smallMode==TRUE)
+	{
+		cerr << "\t(small mode [-s] selected...I will NOT read dictionary into memory...)" << endl;
+	}
+	else
+	{
+		cerr << "\t(Reading dictionary into memory...if I run out of RAM try using [-s])" << endl;
+	}
+
+	if (converter->openDictName(dictFile, smallMode)==FALSE)
+	{
+		exit(-1);
+	}
+
+	converter->setStatFreq(statFreq);
+
+	if (statFreq!=0)
+	{
+		cerr << "\tUpdate Status Every " << converter->getStatFreq() << " Sentences " << endl;
+	}
+	else
+	{
+		cerr << "\tUpdate Status Disabled with [-q] or [-u 0]" << endl;
+	}
+
+	cerr << "\tMax Model Length: " << maxModelLength << endl;
+	converter->setMaxModelLength(maxModelLength);
+
+	cerr << "Stage 2: Process input file..." << endl;
+
+	randomize();
+
+	converter->doIt();
+
+	cerr << "Stage 3: Print Final Stats                                                    " << endl;
+
+	converter->printStats();
+
+	cerr << endl;
+
+	cerr << "That's all folks!" << endl;
+
+}
+
+void randomize()
+{
+	struct timeval t;
+	struct timezone tz; 
+
+	if (gettimeofday(&t, &tz)==-1)
+	{
+		errorMsg(EMT_WARNING, "random seed generation failed...no big deal though...", "randomize()");
+	}
+
+	srandom(t.tv_sec|t.tv_usec);
+}
+
+void usage()
+{
+	cerr << "Usage: nicetext -i inputfile [[-g grammarDefFile] | [-m model]] [-d dictionary] [-o outputFile] [-s] [-l maxModelLength] [[-u updateFreq] | [-q]]" << endl; 
+	cerr << "\t-d\tSpecify the prefix for the dictionary file\n\t\t(i.e. mstr for mstrdict.dat, mstrtype.dat)" << endl; 
+	cerr << "\t-g\tSpecify the full grammar definition file path" << endl; 
+	cerr << "\t-i\tSpecify the full input file path" << endl; 
+	cerr << "\t-l\tDo not use sentences with more than this number of components" << endl;
+	cerr << "\t-m\tSpecify the prefix for the model file\n\t\t(i.e. mstr for mstrmodel.dat)" << endl; 
+	cerr << "\t-o\tSpecify the full output file path (default to stdout)" << endl; 
+	cerr << "\t-q\tDo not print status updates. (same as [-u 0])" << endl;
+	cerr << "\t-s\tSmall mode - use tables from disk, don't load them into RAM" << endl;
+	cerr << "\t-u\tPrint status updates every 'updateFreq' sentences." << endl;
+	cerr << "The following statistics are printed because of [-u]:" << endl;
+	cerr << "\tI: Number of Input Bits Read" << endl;
+	cerr << "\tE: Number of Extra Bits Appended to Input" << endl; 
+	cerr << "\tO: Number of Output Bits" << endl;
+	cerr << "\tG: Growth Ratio: (100*O)/(I+E)" << endl;
+	cerr << "\tU: Number of Models Used" << endl;
+	cerr << "\tS: Number of Models Skipped Because of [-l]" << endl;
+	cerr << "\tN: Total Number of Model Elements Used" << endl;
+	cerr << "\tA: Average Number of Elements per Model: N/S" << endl;
+}
+@
+
+
+1.25
+log
+@Added stats doc to usage()
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.24 1997/03/05 17:49:59 markc Exp markc $
+d8 3
+d12 1
+a12 1
+ * Added static char rcsid []  = "@@(#)$Id$";
+d89 1
+a89 1
+static char rcsid []  = "@@(#)$Id: nicetext.cc,v 1.24 1997/03/05 17:49:59 markc Exp markc $";
+d192 1
+a192 1
+	cerr << "Converting input file into babbled output file..." << endl;
+@
+
+
+1.24
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.23 1997/02/27 17:52:25 markc Exp markc $
+d8 3
+d86 1
+a86 1
+static char rcsid []  = "@@(#)$Id$";
+d335 9
+@
+
+
+1.23
+log
+@Fixed usage()
+@
+text
+@d2 1
+a2 1
+ * Babble Program 
+d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.22 1997/02/27 16:55:03 markc Exp markc $
+d8 3
+d83 2
+a84 1
+//#define DEBUG
+@
+
+
+1.22
+log
+@Fixed small mode comments
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.21 1997/02/27 13:35:31 chapman Exp markc $
+d8 3
+d119 1
+d128 1
+a128 1
+	while ((ch = getopt(argc, argv, "g:m:d:sho:i:l:")) != EOF)
+d156 6
+a199 1
+
+d273 11
+d318 2
+a319 2
+	cerr << "Usage: nicetext -i inputfile [[-g grammarDefFile] | [-m model]] [-d dictionary] [-o outputFile] [-s] [-l maxModelLength]" << endl; 
+	cerr << "\t-d\tSpecify the prefix for the dictionary file (i.e. mstr for mstrdict.dat, mstrtype.dat)" << endl; 
+d321 3
+a323 3
+	cerr << "\t-i\tSpecify the full input file path (no default))" << endl; 
+	cerr << "\t-l\tDo not use any sentence models with more than this number of components" << endl;
+	cerr << "\t-m\tSpecify the prefix for the model file (i.e. mstr for mstrmodel.dat)" << endl; 
+d325 1
+d327 1
+@
+
+
+1.21
+log
+@Enabled -s parameter for smaller memory usage
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.20 1997/02/24 04:27:49 markc Exp chapman $
+d8 3
+a150 1
+				errorMsg(EMT_WARNING,  "Small Mode (-s) is NOT available at this time -- I will read the tables into RAM", "main()");
+d249 9
+@
+
+
+1.20
+log
+@Added bit-input and output statistics
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.19 1997/02/24 00:12:19 markc Exp markc $
+d8 3
+a190 14
+	cerr << "\tOpening dictionary table: " << dictFile << endl;
+
+	if (converter->openDictName(dictFile)==FALSE)
+	{
+		exit(-1);
+	}
+
+	cerr << "\tOpening type table: " << typeFile << endl;
+
+	if (converter->openTypeName(typeFile)==FALSE)
+	{
+		exit(-1);
+	}
+
+d220 7
+d244 7
+@
+
+
+1.19
+log
+@Added printStats and fixed maxModelLength
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.18 1997/02/16 06:58:59 markc Exp markc $
+d8 3
+d259 2
+d262 2
+@
+
+
+1.18
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.17 1996/07/03 22:02:42 markc Exp markc $
+d8 3
+d94 2
+d113 1
+d115 1
+a115 1
+	while ((ch = getopt(argc, argv, "g:m:d:sho:i:")) != EOF)
+d142 12
+a153 1
+				cerr << "* * * Warning: Small Mode is NOT available at this time -- I will read the tables into RAM" << endl; 
+a163 1
+
+d247 3
+d253 1
+d256 2
+d277 7
+a283 1
+	cerr << "Usage: nicetext [[-g grammarDefFile] | [-m model]] [-d dictionary] [-o outputFile] -i inputFile [-s]" << endl; 
+@
+
+
+1.17
+log
+@added stub for small mode (-s)
+@
+text
+@d5 1
+a5 1
+ * $Id: nicetext.cc,v 1.16 1996/02/08 01:09:38 markc Exp markc $
+d8 3
+d74 1
+a74 1
+#include "../../mtc++/include/bst.h"
+d77 1
+a77 1
+#include "../../mtc++/include/raof2bst.h"
+@
+
+
+1.16
+log
+@added srandom() call
+@
+text
+@d5 5
+a9 1
+ * $Id: babble.cc,v 1.15 1996/01/13 14:30:01 markc Exp markc $
+a10 1
+ * $Log: babble.cc,v $
+d97 1
+a97 1
+	BOOL lowMemoryMode=FALSE;
+d106 1
+a106 1
+	while ((ch = getopt(argc, argv, "g:m:d:lho:i:")) != EOF)
+d131 3
+d252 2
+a253 1
+	cerr << "Usage: babble [[-g grammarDefFile] | [-m model]] [-d dictionary] [-o outputFile] -i inputFile" << endl; 
+@
+
+
+1.15
+log
+@fixed usage()
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.14 1996/01/13 14:25:21 markc Exp markc $
+d8 3
+d64 1
+d86 1
+d224 1
+d229 13
+@
+
+
+1.14
+log
+@removed -t from getopts call
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.13 1996/01/13 13:56:22 markc Exp markc $
+d8 3
+d227 1
+a227 1
+	cerr << "Usage: babble [[-g grammarDefFile] | [-m model]] [-d dictionary] [-o outputFile] inputFile" << endl; 
+@
+
+
+1.13
+log
+@merged -d to mean -t and -d -- it must be this way
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.12 1996/01/13 13:33:36 markc Exp markc $
+d8 3
+d95 1
+a95 1
+	while ((ch = getopt(argc, argv, "g:m:d:t:lho:i:")) != EOF)
+@
+
+
+1.12
+log
+@-m option for babble added -- both models and grammars work!
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.11 1996/01/13 10:18:10 markc Exp markc $
+d8 3
+d103 1
+d107 1
+a107 2
+				break;
+			case 't':
+d109 1
+d221 1
+a221 1
+	cerr << "Usage: babble [[-g grammar.def] | [-m model.dat]] [-d dict.dat] [-t type.dat] [-o outputFile] inputFile" << endl; 
+@
+
+
+1.11
+log
+@use new sentnode enabled sentence models
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.10 1996/01/12 23:50:20 markc Exp markc $
+d8 3
+d199 6
+a204 1
+		errorMsg(EMT_ABORT, "Model mode not yet merged into this version of babble.  Please see an older version (or newer...)", "main()");
+@
+
+
+1.10
+log
+@dynamic grammar makeModel() workds -- cleaned up parameters in babble.cc
+next step, punctuation, etc.
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.9 1996/01/12 16:37:37 markc Exp markc $
+d8 4
+d60 1
+d159 1
+a159 2
+		usage();
+		errorMsg(EMT_ABORT, "I was not given an input file to process.", "main()");
+@
+
+
+1.9
+log
+@BAD BAD BAD -- REMOVE REMOVE REMOVE THIS EDIT
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.8 1995/11/13 11:04:27 markc Exp markc $
+d8 3
+d55 1
+d60 2
+d64 2
+d81 1
+a81 1
+	while ((ch = getopt(argc, argv, "g:m:d:t:lho:")) != EOF)
+d100 5
+d107 1
+a107 1
+				cerr << "Usage: babble [[-g grammar.def] | [-m model.dat]] [-d dict.dat] [-t type.dat] [-o outputFile] inputFile" << endl; 
+d115 1
+d118 1
+a118 3
+	// set up input stream
+
+	MTCinputBitStream inputBitStream(argv[1]);
+d120 1
+a120 1
+	if (inputBitStream.getStreamBitsLeft()==0)
+d122 1
+a122 2
+		cerr << "Could not open input file: " <<  argv[1] << endl;
+		return -2;
+d124 1
+a124 2
+
+	if (argc==3)
+d126 2
+a127 1
+		outputFile=new ofstream (argv[2]);
+d129 1
+a129 7
+		if (outputFile==NULL)
+		{
+			cerr << "Could not open output file: " <<  argv[2] << endl;
+			return -2;
+		}
+	}
+	else
+d131 1
+a131 1
+		outputFile=&cout;
+a133 1
+	// are we in hugeMode?
+d135 1
+a135 1
+	BOOL hugeMode=TRUE;
+d137 1
+a137 1
+	MTCBST <MTCdictAltRecord> dictAltRecordBST;
+d139 1
+a139 1
+	if (hugeMode==TRUE)
+d141 2
+a142 1
+		cerr << "Huge mode on: loading dictionary into RAM..." << endl; 
+d144 1
+a144 1
+		MTCraofToBST <MTCdictAltRecord> loadDictAltRecord;
+d146 3
+a148 1
+		loadDictAltRecord.doIt(dictAltRecordRAOF, dictAltRecordBST);
+d151 7
+a157 18
+	// process the input into the output
+
+	cerr << "Processing input file..." << endl;
+
+	long type;
+	MTCstring output;
+	MTCtypeRecord tempMstrType;
+	MTCdictAltRecord tempDistDict;
+	const MTCdictAltRecord *found;
+	char buffer[10];
+	long maxWords;
+	unsigned seed;
+	unsigned long bitString;
+	long extraBits=0;
+
+	model=NULL;
+
+ 	for(;;)
+d159 1
+a159 3
+		type=getNextType();
+
+		tempMstrType=*distTypeRAOF.read(type);
+d161 1
+a161 1
+		if (tempMstrType.getFreq()==0)
+d163 1
+a163 2
+			cerr << "ERROR -- TYPEFREQ IS ZERO FOR " << type << endl;
+			continue;
+d165 1
+a165 3
+		else
+		{
+			tempDistDict.setTypeIndex(type);
+d167 7
+a173 1
+			tempDistDict.setBitString(inputBitStream.readBits(tempMstrType.getBitCount()));
+d175 1
+a175 20
+			if (hugeMode==TRUE)
+			{
+				found=dictAltRecordBST.find(tempDistDict);
+			}
+			else
+			{
+				found=dictAltRecordRAOF.find(tempDistDict);
+			}
+
+			if (found==NULL)
+			{
+				*outputFile << "NOT FOUND" << endl;
+			}
+			else
+			{
+				*outputFile << ' ' << found->getValue();
+			}
+		}
+
+		if ((inputBitStream.getStreamBitsLeft()==0)&&(extraBits++>=EXTRA_BITS))
+d177 1
+a177 1
+			break;
+d181 1
+a181 3
+	*outputFile << endl;
+
+	if (argc==3)
+d183 1
+a183 3
+		delete outputFile;
+		outputFile=NULL;
+	}
+d185 4
+a188 14
+	cerr << "That's all folks!" << endl;
+
+}
+
+long getNextType()
+{
+	MTCstring punctuation;
+	long answer;
+
+	if (model==NULL)
+	{
+		getNextModel();
+		*outputFile << endl;
+		return getNextType();
+d192 1
+a192 6
+		if ((answer=model->getNext(&punctuation))==SENTMDL_GETNEXT_DONE)
+		{
+			printPunctuation(punctuation);
+			model=NULL;
+			return getNextType();
+		}
+d195 1
+a195 1
+	printPunctuation(punctuation);
+d197 1
+a197 2
+	return answer;
+}
+d199 1
+a199 16
+void getNextModel()
+{
+	long randomJump=random()%modelRAOF.getCount();
+
+	if (model!=NULL)
+	{
+		model->clear();
+	}
+
+	model=modelRAOF.read(randomJump);
+
+	if (model==NULL)
+	{
+		cerr << "getNextModel() failed...trying agian..." << endl;
+		getNextModel();
+	}
+a200 1
+	return;
+d203 1
+a203 1
+void printPunctuation(MTCstring &aStr)
+d205 1
+a205 11
+	for(int i=0; i<aStr.length(); i++)
+	{
+		switch (aStr.c_str()[i]) {
+
+		case 'n':  	*outputFile << endl;
+				break;
+		case 'e':	break;
+		default:
+				*outputFile << aStr.c_str()[i];
+		}
+	}
+@
+
+
+1.8
+log
+@Added option for stdout if no outfileName specified on command line
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.7 1995/11/13 01:50:26 chapman Exp markc $
+d8 3
+d56 1
+a56 13
+
+#define PREFIX "dist"
+#define EXTRA_BITS 128
+
+MTCreadRAOF <MTCdictAltRecord> 	dictAltRecordRAOF (PREFIX"dict.dat", PREFIX"dict.alt");
+MTCreadRAOF <MTCtypeRecord> 	distTypeRAOF (PREFIX"type");
+MTCreadRAOF <MTCsentenceModel> 	modelRAOF ("model");
+MTCsentenceModel *model;
+ostream * outputFile;
+
+long getNextType();
+void getNextModel();
+void printPunctuation(MTCstring &);
+d61 11
+d73 1
+a73 1
+	if ((argc!=2)&&(argc!=3))
+d75 22
+a96 2
+		cerr << "Usage: " << argv[0] << " inputFile [outputFile]" << endl;
+		return -1;
+d98 3
+@
+
+
+1.8.1.1
+log
+@um, what's up here?
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.10 1996/01/12 23:50:20 markc Exp $
+a7 10
+// Revision 1.10  1996/01/12  23:50:20  markc
+// dynamic grammar makeModel() workds -- cleaned up parameters in babble.cc
+// next step, punctuation, etc.
+//
+// Revision 1.9  1996/01/12  16:37:37  markc
+// BAD BAD BAD -- REMOVE REMOVE REMOVE THIS EDIT
+//
+// Revision 1.8  1995/11/13  11:04:27  markc
+// Added option for stdout if no outfileName specified on command line
+//
+a48 1
+#include "../../gendict/include/typearec.h"
+a52 3
+#include "../include/rule.h"
+#include "../include/grammar.h"
+#include "../include/bits2txt.h"
+d54 12
+a65 1
+void usage();
+a69 11
+	extern char *optarg;
+	extern int optind;
+	int ch;
+	BOOL lowMemoryMode=FALSE;
+	BOOL grammarMode=TRUE;
+	MTCstring grammarFile("grammar.def");
+	MTCstring modelFile("model");
+	MTCstring dictFile("mstrdict");
+	MTCstring typeFile("mstrtype");
+	MTCstring outputFileName;
+	MTCstring inputFileName;
+d71 1
+a71 1
+	while ((ch = getopt(argc, argv, "g:m:d:t:lho:i:")) != EOF)
+d73 2
+a74 27
+		switch(ch) 
+		{
+			case 'g':
+				grammarMode=TRUE;
+				grammarFile=optarg;
+				break;
+			case 'm':
+				grammarMode=FALSE;
+				modelFile=optarg;
+				break;
+			case 'd':
+				dictFile=optarg;
+				break;
+			case 't':
+				typeFile=optarg;
+				break;
+			case 'o':
+				outputFileName=optarg;
+				break;
+			case 'i':
+				inputFileName=optarg;
+				break;
+
+			default:
+				usage();
+				return (-1);
+		}
+d77 1
+a77 2
+	argc -= optind;
+ 	argv += optind;
+d79 1
+d81 1
+a81 1
+	cerr << "Converting input file into babbled output file..." << endl;
+d83 5
+a87 1
+	MTCbitsToTextBase *converter;
+d89 1
+a89 1
+	if (grammarMode==TRUE)
+d91 7
+a97 1
+		converter=new MTCbitsToTextGrammar;
+d101 1
+a101 1
+		converter=new MTCbitsToTextModel;
+d104 7
+a110 1
+	if (converter==NULL)
+d112 5
+a116 1
+		errorMsg(EMT_ABORT, "I could not allocate a converter object", "main()"); 
+d119 3
+d123 10
+a132 1
+	cerr << "Stage 1: Setup"<< endl;
+d134 1
+a134 1
+	cerr << "\tOpening dictionary table: " << dictFile << endl;
+d136 1
+a136 1
+	if (converter->openDictName(dictFile)==FALSE)
+d138 38
+a175 1
+		exit(-1);
+d178 1
+a178 1
+	cerr << "\tOpening type table: " << typeFile << endl;
+d180 1
+a180 1
+	if (converter->openTypeName(typeFile)==FALSE)
+d182 2
+a183 1
+		exit(-1);
+d186 10
+a195 1
+	if (inputFileName.length()==0)
+d197 3
+a199 3
+		cerr << endl;
+		usage();
+		errorMsg(EMT_ABORT, "I was not given an input file to process.", "main()");
+d203 1
+a203 3
+		cerr << "\tOpening input file: " << inputFileName << endl;
+
+		if (converter->openInputName(inputFileName)==FALSE)
+d205 3
+a207 1
+			exit(-1);
+d211 1
+a211 7
+	if (outputFileName.length()==0)
+	{
+		cerr << "\tUsing stdout for output." << endl;
+	}
+	else
+	{
+		cerr << "\tOpening output file: " << outputFileName << endl;
+d213 2
+a214 5
+		if (converter->openOutputName(outputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+d216 3
+a218 3
+	if (grammarMode==TRUE)
+	{
+		cerr << "\tOpening grammar definition file: " << grammarFile << endl;
+d220 1
+a220 6
+		if (((MTCbitsToTextGrammar *)converter)->openGrammarName(grammarFile)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+	else
+d222 1
+a222 1
+		errorMsg(EMT_ABORT, "Model mode not yet merged into this version of babble.  Please see an older version (or newer...)", "main()");
+d225 1
+a225 1
+	cerr << "Stage 2: Process input file..." << endl;
+d227 5
+a231 3
+	converter->doIt();
+
+	cerr << "That's all folks!" << endl;
+d233 1
+d236 1
+a236 1
+void usage()
+d238 11
+a248 1
+	cerr << "Usage: babble [[-g grammar.def] | [-m model.dat]] [-d dict.dat] [-t type.dat] [-o outputFile] inputFile" << endl; 
+@
+
+
+1.7
+log
+@Added HugeMode -- significant speed improvement!!!!
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.6 1995/11/13 01:06:22 chapman Exp chapman $
+d8 3
+d61 1
+a61 1
+ofstream * outputFile;
+d71 1
+a71 1
+	if (argc!=3)
+d73 1
+a73 1
+		cerr << "Usage: " << argv[0] << " inputFile outputFile" << endl;
+d89 3
+a91 1
+	outputFile=new ofstream (argv[2]);
+d93 7
+a99 1
+	if (outputFile==NULL)
+d101 1
+a101 2
+		cerr << "Could not open output file: " <<  argv[2] << endl;
+		return -2;
+d178 3
+a180 1
+	if (outputFile!=NULL)
+@
+
+
+1.6
+log
+@Converted to use new output from genmodel.
+Added extrabits -- otherwise the last byte of input stream was not used
+for some reason.
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.5 1995/11/07 18:54:30 chapman Exp chapman $
+d8 5
+d42 1
+d74 4
+d94 15
+d111 2
+d143 8
+a150 1
+			found=dictAltRecordRAOF.find(tempDistDict);
+d173 3
+@
+
+
+1.5
+log
+@Added MTCinputBitStream logic and file selection
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.4 1995/11/04 18:46:16 chapman Exp chapman $
+d8 3
+a33 1
+#include "../../gendict/include/dictent.h"
+d37 3
+a39 3
+#include "../../gendict/include/mstrdict.h"
+#include "../../gendict/include/mstrtype.h"
+#include "../../gendict/include/distdict.h"
+d45 5
+a49 2
+MTCreadRAOF <MTCdistDict> 	distDictRAOF ("distdict");
+MTCreadRAOF <MTCmstrType> 	distTypeRAOF ("disttype");
+d88 3
+a90 3
+	MTCmstrType tempMstrType;
+	MTCdistDict tempDistDict;
+	const MTCdistDict *found;
+d95 1
+d99 1
+a99 1
+	while (inputBitStream.getStreamBitsLeft()>0)
+d116 1
+a116 1
+			found=distDictRAOF.find(tempDistDict);
+d126 5
+@
+
+
+1.4
+log
+@removed #include <String>
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.3 1995/09/25 03:12:15 markc Exp chapman $
+d8 3
+d40 2
+d47 1
+d53 1
+a53 1
+int main()
+d55 26
+a81 1
+	long maxsize;
+d89 1
+d93 1
+a93 4
+	cout << "How Many Words Should I Babble? " << endl;
+	cin >> maxWords;
+
+	for(int i=0; i<maxWords ; i++)
+a94 1
+		//cout << "STARTMAIN" << endl;
+d97 1
+a97 2
+		//cout << "BACK AT MAIN" << endl;
+		maxsize=distTypeRAOF.read(type)->getFreq();
+d99 1
+a99 1
+		if (maxsize==0)
+d101 2
+a102 1
+			cout << "ERROR -- TYPEFREQ IS ZERO FOR " << type << endl;
+d107 2
+a108 1
+			tempDistDict.setBitString(random()%maxsize);
+d114 1
+a114 1
+				cout << "NOT FOUND" << endl;
+d118 1
+a118 1
+				cout << ' ' << found->getValue();
+a119 1
+			//cout << "ENDMAIN" << endl;
+d123 5
+a127 2
+	cout << endl << endl;
+
+a131 1
+	//cout << "GetNextType()"<< endl;
+a136 1
+		//cout << "model==NULL" << endl;
+d138 1
+a138 1
+		cout << endl;
+a157 1
+	//cout << "MODEL MODEL MODEL GetNext()"<< endl;
+a159 2
+	//cout << "randomJump=" << randomJump << endl;
+
+a166 2
+	//cout << "model read..." << endl;
+
+d169 1
+a169 1
+		cout << "getNextModel() failed...trying agian..." << endl;
+d182 1
+a182 1
+		case 'n':  	cout << endl;
+d186 1
+a186 1
+				cout << aStr.c_str()[i];
+@
+
+
+1.3
+log
+@Check it in
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.2 1995/08/26 21:34:58 markc Exp markc $
+d8 3
+a24 1
+#include <String.h>
+@
+
+
+1.2
+log
+@Just about working for a first cut...
+@
+text
+@d5 1
+a5 1
+ * $Id: babble.cc,v 1.1 1995/08/24 20:14:57 markc Exp markc $
+d8 3
+d70 1
+a70 6
+		tempDistDict.setTypeIndex(type);
+		tempDistDict.setBitString(random()%maxsize);
+
+		found=distDictRAOF.find(tempDistDict);
+
+		if (found==NULL)
+d72 1
+a72 1
+			cout << "NOT FOUND" << endl;
+d76 14
+a89 1
+			cout << ' ' << found->getValue();
+a90 1
+		//cout << "ENDMAIN" << endl;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d40 1
+d61 1
+d63 2
+a67 1
+
+d78 1
+a78 1
+			cout << found->getValue() << ' ';
+d80 1
+d83 2
+d89 1
+a89 1
+	//cerr << "GetNextType()"<< endl;
+d95 1
+d104 2
+a105 2
+			cout << punctuation;
+			getNextModel();
+d110 2
+d117 1
+a117 1
+	//cerr << "MODEL MODEL MODEL GetNext()"<< endl;
+d120 6
+a125 1
+	//cerr << "randomJump=" << randomJump << endl;
+d129 1
+a129 1
+	//cerr << "model read..." << endl;
+d133 1
+a133 1
+		cerr << "getNextModel() failed...trying agian..." << endl;
+d138 15
+@

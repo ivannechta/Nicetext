@@ -1,0 +1,718 @@
+head	1.13;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.13
+date	98.08.18.18.10.17;	author root;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	97.03.05.17.49.59;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	97.03.03.19.46.32;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	97.02.27.17.52.25;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	97.02.27.16.55.03;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	97.02.27.15.56.17;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	97.02.16.06.59.55;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.13.15.13.56;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.13.13.02.28;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.12.23.48.19;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.13.14.28.08;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.11.13.02.15.26;	author chapman;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.11.13.01.07.46;	author chapman;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial check-in
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@/*
+ * Scramble Program 
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: scramble.cc,v 1.12 1997/03/05 17:49:59 markc Exp root $
+ *
+ * $Log: scramble.cc,v $
+ * Revision 1.12  1997/03/05 17:49:59  markc
+ * Added static char rcsid []  = "@@(#)$Id$";
+ *
+ * Revision 1.11  1997/03/03 19:46:32  markc
+ * Added -v for verbose error reporting
+ *
+ * Revision 1.10  1997/02/27 17:52:25  markc
+ * Fixed usage()
+ *
+ * Revision 1.9  1997/02/27 16:55:03  markc
+ * Fixed small mode comments
+ *
+ * Revision 1.8  1997/02/27 15:56:17  markc
+ * Added -s Small Mode
+ *
+ * Revision 1.7  1997/02/16 06:59:55  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.6  1996/01/13 15:13:56  markc
+ * txt2bits.o now working, unbabble takes parameters like babble
+ *
+// Revision 1.5  1996/01/13  13:02:28  markc
+// Cap first letter of first word in each sentence
+//
+// Revision 1.4  1996/01/12  23:48:19  markc
+// dynamic grammars work system wide -- next step, constant expressions
+//
+// Revision 1.3  1995/11/13  14:28:08  markc
+// Added output file parameter on command line.
+//
+// Revision 1.2  1995/11/13  02:15:26  chapman
+// Added hugeMode -- much faster!!!
+//
+// Revision 1.1  1995/11/13  01:07:46  chapman
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: scramble.cc,v 1.12 1997/03/05 17:49:59 markc Exp root $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/dictrec.h"
+#include "../../gendict/include/typerec.h"
+#include "../../gendict/include/typearec.h"
+#include "../../gendict/include/lexword.h"
+#include "../include/bitstrm.h"
+#include "../include/bitoutput.h"
+#include "../include/txt2bits.h"
+
+void usage();
+BOOL smallMode=FALSE;
+
+int main(int argc, char * argv[])
+{
+	// check command line arguments
+	extern char *optarg;
+	extern int optind;
+	int ch;
+	BOOL lowMemoryMode=FALSE;
+	MTCstring dictFile("mstrdict");
+	MTCstring typeFile("mstrtype");
+	MTCstring outputFileName;
+	MTCstring inputFileName;
+	BOOL verboseMode=FALSE;
+
+	while ((ch = getopt(argc, argv, "d:lho:i:se")) != EOF)
+	{
+		switch(ch) 
+		{
+			case 'd':
+				dictFile=optarg;
+				dictFile+="dict";
+				typeFile=optarg;
+				typeFile+="type";
+				break;
+			case 'o':
+				outputFileName=optarg;
+				break;
+			case 'i':
+				inputFileName=optarg;
+				break;
+			case 's':
+				smallMode=TRUE;
+				break;
+			case 'e':
+				verboseMode=TRUE;
+				break;
+
+			default:
+				usage();
+				return (-1);
+		}
+	}
+
+	argc -= optind;
+ 	argv += optind;
+
+	cerr << "Converting input text file into binary file..." << endl;
+
+	MTCtextToBits converter;
+
+	converter.setVerboseMode(verboseMode);
+
+	cerr << "Stage 1: Setup"<< endl;
+	
+	if (inputFileName.length()==0)
+	{
+		cerr << "\tUsing stdin for input." << endl;
+	}
+	else
+	{
+		cerr << "\tOpening input file: " << inputFileName << endl;
+
+		if (converter.openInputName(inputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+
+	if (converter.getVerboseMode()==TRUE)
+	{
+		cerr << "\tPrint undefined words to error output" << endl;
+	}
+	else
+	{
+		cerr << "\tDO NOT Print undefined words to error output" << endl;
+	}
+
+	if (outputFileName.length()==0)
+	{
+		cerr << endl;
+		errorMsg(EMT_ABORT, "I was not given an output file (use -o outputFile)", "main()");
+	}
+	else
+	{
+		cerr << "\tOpening output file: " << outputFileName << endl;
+
+		if (converter.openOutputName(outputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+	}
+
+	cerr << "\tOpening type table: " << typeFile << endl;
+
+	if (converter.openTypeName(typeFile)==FALSE)
+	{
+		exit(-1);
+	}
+
+	cerr << "\tOpening dictionary table: " << dictFile << endl;
+
+	if (smallMode==TRUE)
+	{
+        	cerr << "\t(small mode [-s] selected...I will NOT read dictionary into memory...)" << endl;
+	}
+	else
+	{
+                cerr << "\t(Reading dictionary into memory...if I run out of RAM try using [-s])" << endl;
+	}
+
+	if (converter.openDictName(dictFile, smallMode)==FALSE)
+	{
+		exit(-1);
+	}
+
+	cerr << "Stage 2: Process input file..." << endl;
+
+	converter.doIt();
+
+	cerr << "That's all folks!" << endl;
+
+}
+
+void usage()
+{
+	cerr << "Usage: scramble -o outputFile [-d dictionary] [-i inputFile] [-s] [-e]" << endl; 
+       cerr << "\t-d\tSpecify the prefix for the dictionary file\n\t\t(i.e. mstr for mstrdict.dat, mstrtype.dat)" << endl; 
+	cerr << "\t-e\tPrint undefined words to error output" << endl;
+        cerr << "\t-i\tSpecify the full input file path (default to stdin)" << endl; 
+        cerr << "\t-o\tSpecify the full output file path" << endl; 
+	cerr << "\t-s\tSmall mode - use tables from disk, don't load them into RAM" << endl;
+}
+@
+
+
+1.12
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d5 1
+a5 1
+ * $Id: scramble.cc,v 1.11 1997/03/03 19:46:32 markc Exp markc $
+d8 3
+d47 1
+a47 1
+static char rcsid []  = "@@(#)$Id$";
+d84 1
+a84 1
+	while ((ch = getopt(argc, argv, "d:lho:i:sv")) != EOF)
+d103 1
+a103 1
+			case 'v':
+d144 1
+a144 1
+		cerr << "\tDO NOT Print undefined words to error output ([-v] selected)" << endl;
+d195 1
+a195 1
+	cerr << "Usage: scramble -o outputFile [-d dictionary] [-i inputFile] [-s] [-v]" << endl; 
+d197 1
+a200 1
+	cerr << "\t-v\tPrint undefined words to error output" << endl;
+@
+
+
+1.11
+log
+@Added -v for verbose error reporting
+@
+text
+@d2 1
+a2 1
+ * UnBabble Program 
+d5 1
+a5 1
+ * $Id: scramble.cc,v 1.10 1997/02/27 17:52:25 markc Exp markc $
+d8 3
+d43 2
+@
+
+
+1.10
+log
+@Fixed usage()
+@
+text
+@d5 1
+a5 1
+ * $Id: scramble.cc,v 1.9 1997/02/27 16:55:03 markc Exp markc $
+d8 3
+d74 1
+d76 1
+a76 1
+	while ((ch = getopt(argc, argv, "d:lho:i:s")) != EOF)
+d95 4
+d112 2
+d115 1
+a115 1
+
+d130 9
+d187 1
+a187 1
+	cerr << "Usage: scramble -o outputFile [-d dictionary] [-i inputFile] [-s]" << endl; 
+d192 1
+@
+
+
+1.9
+log
+@Fixed small mode comments
+@
+text
+@d5 1
+a5 1
+ * $Id: scramble.cc,v 1.8 1997/02/27 15:56:17 markc Exp markc $
+d8 3
+d169 4
+a172 1
+	cerr << "\t-s Small-Memory-Mode - Read dictionary from disk" << endl;
+@
+
+
+1.8
+log
+@Added -s Small Mode
+@
+text
+@d5 1
+a5 1
+ * $Id: scramble.cc,v 1.7 1997/02/16 06:59:55 markc Exp markc $
+d8 3
+d140 9
+@
+
+
+1.7
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: scramble.cc,v 1.6 1996/01/13 15:13:56 markc Exp markc $
+d8 3
+d52 1
+d66 1
+a66 1
+	while ((ch = getopt(argc, argv, "d:lho:i:")) != EOF)
+d82 3
+d100 1
+a100 3
+	cerr << "\tOpening dictionary table: " << dictFile << endl;
+
+	if (converter.openDictName(dictFile)==FALSE)
+d102 1
+a102 1
+		exit(-1);
+d104 3
+d108 4
+a111 5
+	cerr << "\tOpening type table: " << typeFile << endl;
+
+	if (converter.openTypeName(typeFile)==FALSE)
+	{
+		exit(-1);
+d129 3
+a131 1
+	if (inputFileName.length()==0)
+d133 1
+a133 1
+		cerr << "\tUsing stdin for input." << endl;
+d135 4
+a138 1
+	else
+d140 1
+a140 6
+		cerr << "\tOpening input file: " << inputFileName << endl;
+
+		if (converter.openInputName(inputFileName)==FALSE)
+		{
+			exit(-1);
+		}
+d153 2
+a154 1
+	cerr << "Usage: unbabble [-d dictionary] [-i inputFile] -o outputFile" << endl; 
+@
+
+
+1.6
+log
+@txt2bits.o now working, unbabble takes parameters like babble
+@
+text
+@d5 5
+a9 1
+ * $Id: unbabble.cc,v 1.5 1996/01/13 13:02:28 markc Exp markc $
+a10 1
+ * $Log: unbabble.cc,v $
+d36 1
+a36 1
+#include "../../mtc++/include/bst.h"
+d39 1
+a39 1
+#include "../../mtc++/include/raof2bst.h"
+@
+
+
+1.5
+log
+@Cap first letter of first word in each sentence
+@
+text
+@d5 1
+a5 1
+ * $Id: unbabble.cc,v 1.4 1996/01/12 23:48:19 markc Exp markc $
+d8 3
+d43 1
+d45 1
+a45 7
+#define PREFIX "mstr"
+
+int yylex();
+extern char *yytext;
+extern FILE *yyin;
+
+loadTypeAltRecSet(MTCBST <MTCtypeAltRecord> &);
+d49 9
+a57 1
+	// check parameters
+d59 1
+a59 1
+	if ((argc!=2)&&(argc!=3))
+d61 18
+a78 9
+		cerr << "Usage: " << argv[0] << " [inputFile] outputFile" << endl;
+		return -1;
+	}
+
+	const char *outputFileName;
+
+	if (argc==2)
+	{
+		outputFileName=argv[1];
+a79 3
+	else
+	{
+		outputFileName=argv[2];
+d81 2
+a82 2
+		yyin=fopen(argv[1], "r");
+	}
+d84 1
+a84 9
+	MTCreadRAOF <MTCdictRecord> dictRecReadRAOF(PREFIX"dict");
+	MTCBST <MTCdictRecord> dictRecReadBST;
+	MTCBST <MTCtypeAltRecord> typeAltRecSet; 
+	int retval;
+	MTCdictRecord tempDictRec;
+	MTCdictRecord *foundDictRec;
+	MTCtypeAltRecord tempTypeAltRec;
+	MTCtypeRecord *foundTypeRec;
+	MTCoutputBitStream outputBitStream(outputFileName);
+d86 1
+a86 1
+	cerr << "Program to convert text into an output file running..." << endl;
+d88 1
+a88 1
+	// if we are in hugeMode, load the dictRecReadBST
+d90 1
+a90 1
+	BOOL hugeMode=TRUE;
+d92 1
+a92 1
+	if (hugeMode==TRUE)
+d94 2
+a95 1
+		cerr << "HugeMode on: loading dictionary..." << endl;
+d97 1
+a97 1
+		MTCraofToBST <MTCdictRecord> loadBST;
+d99 4
+a102 1
+		loadBST.doIt(dictRecReadRAOF, dictRecReadBST);
+d104 4
+a107 1
+		cerr << dictRecReadBST.getCount() << " dictionary records" << endl;
+d109 1
+a109 14
+
+	// load the type table
+
+	cerr << "Loading type table..." << endl;
+
+	loadTypeAltRecSet(typeAltRecSet);
+
+	cerr << typeAltRecSet.getCount() << " type records" << endl;
+
+	// parse each word (ignoring all punctuation)
+
+	cerr << "Processing sentences from stdin..." << endl;
+
+	for(;;)
+d111 1
+a111 1
+		retval=yylex();		// read the next token from stdin
+d113 1
+a113 1
+		if (yytext[0]=='\0')	// is it eof?
+d115 1
+a115 1
+			break;
+d117 1
+d119 7
+a125 3
+		if (retval==END_OF_WORD)
+		{
+			// use lower case of word for now...
+d127 1
+a127 37
+			MTCstring yytextString(yytext);
+			yytextString.toLower();	
+			tempDictRec.setValue(yytextString);
+
+			// look up the word in the dictionary table
+
+			if (hugeMode==TRUE)
+			{
+				foundDictRec=dictRecReadBST.find(tempDictRec);
+			}
+			else
+			{
+				foundDictRec=dictRecReadRAOF.find(tempDictRec);
+			}
+
+			if (foundDictRec!=NULL)
+			{
+				// look up the type
+
+				tempTypeAltRec.setIndex(foundDictRec->getTypeIndex());
+				if ((foundTypeRec=typeAltRecSet.find(tempTypeAltRec))!=NULL)
+				{
+					// output the bitstring for the word
+
+					outputBitStream.writeBits(foundDictRec->getBitString(), foundTypeRec->getBitCount());
+				}
+				else
+				{
+					cout << "ERROR: I could not find type index" << endl;
+				}
+			}
+			else
+			{
+				cout << "ERROR: I could not find word: " << yytextString << endl;
+			}
+		}
+		else
+d129 1
+a129 1
+	//		cout << "IGNORING INPUT: NOT AN END_OF_WORD! :" << retval << ":" << endl;
+d133 3
+a135 1
+	outputBitStream.writeBits(0xFFFFFFFF, 32);
+d137 1
+a137 4
+	if (argc==3)
+	{
+		fclose(yyin);
+	}
+a138 1
+	cerr << "That's All Folks!" << endl;
+d141 1
+a141 1
+loadTypeAltRecSet(MTCBST <MTCtypeAltRecord> &aBST)
+d143 1
+a143 5
+	MTCreadRAOF < MTCtypeAltRecord > readRAOF(PREFIX"type");
+
+	MTCraofToBST < MTCtypeAltRecord > convertToBST;
+
+	convertToBST.doIt(readRAOF, aBST);
+@
+
+
+1.4
+log
+@dynamic grammars work system wide -- next step, constant expressions
+@
+text
+@d5 1
+a5 1
+ * $Id: unbabble.cc,v 1.3 1995/11/13 14:28:08 markc Exp markc $
+d8 3
+d126 1
+a126 1
+			tempDictRec.setValue(yytext);
+d157 1
+a157 1
+				cout << "ERROR: I could not find word!" << endl;
+d162 1
+a162 1
+			cout << "IGNORING INPUT: NOT AN END_OF_WORD! :" << retval << ":" << endl;
+@
+
+
+1.3
+log
+@Added output file parameter on command line.
+@
+text
+@d5 1
+a5 1
+ * $Id: unbabble.cc,v 1.2 1995/11/13 02:15:26 chapman Exp markc $
+d8 3
+d38 1
+a38 1
+#define PREFIX "dist"
+d92 2
+d102 2
+d156 4
+@
+
+
+1.2
+log
+@Added hugeMode -- much faster!!!
+@
+text
+@d5 1
+a5 1
+ * $Id: unbabble.cc,v 1.1 1995/11/13 01:07:46 chapman Exp chapman $
+d8 3
+d39 1
+d43 1
+a43 1
+int main()
+d45 21
+d74 1
+a74 1
+	MTCoutputBitStream outputBitStream("unbabble.out");
+d76 1
+a76 1
+	cerr << "Program to Convert text into an output file running..." << endl;
+d153 5
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d42 1
+d51 15
+d68 2
+d74 2
+d95 10
+a104 1
+			if ((foundDictRec=dictRecReadRAOF.find(tempDictRec))!=NULL)
+d128 2
+@

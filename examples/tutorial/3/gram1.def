@@ -1,0 +1,19 @@
+
+// this is an example grammar
+
+sentence:
+		{Cap} first_name verbmet {Cap} first_name {Cap} name_family prepin YEAR {.n} @10
+	|	{Cap} name_female verbwent prepto {Cap} place prepin YEAR {.n} @1
+	| 	{CAPSLOCKON} sentence {capslockoff} @3
+	;
+		
+
+first_name:
+		name_female @50
+	|	name_male   @25
+	|       name_other  @5
+	;
+
+YEAR:
+		num_cardinal_digits,num_years_digits
+	;

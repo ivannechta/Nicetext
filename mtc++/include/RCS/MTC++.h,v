@@ -1,0 +1,143 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.08.17.09.56;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.06.30.20.20.55;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.06.07.01.51.00;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Version
+@
+
+
+1.4
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@/*
+ *
+ * MTC++ Library Header File
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: MTC++.h,v 1.3 1995/11/08 17:09:56 chapman Exp markc $
+ * 
+ * $Log: MTC++.h,v $
+ * Revision 1.3  1995/11/08 17:09:56  chapman
+ * Added #include's for stat call
+ *
+ * Revision 1.2  1995/06/30  20:20:55  markc
+ * removed #includes for library headers
+ *
+ * Revision 1.1  1995/06/07  01:51:00  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __MTCPP_H_
+#define __MTCPP_H_
+
+static char rcsid__MTCPP_H_ []  = "@@(#)$Id$";
+
+#include <stdio.h>
+#include <iostream.h>
+#include <fstream.h>
+#include <string.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifndef BOOL
+#define BOOL short
+#endif  BOOL
+
+#ifndef TRUE
+#define TRUE 1
+#endif  TRUE
+
+#ifndef FALSE
+#define FALSE 0
+#endif  FALSE
+
+#ifndef MAXPATH
+#define MAXPATH 80
+#endif  MAXPATH
+
+/*
+ * #include "../include/mstring.h"
+ * #include "../include/errormsg.h"
+ * #include "../include/initfile.h"
+ */
+
+#endif __MTCPP_H_
+@
+
+
+1.3
+log
+@Added #include's for stat call
+@
+text
+@d6 1
+a6 1
+ * $Id: MTC++.h,v 1.2 1995/06/30 20:20:55 markc Exp chapman $
+d9 3
+d23 2
+@
+
+
+1.2
+log
+@removed #includes for library headers
+@
+text
+@d6 1
+a6 1
+ * $Id: MTC++.h 1.1 1995/06/07 01:51:00 markc Exp markc $
+d8 4
+a11 1
+ * $Log: MTC++.h $
+d27 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 1
+a6 1
+ * $Id$
+d8 4
+a11 1
+ * $Log$
+d41 5
+a45 3
+#include "../include/mstring.h"
+#include "../include/errormsg.h"
+#include "../include/initfile.h"
+@

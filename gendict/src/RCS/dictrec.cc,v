@@ -1,0 +1,333 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.4
+date	96.02.17.18.46.28;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.08.18.44.06;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.13.23.01.54;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.07.29.17.06.32;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Check In
+@
+
+
+1.4
+log
+@added freq
+@
+text
+@/*
+ * Dictionary Record Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: dictrec.cc,v 1.3 1995/11/08 18:44:06 chapman Exp markc $
+ *
+ * $Log: dictrec.cc,v $
+// Revision 1.3  1995/11/08  18:44:06  chapman
+// Converted mstrdict.cc to dictrec.cc
+//
+// Revision 1.4  1995/08/24  20:13:36  markc
+// bitstring now is a long
+//
+// Revision 1.3  1995/08/23  19:04:56  markc
+// Changed order of data in << and >> streams
+//
+// Revision 1.2  1995/08/13  23:09:31  markc
+// Change jump to typeIndex
+//
+// Revision 1.1  1995/07/30  17:04:33  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: dictrec.cc,v 1.3 1995/11/08 18:44:06 chapman Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/raof.h"
+#include "../include/dictrec.h"
+
+// dictRecord stream insertor operator
+
+ostream & operator<<(ostream & anOStream, const MTCdictRecord & aSrc)
+{
+	anOStream << aSrc.getTypeIndex() << ' ' << aSrc.getBitString() << ' ' << aSrc.getFreq() << ' ' << aSrc.getValue() << endl;
+
+	return anOStream;
+}
+
+// dictRecord stream extractor operator
+
+istream & operator>>(istream & anIStream, MTCdictRecord & aSrc)
+{
+	// get typeIndex
+
+	long tempTypeIndex;
+
+	anIStream >> tempTypeIndex;
+	aSrc.setTypeIndex(tempTypeIndex);
+
+	// get bitstring
+
+	long tempBitstring;
+
+	anIStream >> tempBitstring;
+	aSrc.setBitString(tempBitstring);
+
+	// get freq
+
+	long tempFreq;
+
+	anIStream >> tempFreq;
+	aSrc.setFreq(tempFreq);
+
+	// get value -- but skip the leading whitespace!
+
+	MTCstring temp;
+	char buffer[DICTREC_VALUE_MAX_LENGTH+1];
+	char *startbuffer=NULL;
+
+	anIStream.getline(buffer, DICTREC_VALUE_MAX_LENGTH);
+
+	int i;
+
+	for(i=0; i<strlen(buffer); i++)
+	{
+		if (isprint(buffer[i])&&(buffer[i]!=' '))
+		{
+			startbuffer=&buffer[i];
+			break;
+		}
+	}
+
+	temp=startbuffer;
+
+	aSrc.setValue(temp);
+
+	return anIStream;
+}
+
+// < comparison
+
+int MTCdictRecord::isLessThan(const MTCdictRecord & aSrc) const
+{
+	return (value<aSrc.value);
+}
+
+// equivalence test
+
+int MTCdictRecord::isEqual(const MTCdictRecord & aSrc) const
+{
+	return (value==aSrc.value);
+}
+
+
+// == operator
+
+BOOL MTCdictRecord::operator==(const MTCdictRecord & aSrc) const
+{
+	return (isEqual(aSrc));
+}
+
+// != operator
+
+BOOL MTCdictRecord::operator!=(const MTCdictRecord & aSrc) const
+{
+	return (!isEqual(aSrc));
+}
+
+// DictEnt < operator
+
+BOOL MTCdictRecord::operator<(const MTCdictRecord & aSrc)  const
+{
+	return (isLessThan(aSrc));
+}
+
+// DictEnt <= operator
+
+BOOL MTCdictRecord::operator<=(const MTCdictRecord & aSrc) const
+{
+	return (isLessThan(aSrc)||isEqual(aSrc));
+}
+
+// DictEnt > operator
+
+BOOL MTCdictRecord::operator>(const MTCdictRecord & aSrc)  const
+{
+	return (!(isLessThan(aSrc)||(isEqual(aSrc))));
+}
+
+// DictEnt >= operator
+
+BOOL MTCdictRecord::operator>=(const MTCdictRecord & aSrc) const
+{
+	return (!(isLessThan(aSrc)));
+}
+
+// overloaded = operator
+
+MTCdictRecord & MTCdictRecord::operator=(const MTCdictRecord &aSrc)
+{
+	value=aSrc.value;
+	typeIndex=aSrc.typeIndex;
+	bitstring=aSrc.bitstring;
+	freq=aSrc.freq;
+
+	return *this;
+}
+@
+
+
+1.3
+log
+@Converted mstrdict.cc to dictrec.cc
+@
+text
+@d5 1
+a5 1
+ * $Id: distdict.cc,v 1.4 1995/08/24 20:13:36 markc Exp chapman $
+d7 4
+a10 1
+ * $Log: distdict.cc,v $
+d26 1
+a26 1
+static char rcsid []  = "@@(#)$Id: distdict.cc,v 1.4 1995/08/24 20:13:36 markc Exp chapman $";
+d40 1
+a40 1
+	anOStream << aSrc.getTypeIndex() << ' ' << aSrc.getBitString() << ' ' << aSrc.getValue() << endl;
+d63 7
+d160 1
+@
+
+
+1.2
+log
+@Changed jump to typeIndex -- to be more clear on purpose
+@
+text
+@d2 1
+a2 1
+ * Master Dict Class
+d5 1
+a5 1
+ * $Id: mstrdict.cc,v 1.1 1995/07/29 17:06:32 markc Exp markc $
+d7 11
+a17 2
+ * $Log: mstrdict.cc,v $
+// Revision 1.1  1995/07/29  17:06:32  markc
+d23 1
+a23 1
+static char rcsid []  = "@@(#)$Id: mstrdict.cc,v 1.1 1995/07/29 17:06:32 markc Exp markc $";
+d31 1
+a31 2
+#include "../include/mstrtype.h"
+#include "../include/mstrdict.h"
+d33 1
+a33 1
+// mstrDict stream insertor operator
+d35 1
+a35 1
+ostream & operator<<(ostream & anOStream, const MTCmstrDict & aSrc)
+d37 2
+a38 1
+	anOStream << aSrc.getTypeIndex() << " " << aSrc.getValue() << endl;
+d42 1
+a42 1
+// mstrDict stream extractor operator
+d44 1
+a44 1
+istream & operator>>(istream & anIStream, MTCmstrDict & aSrc)
+d53 7
+d63 1
+a63 1
+	char buffer[MSTRTYPE_CODE_MAX_LENGTH+1];
+d66 1
+a66 1
+	anIStream.getline(buffer, MSTRTYPE_CODE_MAX_LENGTH);
+d88 1
+a88 1
+int MTCmstrDict::isLessThan(const MTCmstrDict & aSrc) const
+d95 1
+a95 1
+int MTCmstrDict::isEqual(const MTCmstrDict & aSrc) const
+d100 1
+d103 1
+a103 1
+BOOL MTCmstrDict::operator==(const MTCmstrDict & aSrc) const
+d110 1
+a110 1
+BOOL MTCmstrDict::operator!=(const MTCmstrDict & aSrc) const
+d117 1
+a117 1
+BOOL MTCmstrDict::operator<(const MTCmstrDict & aSrc)  const
+d124 1
+a124 1
+BOOL MTCmstrDict::operator<=(const MTCmstrDict & aSrc) const
+d131 1
+a131 1
+BOOL MTCmstrDict::operator>(const MTCmstrDict & aSrc)  const
+d138 1
+a138 1
+BOOL MTCmstrDict::operator>=(const MTCmstrDict & aSrc) const
+d145 1
+a145 1
+MTCmstrDict & MTCmstrDict::operator=(const MTCmstrDict &aSrc)
+d149 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d29 1
+a29 1
+	anOStream << aSrc.getJump() << " " << aSrc.getValue() << endl;
+d37 1
+a37 1
+	// get jump
+d39 1
+a39 1
+	long tempJump;
+d41 2
+a42 2
+	anIStream >> tempJump;
+	aSrc.setJump(tempJump);
+d131 1
+a131 1
+	jump=aSrc.jump;
+@

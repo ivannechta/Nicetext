@@ -1,0 +1,252 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	98.08.25.18.11.32;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	98.08.19.21.54.15;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	98.07.13.18.40.14;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	98.07.13.18.34.21;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@added truncateLength()
+@
+text
+@/* 
+ * String list container
+ * Copyright (c) Mark T. Chapman 1998
+ *
+ * MTC++ Class library
+ * 
+ * The purpose of this container is to more efficiently create MTCstring
+ * objects by appending many multiple MTCstrings.
+ *
+ *
+ * $Id: strlst.h,v 1.3 1998/08/19 21:54:15 markc Exp markc $
+ *
+ * $Log: strlst.h,v $
+ * Revision 1.3  1998/08/19 21:54:15  markc
+ * cast NULL to (char)NULL
+ *
+ * Revision 1.2  1998/07/13 18:40:14  markc
+ * fixed {}'s
+ *
+ * Revision 1.1  1998/07/13 18:34:21  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __STRLST_H__
+#define __STRLST_H__
+
+// Class for making one big string from a list of strings
+
+class MTCstringList {
+private:
+	MTCstring value;
+	MTClist <MTCstring> list;
+	long listLength;
+	BOOL isCompressed;
+
+public:
+	MTCstringList() { listLength=0; isCompressed=TRUE; };
+
+	virtual ~MTCstringList() {};
+
+	BOOL add(const char * aStr)
+	{
+		if ((aStr!=NULL)&&(aStr[0]!=(char)NULL))
+		{
+			MTCstring t(aStr);
+
+			return(add(t));
+		}
+
+		return FALSE;
+	};
+
+	BOOL add(const MTCstring &aString)
+	{
+		if (aString.length()>0)
+		{
+			listLength+=aString.length();
+			isCompressed = FALSE;
+			return (list.add(aString));
+		}
+		
+		return TRUE;
+	};
+
+	void clear()
+	{
+		value="";
+		isCompressed=TRUE;
+		list.clear();
+		listLength=0;
+	};
+
+	long length() const 
+	{ 
+		return (listLength+value.length());
+	};
+
+	void compress()
+	{
+		if (isCompressed==FALSE)
+		{
+			isCompressed=TRUE;
+
+			char buffer[length()+1];
+
+			long index=0;
+
+			if (value.length()!=0)
+			{
+				strcpy(&buffer[index], value.c_str());
+				index+=value.length();
+				buffer[index]=(char)NULL;
+			}
+		
+			MTCstring *tempStr;
+	
+			for(tempStr=list.getFirst(); tempStr!=NULL; tempStr=list.getNext())
+			{
+				if (tempStr->length()!=0)
+				{
+					strcpy(&buffer[index], tempStr->c_str());
+					index+=tempStr->length();
+					buffer[index]=(char)NULL;
+				}
+			}
+
+			if (index!=length())
+			{
+				errorMsg(EMT_ABORT, "I somehow miscalculated the length of the list of strings", "MTCstringList::compress()");
+			}
+
+			list.clear();
+			listLength=0;
+
+			value=buffer;
+		}
+	};
+
+	MTCstring & getValue() { compress(); return value; };
+
+	unsigned truncateLength(unsigned aNum)
+	{
+		compress();
+
+		return(value.truncateLength(aNum));
+	}
+};
+
+#endif __STRLST_H__
+@
+
+
+1.3
+log
+@cast NULL to (char)NULL
+@
+text
+@d11 1
+a11 1
+ * $Id: strlst.h,v 1.2 1998/07/13 18:40:14 markc Exp markc $
+d14 3
+d45 6
+a50 1
+		MTCstring t(aStr);
+d52 1
+a52 1
+		return(add(t));
+d57 8
+a64 3
+		listLength+=aString.length();
+		isCompressed = FALSE;
+		return (list.add(aString));
+d71 1
+a72 1
+		list.clear();
+d92 1
+a92 1
+				strncpy(&buffer[index], value.c_str(), value.length());
+d103 1
+a103 1
+					strncpy(&buffer[index], tempStr->c_str(), tempStr->length());
+d122 7
+@
+
+
+1.2
+log
+@fixed {}'s
+@
+text
+@d11 1
+a11 1
+ * $Id: strlst.h,v 1.1 1998/07/13 18:34:21 markc Exp markc $
+d14 3
+d81 1
+a81 1
+				buffer[index]=NULL;
+d92 1
+a92 1
+					buffer[index]=NULL;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 5
+a15 1
+ * $Id$
+a16 1
+ * $Log$
+d33 2
+a34 1
+	MTCstringList() : listLength(0), isCompressed(TRUE) {};
+d42 1
+a42 1
+	}
+d49 1
+a49 1
+	}
+d57 1
+a57 1
+	}
+d62 1
+a62 1
+	}
+d103 1
+d105 1
+a105 1
+		MTCstring & getValue() { compress(); return value; };
+@

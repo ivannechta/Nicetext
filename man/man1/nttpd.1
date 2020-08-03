@@ -1,0 +1,91 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" nttpd.1 by Mark T. Chapman
+.\"
+.TH NTTPD 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+nttpd
+.SH SYNOPSIS
+.B nttpd
+.RB [\-b\ dataBaseDir]
+.RB [\-t\ tempDir]
+.RB [\-p\ port]
+.RB [\-w\]
+.SH DESCRIPTION
+.I nttpd
+is a program that provides an 
+.B EXPERIMENTAL
+HTTP/1.0 interface to the 
+.B NICETEXT
+system.  The idea is to provide a quick and dirty way to do the
+.I nicetext(1L)
+and 
+.I scramble(1L)
+transformations through a standard web browser. 
+
+The
+.I qstart-nttpd
+shell-script may help you with a quick-start of the nttp-daemon.
+.SH "WARNING"
+The 
+.I nttpd
+program is 
+.B EXPERIMENTAL
+- which is another way of saying it is a terrible hack of a program.
+
+Assume that it will be a 
+.B resource hog 
+and a 
+.B security risk 
+on your system. 
+
+.B IT IS NOT REPRESENTATIVE OF THE REST OF THE NICETEXT SYSTEM,
+which is quite robust.
+
+.SH "OPTIONS"
+.TP
+.BI \-b\ dataBaseDir
+This is the location of the dictionary and style-source files.  
+You should point this to the 
+.I database
+directory of the standard
+.B NICETEXT
+distribution.
+
+The default is the current working directory.
+.TP
+.BI \-p\ port
+The TCP/IP port number that the server will 
+.B listen
+for new connections.
+
+The default is 2119.
+.TP
+.BI \-t\ tempDir
+The location where the temporary 
+.I nicetext
+and
+.I scramble'd
+text will be placed during processing.  
+
+The default is /tmp.
+.TP
+.BI -w
+Allow connection from any machine on the World-Wide-Web.  Otherwise, 
+.I nttpd
+only accepts connections from localhost (127.0.0.1).
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1L).
+

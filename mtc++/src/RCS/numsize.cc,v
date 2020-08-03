@@ -1,0 +1,56 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.2
+date	97.03.05.15.51.25;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.04.10.20.23.57;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.2
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@#include <stdio.h>
+
+static char rcsid []  = "@@(#)$Id$";
+
+int main()
+{
+   unsigned long s1;
+   unsigned int s2;
+   unsigned short s3;
+
+   printf("Size of unsigned long: %i\n", sizeof(s1));
+   printf("Size of unsigned int: %i\n", sizeof(s2));
+   printf("Size of unsigned short: %i\n", sizeof(s3));
+
+   return(0);
+}
+
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d3 2
+@

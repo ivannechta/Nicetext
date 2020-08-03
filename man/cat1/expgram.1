@@ -1,0 +1,132 @@
+
+
+
+EXPGRAM(1L)					      EXPGRAM(1L)
+
+
+NNAAMMEE
+       expgram
+
+SSYYNNOOPPSSIISS
+       eexxppggrraamm	[-d dictionary]  [-o outputFile]  [-s sampleFile]
+       [-n]
+
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_x_p_g_r_a_m automatically creates "merged-type" grammar  rules
+       from  a	dictionary in the NNIICCEETTEEXXTT system.  The rules are
+       in the format of a grammar-definition  file   and  may  be
+       appended  to  existing grammar definition files.  The pur-
+       pose of the tool is to help with grammar  definition  file
+       creation.   It  does not apply to the ggeennmmooddeell approach to
+       creating custom style sources.
+
+       Each word in the dictionary  is	categorized  into  unique
+       types.	These types are sometimes a concatenation of mul-
+       tiple type categories.  For example "bill" may be  both	a
+       male_name  and  an  object.   Since "bill" can only appear
+       once in the dictionary, ssoorrttddcctt	automatically  creates	a
+       new type called "male_name,object".
+
+       A   grammar   definition  style	source	could  specify	a
+       "male_name,object", but is sometimes would be nice to have
+       a  rule that says "all types that have male_name as a sub-
+       type".  The _e_x_p_g_r_a_m  program  creates  such  "merged-type"
+       rules  in  the  format of "mMALE_NAME" and "mOBJECT".  The
+       "mMALE_NAME" rule  would  be  rewritten	as  "male_name	|
+       male_name,object | male_name,female_name", etc.	The "mOB-
+       JECT" rules may have a RHS of "object | male_name,object |
+       female_name,object",  etc.   The weight of each RHS of the
+       rules corresponds to the number of words of each  sub-type
+       in the dictionary.
+
+OOPPTTIIOONNSS
+       --dd ddiiccttiioonnaarryy
+	      The  prefix for the input dictionary database.  The
+	      default is mstr.
+
+       --oo oouuttppuuttFFiillee
+	      The  destination	for  the  generated  rules.   The
+	      default is stdout.
+
+       --ss ssaammpplleeFFiillee
+	      Create  another  set  of	rules  that will generate
+	      examples of each type of	word  via.  the  _n_i_c_e_t_e_x_t
+	      program.	 Note that this set of rules may generate
+	      text that is not invertable by  _s_c_r_a_m_b_l_e	since  it
+	      uses "quoted" rules.
+
+       --nn     "Normalize"  the	weights of each RHS of the merged
+	      types.	For   example,	 if    there	are    16
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+EXPGRAM(1L)					      EXPGRAM(1L)
+
+
+	      male_names,objects  then the default weight in both
+	      mMALE_NAMES and  mOBJECTS  would	be  16.   The  --nn
+	      option  tells  _e_x_p_g_r_a_m  to divide the weight by the
+	      number of sub-types in each RHS.	  In  this  case,
+	      male_names,objects  would have a weight of 16/2 = 8
+	      in each of mMALE_NAMES and mOBJECTS.
+
+	      The purpose is to help match the	probability  dis-
+	      tribution  of  merged  types better.  (Otherwise, a
+	      merged type with 100  sub-components  would  incor-
+	      rectly  very  roughly  have 100 times the chance of
+	      appearing than it should.)
+
+EEXXAAMMPPLLEESS
+       It is strongly suggested that you try the examples in  the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+DDIIAAGGNNOOSSTTIICCSS
+       _e_x_p_g_r_a_m returns a non-zero value if it detects any errors.
+
+SSEEEE AALLSSOO
+       bitcp(1L), dct2mstr(1L), genmodel(1L), gramtest(1L),  imp-
+       kimmo(1L),  impmsc(1L),	impwbstr(1L), listword(1L), nice-
+       text(1L),   printint(1L),    scramble(1L),    sortdct(1L),
+       txt2dct(1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+

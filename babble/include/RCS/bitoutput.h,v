@@ -1,0 +1,107 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	97.03.05.17.44.52;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.14.19.25;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.11.05.00.06.09;	author chapman;	state Exp;
+branches;
+next	;
+
+
+desc
+@ Initial Check-in
+@
+
+
+1.3
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+/*
+ *
+ * "Output" abstract bitstream class
+ * Copyright (c) 1995, Mark T. Chapman
+ *
+ * The main purpose is the writeBits(howmany) method.
+ *
+ * The idea is to first write bits to a stream for a set length 
+ * after that, ignore the writeBits() request
+ *
+ * $Id: bitoutput.h,v 1.2 1996/01/13 14:19:25 markc Exp markc $
+ *
+ * $Log: bitoutput.h,v $
+ * Revision 1.2  1996/01/13 14:19:25  markc
+ * added MTCstring & ctor
+ *
+ * Revision 1.1  1995/11/05  00:06:09  chapman
+ * Initial revision
+ *
+ */
+
+#ifndef __BITOUTPUT_H_
+#define __BITOUTPUT_H_
+
+static char rcsid__BITOUTPUT_H_ []  = "@@(#)$Id$";
+
+// concrete class for output operations
+
+class MTCoutputBitStream : public MTCbitStream {
+private:
+protected:
+	virtual void openFile(const char *aFileName); // open a file
+	void saveBuffer();	// save buffer to the file or ignore
+	BOOL streamBitsDefined;	// have we defined streamBits?
+public:
+	// constructors and destructors
+	MTCoutputBitStream(const char *aFileName);
+	MTCoutputBitStream(const MTCstring &aFileName);
+	virtual ~MTCoutputBitStream();	// virtual destructor
+
+	// read a number bits from the stream or from the generator
+	BOOL writeBits(bitBucketType bitBucket, bitCountType aCount);
+};
+
+#endif  __BITOUTPUT_H_
+@
+
+
+1.2
+log
+@added MTCstring & ctor
+@
+text
+@d12 1
+a12 1
+ * $Id: bitoutput.h,v 1.1 1995/11/05 00:06:09 chapman Exp markc $
+d15 3
+d25 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d12 5
+a16 1
+ * $Id$
+a17 1
+ * $Log$
+d34 1
+@

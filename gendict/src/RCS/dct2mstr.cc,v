@@ -1,0 +1,857 @@
+head	1.16;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.16
+date	97.03.05.17.41.20;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	97.02.22.20.30.13;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	97.02.16.06.57.29;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	96.03.21.17.18.56;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	96.01.20.17.23.28;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.01.20.08.59.44;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.01.14.13.47.33;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.01.14.12.27.45;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.11.10.12.25.43;	author chapman;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	95.11.08.19.34.46;	author chapman;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.11.08.18.49.28;	author chapman;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.11.08.04.24.14;	author chapman;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.08.31.02.34.54;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.08.13.23.02.17;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.13.22.38.36;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.13.22.03.55;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial check-in
+@
+
+
+1.16
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@/*
+ * Raw Dictionary to Master Tables Program 
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: dct2mstr.cc,v 1.15 1997/02/22 20:30:13 markc Exp markc $
+ *
+ * $Log: dct2mstr.cc,v $
+ * Revision 1.15  1997/02/22 20:30:13  markc
+ * changed default input file to "dct.srt" from "dictionary"
+ *
+ * Revision 1.14  1997/02/16 06:57:29  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.13  1996/03/21 17:18:56  markc
+ * program name changes and messages (minor)
+ *
+ * Revision 1.12  1996/01/20 17:23:28  markc
+ * use rbt version of raofalt instead of bst
+ *
+// Revision 1.11  1996/01/20  08:59:44  markc
+// fixed default dictionary name to be mstrdict instead of mstrtype :(
+//
+// Revision 1.10  1996/01/14  13:47:33  markc
+// added parameters
+//
+// Revision 1.9  1996/01/14  12:27:45  markc
+// added count display
+//
+// Revision 1.8  1995/11/10  12:25:43  chapman
+// I works! -- use new typeREcord, rawDictEnt, dictREcord,
+// and most important, MTCcreateAltJmpRAOF -- seems to go!
+//
+// Revision 1.7  1995/11/08  19:34:46  chapman
+// Updated to use rawdict.h instead of dictent.h
+//
+// Revision 1.6  1995/11/08  18:49:28  chapman
+// Updated to dictRecord and typeRecord from mstr*
+//
+// Revision 1.5  1995/11/08  04:24:14  chapman
+// Removed #include <String.h>
+//
+// Revision 1.4  1995/08/31  02:34:54  markc
+// Added suffixes to mstrdict -- THIS DOES NOT WORK -- USE OLD VERSION
+//
+// Revision 1.3  1995/08/13  23:02:17  markc
+// Changed jump to typeIndex -- to be more clean on purpose
+//
+// Revision 1.2  1995/08/13  22:38:36  markc
+// Added ../include/dconst.h and the BAD_CODE and BAD_VALUE items
+// into the mstrdict and mstrtype.
+// This is an example of how undefined words will be handled.
+//
+// Revision 1.1  1995/08/13  22:03:55  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id$";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raofalt.h"
+#include "../../mtc++/include/list.h"
+#include "../include/rawdict.h"
+#include "../include/dictrec.h"
+#include "../include/dictarec.h"
+#include "../include/typerec.h"
+#include "../include/dconst.h"
+
+MTCwriteRAOF <MTCtypeRecord> *typeRecordWriteRAOF=NULL;
+MTCwriteRAOF <MTCdictRecord> *dictRecordWriteRAOF=NULL;
+MTCRBTFreq  <MTCtypeRecord>  typeRecordRBTFreq;
+
+void createMstrType(MTCtypeRecord *, long); 
+void createMstrDict(MTCrawDictEnt *);
+void usage();
+
+int main(int argc, char *argv[])
+{
+	MTCtypeRecord tempTypeRecord;
+	MTCrawDictEnt rawDictEnt;
+
+	// check command line arguments
+	extern char *optarg;
+	extern int optind;
+	int ch;
+	MTCstring inputFileName;
+	MTCstring prefix("mstr");
+	MTCstring typeName("mstrtype");
+	MTCstring dictName("mstrdict");
+
+	while ((ch = getopt(argc, argv, "d:i:h")) != EOF)
+	{
+		switch(ch) 
+		{
+			case 'd':
+				prefix=optarg;
+				dictName=optarg;
+				dictName+="dict";
+				typeName=optarg;
+				typeName+="type";
+				break;
+			case 'i':
+				inputFileName=optarg;
+				break;
+			case 'h':
+			default:
+				usage();
+				return (-1);
+		}
+	}
+
+	if (inputFileName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I need to have an input file name specified with the -i option", "main()");
+		usage();
+		return -1;
+	}
+
+	argc -= optind;
+ 	argv += optind;
+
+	cerr << "Processing Pre-Sorted Dictionary (see sortdct)..." << endl;
+	cerr << "\tInput File: " << inputFileName << endl;
+	cerr << "\tOutput Dictionary Table: " << prefix << endl; 
+
+	cerr << "Stage 1: read dictionary for type information..." << endl;
+
+	// add a stub for all bad values
+
+	tempTypeRecord.setCode(BAD_CODE);
+	typeRecordRBTFreq.add(tempTypeRecord);
+
+	// read all entries in dictionary file
+
+	ifstream infile(inputFileName.c_str());
+
+	if (infile==NULL)
+	{
+		perror(inputFileName.c_str());
+		usage();
+		return -1;
+	}
+
+	infile >> rawDictEnt;
+
+	int i=0;
+
+	while (infile.eof()==0)
+	{
+		tempTypeRecord.setCode(rawDictEnt.getCode());
+		typeRecordRBTFreq.add(tempTypeRecord);
+		infile >> rawDictEnt;
+	} 
+
+	cerr << "Stage 2: output master type table..." << endl;
+
+	typeRecordWriteRAOF = new MTCwriteRAOF <MTCtypeRecord> (typeName);
+
+	typeRecordRBTFreq.forEachFreq(createMstrType);
+
+	cerr << "\t" << typeRecordWriteRAOF->getCount() << " types. " << endl;
+	delete typeRecordWriteRAOF;
+	typeRecordWriteRAOF=NULL;
+
+	cerr << "Stage 3: Create master dictionary table..." << endl;
+
+	dictRecordWriteRAOF = new MTCwriteRAOF <MTCdictRecord> (dictName);
+
+	if (dictRecordWriteRAOF==NULL)
+	{
+		cerr << "not Enough RAM" << endl;
+		return (-1);
+	}
+
+	infile.close();
+	infile.open(inputFileName.c_str());
+
+	rawDictEnt.setCode(BAD_CODE);	// note: stub not really needed in dict
+	rawDictEnt.setValue(BAD_VALUE);	// just in the typeRecordRBTFreq 
+
+	do {
+		createMstrDict(&rawDictEnt);	
+		infile >> rawDictEnt;
+	} while (infile.eof()==0);
+
+	typeRecordRBTFreq.clear();
+
+	cerr << "\t" << dictRecordWriteRAOF->getCount() << " words." << endl;
+
+	delete dictRecordWriteRAOF;
+	dictRecordWriteRAOF=NULL;
+
+	cerr << "Stage 4: Create Alternate Dictionary Index" << endl;
+
+	MTCcreateAltJmpRAOF <MTCdictAltRecord> makeAlt(dictName);
+
+	makeAlt.doIt();
+
+	cerr << "That's All Folks!" << endl;
+
+	return 0;
+}
+
+void createMstrType(MTCtypeRecord *aTypeRecord, long freq) 
+{
+	static long typeIndex=0;
+
+	aTypeRecord->setIndex(typeIndex++);
+	aTypeRecord->setFreq(freq);
+
+	typeRecordWriteRAOF->append(*aTypeRecord);
+}
+
+void createMstrDict(MTCrawDictEnt *aRawDictEnt)
+{
+	MTCdictRecord dictRecord;
+	MTCtypeRecord typeRecord;
+	MTCtypeRecord *foundTypeRecord;
+
+	dictRecord.setValue(aRawDictEnt->getValue());
+	typeRecord.setCode(aRawDictEnt->getCode());
+
+	foundTypeRecord=typeRecordRBTFreq.find(typeRecord);
+
+	if (foundTypeRecord==NULL)
+	{
+		cerr << "PROGRAM ERROR: I could not find a record type:" << typeRecord << endl;
+		exit(-1);
+	}
+
+	dictRecord.setTypeIndex(foundTypeRecord->getIndex());
+
+	// decrement the foundTypeRecord and use index as bitstring...
+	// this causes a "reverse ordering" of bitStrings, but it does
+	// not matter because we are ultimately accessing things randomly anyway
+
+	foundTypeRecord->setFreq(foundTypeRecord->getFreq()-1);
+
+	dictRecord.setBitString(foundTypeRecord->getFreq());
+
+	dictRecordWriteRAOF->append(dictRecord);
+}
+
+void usage()
+{
+	cerr << "Usage: dct2mstr -i inputFile [-d dictionary]" << endl;
+}
+@
+
+
+1.15
+log
+@changed default input file to "dct.srt" from "dictionary"
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.14 1997/02/16 06:57:29 markc Exp markc $
+d8 3
+d58 2
+@
+
+
+1.14
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.13 1996/03/21 17:18:56 markc Exp markc $
+d8 3
+d90 1
+a90 1
+	MTCstring inputFileName("dictionary");
+d116 7
+d250 1
+a250 1
+	cerr << "Usage: dct2mstr [-i inputFile] [-d dictionary]" << endl;
+@
+
+
+1.13
+log
+@program name changes and messages (minor)
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.12 1996/01/20 17:23:28 markc Exp markc $
+d8 3
+a59 1
+#include "../../mtc++/include/bst.h"
+d72 1
+a72 1
+MTCBSTFreq  <MTCtypeRecord>  typeRecordBSTFreq;
+d125 1
+a125 1
+	typeRecordBSTFreq.add(tempTypeRecord);
+d145 1
+a145 1
+		typeRecordBSTFreq.add(tempTypeRecord);
+d153 1
+a153 1
+	typeRecordBSTFreq.forEachFreq(createMstrType);
+d173 1
+a173 1
+	rawDictEnt.setValue(BAD_VALUE);	// just in the typeRecordBSTFreq 
+d180 1
+a180 1
+	typeRecordBSTFreq.clear();
+d217 1
+a217 1
+	foundTypeRecord=typeRecordBSTFreq.find(typeRecord);
+@
+
+
+1.12
+log
+@use rbt version of raofalt instead of bst
+@
+text
+@d2 1
+a2 1
+ * Dictionary to Master Tables Program 
+d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.11 1996/01/20 08:59:44 markc Exp markc $
+d8 3
+d114 1
+a114 1
+	cerr << "Processing Pre-Sorted Dictionary (see sortdict)..." << endl;
+@
+
+
+1.11
+log
+@fixed default dictionary name to be mstrdict instead of mstrtype :(
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.10 1996/01/14 13:47:33 markc Exp markc $
+d8 3
+d55 1
+@
+
+
+1.10
+log
+@added parameters
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.9 1996/01/14 12:27:45 markc Exp markc $
+d8 3
+d81 1
+a81 1
+	MTCstring dictName("mstrtype");
+@
+
+
+1.9
+log
+@added count display
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.8 1995/11/10 12:25:43 chapman Exp markc $
+d8 3
+d44 1
+d64 1
+d66 1
+a66 1
+int main()
+d71 32
+a102 1
+	ifstream infile("dictionary");
+d105 2
+d117 9
+d139 1
+a139 1
+	typeRecordWriteRAOF = new MTCwriteRAOF <MTCtypeRecord> ("mstrtype");
+d149 1
+a149 1
+	dictRecordWriteRAOF = new MTCwriteRAOF <MTCdictRecord> ("mstrdict");
+d158 1
+a158 1
+	infile.open("dictionary");
+d177 1
+a177 1
+	MTCcreateAltJmpRAOF <MTCdictAltRecord> makeAlt("mstrdict");
+d224 5
+@
+
+
+1.8
+log
+@I works! -- use new typeREcord, rawDictEnt, dictREcord,
+and most important, MTCcreateAltJmpRAOF -- seems to go!
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.7 1995/11/08 19:34:46 chapman Exp chapman $
+d8 4
+d96 1
+d122 2
+@
+
+
+1.7
+log
+@Updated to use rawdict.h instead of dictent.h
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.6 1995/11/08 18:49:28 chapman Exp chapman $
+d8 3
+d42 1
+d46 1
+d51 2
+a52 2
+MTCreadRAOF  <MTCtypeRecord> *typeRecordReadRAOF=NULL;
+MTCwriteRAOF <MTCdictRecord> dictRecordWriteRAOF("mstrdict");
+d54 1
+a54 1
+void createMstrType(MTCstring *, long); 
+d59 1
+a59 2
+	MTClist <MTCrawDictEnt> dictList;	
+	MTCBSTFreq  <MTCstring>  typeBST;
+a60 1
+	MTCstring temp;
+d64 1
+a64 1
+	cerr << "Processing Dictionary - Please Wait..." << endl;
+d66 1
+a66 1
+	cerr << "Stage 1: read dictionary..." << endl;
+d70 2
+a71 5
+	typeBST.add(BAD_CODE);
+
+	rawDictEnt.setCode(BAD_CODE);	// note: stub not really needed in dict
+	rawDictEnt.setValue(BAD_VALUE);	// just in the typeBST 
+	dictList.add(rawDictEnt);		// oh well -- a commented dictent...
+a76 1
+
+d81 2
+a82 8
+		dictList.add(rawDictEnt);
+		typeBST.add(rawDictEnt.getCode());
+		typeBST.add(rawDictEnt.getCode()+",-ARY");
+		typeBST.add(rawDictEnt.getCode()+",-PLURAL");
+		typeBST.add(rawDictEnt.getCode()+",-GERUND");
+		typeBST.add(rawDictEnt.getCode()+",-ISM");
+		typeBST.add(rawDictEnt.getCode()+",-LY");
+
+d86 1
+a86 1
+	cerr << "Stage 2: create master type table..." << endl;
+d90 1
+a90 1
+	typeBST.forEachFreq(createMstrType);
+d95 1
+a95 1
+	cerr << "Stage 3: create master dictionary table..." << endl;
+d97 1
+a97 1
+	typeRecordReadRAOF = new MTCreadRAOF <MTCtypeRecord> ("mstrtype");
+d99 8
+a106 1
+	dictList.forEach(createMstrDict);
+d108 7
+a114 2
+	delete typeRecordReadRAOF;
+	typeRecordReadRAOF=NULL;
+d116 12
+a127 1
+	cerr << "Done Converging Dictionary." << endl;
+d132 1
+a132 1
+void createMstrType(MTCstring *aString, long freq) 
+d134 1
+a134 1
+	MTCtypeRecord typeRecord;
+d136 2
+a137 2
+	typeRecord.setCode(*aString);
+	typeRecord.setFreq(freq);
+d139 1
+a139 1
+	typeRecordWriteRAOF->append(typeRecord);
+d146 1
+a146 1
+	MTCstring   temp(aRawDictEnt->getValue());
+d151 1
+a151 1
+	typeRecordReadRAOF->find(typeRecord);
+d153 5
+a157 7
+	dictRecord.setTypeIndex(typeRecordReadRAOF->getIndex());
+
+	dictRecordWriteRAOF.append(dictRecord);
+
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()+1);
+	dictRecord.setValue(temp+"ary");
+	dictRecordWriteRAOF.append(dictRecord);
+d159 1
+a159 3
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()+1);
+	dictRecord.setValue(temp+"es");
+	dictRecordWriteRAOF.append(dictRecord);
+d161 3
+a163 3
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()+1);
+	dictRecord.setValue(temp+"ing");
+	dictRecordWriteRAOF.append(dictRecord);
+d165 1
+a165 3
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()+1);
+	dictRecord.setValue(temp+"ism");
+	dictRecordWriteRAOF.append(dictRecord);
+d167 1
+a167 3
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()+1);
+	dictRecord.setValue(temp+"ly");
+	dictRecordWriteRAOF.append(dictRecord);
+d169 1
+a169 3
+	dictRecord.setTypeIndex(dictRecord.getTypeIndex()-3);
+	dictRecord.setValue(temp+"s");
+	dictRecordWriteRAOF.append(dictRecord);
+@
+
+
+1.6
+log
+@Updated to dictRecord and typeRecord from mstr*
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.5 1995/11/08 04:24:14 chapman Exp chapman $
+d8 3
+d40 1
+a40 1
+#include "../include/dictent.h"
+d50 1
+a50 1
+void createMstrDict(MTCdictEnt *);
+d54 1
+a54 1
+	MTClist <MTCdictEnt> dictList;	
+d56 1
+a56 1
+	MTCdictEnt dictEnt;
+d69 3
+a71 3
+	dictEnt.setCode(BAD_CODE);	// note: stub not really needed in dict
+	dictEnt.setValue(BAD_VALUE);	// just in the typeBST 
+	dictList.add(dictEnt);		// oh well -- a commented dictent...
+d75 1
+a75 1
+	infile >> dictEnt;
+d82 7
+a88 7
+		dictList.add(dictEnt);
+		typeBST.add(dictEnt.getCode());
+		typeBST.add(dictEnt.getCode()+",-ARY");
+		typeBST.add(dictEnt.getCode()+",-PLURAL");
+		typeBST.add(dictEnt.getCode()+",-GERUND");
+		typeBST.add(dictEnt.getCode()+",-ISM");
+		typeBST.add(dictEnt.getCode()+",-LY");
+d90 1
+a90 1
+		infile >> dictEnt;
+d126 1
+a126 1
+void createMstrDict(MTCdictEnt *aDictEnt)
+d130 1
+a130 1
+	MTCstring   temp(aDictEnt->getValue());
+d132 2
+a133 2
+	dictRecord.setValue(aDictEnt->getValue());
+	typeRecord.setCode(aDictEnt->getCode());
+@
+
+
+1.5
+log
+@Removed #include <String.h>
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.4 1995/08/31 02:34:54 markc Exp chapman $
+d8 3
+d38 2
+a39 2
+#include "../include/mstrdict.h"
+#include "../include/mstrtype.h"
+d42 3
+a44 3
+MTCwriteRAOF <MTCmstrType> *mstrTypeWriteRAOF=NULL;
+MTCreadRAOF  <MTCmstrType> *mstrTypeReadRAOF=NULL;
+MTCwriteRAOF <MTCmstrDict> mstrDictWriteRAOF("mstrdict");
+d92 1
+a92 1
+	mstrTypeWriteRAOF = new MTCwriteRAOF <MTCmstrType> ("mstrtype");
+d96 2
+a97 2
+	delete mstrTypeWriteRAOF;
+	mstrTypeWriteRAOF=NULL;
+d101 1
+a101 1
+	mstrTypeReadRAOF = new MTCreadRAOF <MTCmstrType> ("mstrtype");
+d105 2
+a106 2
+	delete mstrTypeReadRAOF;
+	mstrTypeReadRAOF=NULL;
+d115 1
+a115 1
+	MTCmstrType mstrType;
+d117 2
+a118 2
+	mstrType.setCode(*aString);
+	mstrType.setFreq(freq);
+d120 1
+a120 1
+	mstrTypeWriteRAOF->append(mstrType);
+d125 2
+a126 2
+	MTCmstrDict mstrDict;
+	MTCmstrType mstrType;
+d129 2
+a130 2
+	mstrDict.setValue(aDictEnt->getValue());
+	mstrType.setCode(aDictEnt->getCode());
+d132 1
+a132 1
+	mstrTypeReadRAOF->find(mstrType);
+d134 1
+a134 1
+	mstrDict.setTypeIndex(mstrTypeReadRAOF->getIndex());
+d136 1
+a136 1
+	mstrDictWriteRAOF.append(mstrDict);
+d138 3
+a140 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()+1);
+	mstrDict.setValue(temp+"ary");
+	mstrDictWriteRAOF.append(mstrDict);
+d142 3
+a144 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()+1);
+	mstrDict.setValue(temp+"es");
+	mstrDictWriteRAOF.append(mstrDict);
+d146 3
+a148 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()+1);
+	mstrDict.setValue(temp+"ing");
+	mstrDictWriteRAOF.append(mstrDict);
+d150 3
+a152 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()+1);
+	mstrDict.setValue(temp+"ism");
+	mstrDictWriteRAOF.append(mstrDict);
+d154 3
+a156 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()+1);
+	mstrDict.setValue(temp+"ly");
+	mstrDictWriteRAOF.append(mstrDict);
+d158 3
+a160 3
+	mstrDict.setTypeIndex(mstrDict.getTypeIndex()-3);
+	mstrDict.setValue(temp+"s");
+	mstrDictWriteRAOF.append(mstrDict);
+@
+
+
+1.4
+log
+@Added suffixes to mstrdict -- THIS DOES NOT WORK -- USE OLD VERSION
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.3 1995/08/13 23:02:17 markc Exp markc $
+d8 3
+a27 1
+#include <String.h>
+@
+
+
+1.3
+log
+@Changed jump to typeIndex -- to be more clean on purpose
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.2 1995/08/13 22:38:36 markc Exp markc $
+d8 3
+d49 1
+d69 1
+d76 5
+d122 1
+a124 1
+
+d131 24
+@
+
+
+1.2
+log
+@Added ../include/dconst.h and the BAD_CODE and BAD_VALUE items
+into the mstrdict and mstrtype.
+This is an example of how undefined words will be handled.
+@
+text
+@d5 1
+a5 1
+ * $Id: dct2mstr.cc,v 1.1 1995/08/13 22:03:55 markc Exp markc $
+d8 5
+d119 1
+a119 1
+	mstrDict.setJump(mstrTypeReadRAOF->getIndex());
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d27 1
+d47 10
+@

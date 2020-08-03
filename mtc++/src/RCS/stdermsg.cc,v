@@ -1,0 +1,189 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.5
+date	97.02.23.20.27.15;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.08.19.48.00;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.04.19.11.44;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.06.30.23.31.21;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.06.07.01.44.32;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@MTC++ Standard Error -- errormsg.h Routines
+@
+
+
+1.5
+log
+@Added strerror() output to EMT_ERROR types
+Added ERRORMSG_OUTPUT #define to redirect output
+@
+text
+@/*
+ * MTC++ Error Message Processing Routines for stdout
+ * Copyright (c) Mark T. Chapman 1993,1995
+ *
+ * $Id: stdermsg.cc,v 1.4 1996/01/08 19:48:00 markc Exp markc $
+ *
+ * $Log: stdermsg.cc,v $
+ * Revision 1.4  1996/01/08 19:48:00  markc
+ * Added space between critical error and message
+ *
+// Revision 1.3  1995/11/04  19:11:44  chapman
+// added const to char * parms
+//
+// Revision 1.2  1995/06/30  23:31:21  markc
+// Update for general MTC++.h
+//
+// Revision 1.1  1995/06/07  01:44:32  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: stdermsg.cc,v 1.4 1996/01/08 19:48:00 markc Exp markc $";
+
+#include "../include/MTC++.h"
+#include "../include/errormsg.h"
+#include <sys/errno.h>
+
+#ifndef ERRORMSG_OUTPUT
+#define ERRORMSG_OUTPUT cerr
+#endif
+
+int errorMsg(short EMT, const char *Message, const char *FunctionName)
+{
+	switch (EMT) {
+		case EMT_MESSAGE: 	ERRORMSG_OUTPUT << "* Message: ";
+					break;
+		case EMT_WARNING: 	ERRORMSG_OUTPUT << "** Warning: ";
+					break;
+		case EMT_ERROR:		ERRORMSG_OUTPUT << "*** \aERROR (";
+					ERRORMSG_OUTPUT << strerror(errno);
+					ERRORMSG_OUTPUT << "):";
+					break;
+		case EMT_DEBUG:		ERRORMSG_OUTPUT << "DEBUG MESSAGE: ";
+					break;
+		default:        	ERRORMSG_OUTPUT << "**** Critical Error -- Program ending:\t ";
+					ERRORMSG_OUTPUT << FunctionName << " " << Message << endl;
+					exit(0);
+	}
+
+	ERRORMSG_OUTPUT << FunctionName << " " << Message << endl;
+
+	return 0;
+}
+	
+@
+
+
+1.4
+log
+@Added space between critical error and message
+@
+text
+@d5 1
+a5 1
+ * $Id: stdermsg.cc,v 1.3 1995/11/04 19:11:44 chapman Exp markc $
+d8 3
+d23 1
+a23 1
+static char rcsid []  = "@@(#)$Id: stdermsg.cc,v 1.3 1995/11/04 19:11:44 chapman Exp markc $";
+d27 5
+d36 13
+a48 7
+		case EMT_MESSAGE: cout << "* Message: "; 		break;
+		case EMT_WARNING: cout << "** Warning: "; 	break;
+		case EMT_ERROR:	cout << "*** ERROR\a: ";	break;
+		case EMT_DEBUG:	cout << "DEBUG MESSAGE: ";	break;
+		default:        cout << "**** Critical Error -- Program ending:\t ";
+				cout << FunctionName << " " << Message << endl;
+				exit(0);
+d51 1
+a51 6
+	cout << FunctionName << " " << Message << endl;
+
+/*
+	char x[200];
+	cin.getline(x, 199);
+*/
+@
+
+
+1.3
+log
+@added const to char * parms
+@
+text
+@d5 1
+a5 1
+ * $Id: stdermsg.cc,v 1.2 1995/06/30 23:31:21 markc Exp chapman $
+d8 3
+d20 1
+a20 1
+static char rcsid []  = "@@(#)$Id: stdermsg.cc,v 1.2 1995/06/30 23:31:21 markc Exp chapman $";
+d32 1
+a32 1
+		default:        cout << "**** Critical Error -- Program ending";
+@
+
+
+1.2
+log
+@Update for general MTC++.h
+@
+text
+@d5 1
+a5 1
+ * $Id: stdermsg.cc 1.1 1995/06/07 01:44:32 markc Exp markc $
+d7 4
+a10 1
+ * $Log: stdermsg.cc $
+d17 1
+a17 1
+static char rcsid []  = "@@(#)$Id: stdermsg.cc 1.1 1995/06/07 01:44:32 markc Exp markc $";
+d22 1
+a22 1
+int errorMsg(short EMT, char *Message, char *FunctionName)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d17 1
+@

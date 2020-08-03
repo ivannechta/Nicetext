@@ -1,0 +1,287 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.6
+date	97.03.05.17.39.05;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.02.17.18.46.39;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.11.08.18.45.04;	author chapman;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.08.04.21.47;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.13.23.01.30;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.07.29.17.05.22;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Check-in
+@
+
+
+1.6
+log
+@Added static char rcsid__DICTAREC_H_ []  = "@@(#)$Id$";
+@
+text
+@/*
+ *
+ * Dictionary Record Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * class MTCdictRecord - value, typeIndex, bitstring, freq
+ *
+ * The MTCdictRecord class is sorted by (value).
+ * The MTCdictAltRecord class is sorted by (typeINdex, bitstring)
+ *
+ * $Id: dictrec.h,v 1.5 1996/02/17 18:46:39 markc Exp markc $
+ *
+ * $Log: dictrec.h,v $
+ * Revision 1.5  1996/02/17 18:46:39  markc
+ * added freq
+ *
+ * Revision 1.4  1995/11/08  18:45:04  chapman
+ * Converted from mstrdict.h
+ *
+ * Revision 1.3  1995/11/08  04:21:47  chapman
+ * temp version
+ *
+ * Revision 1.2  1995/08/24  20:14:40  markc
+ * bitstring is now a long
+ *
+ * Revision 1.1  1995/08/13  23:08:31  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __DICTREC_H_
+#define __DICTREC_H_
+
+static char rcsid__DICTREC_H_ []  = "@@(#)$Id$";
+
+#define DICTREC_VALUE_MAX_LENGTH 512
+
+class MTCdictRecord {
+private:
+	MTCstring value;
+	long typeIndex;
+	long bitstring;
+	long freq;
+protected:
+public:
+	// constructors and destructor
+	MTCdictRecord() : typeIndex(0), bitstring(0), freq(0) {};
+	MTCdictRecord(const MTCdictRecord &src) : value(src.value), typeIndex(src.typeIndex), bitstring(src.bitstring), freq(0) { };
+
+	// attribute set/get methods 
+	const MTCstring & getValue() const { return value; };
+	long getTypeIndex() const  { return typeIndex;  };
+	long getBitString() const { return bitstring; };
+	long getFreq() const { return freq; };
+	void setValue(const MTCstring &aString) { value=aString; };
+	void setTypeIndex(long aNum)  { typeIndex=aNum; };
+	void setBitString(long aNum) { bitstring=aNum; };
+	void setFreq(long aNum) { freq=aNum; };
+
+	// overloaded operator methods
+	MTCdictRecord & operator=(const MTCdictRecord &);
+	virtual int isLessThan(const MTCdictRecord &) const;
+        virtual int isEqual(const MTCdictRecord &) const;
+     	BOOL operator==(const MTCdictRecord &) const;
+        BOOL operator!=(const MTCdictRecord &) const;
+        BOOL operator<(const MTCdictRecord &)  const;
+        BOOL operator<=(const MTCdictRecord &) const;
+        BOOL operator>(const MTCdictRecord &)  const;
+        BOOL operator>=(const MTCdictRecord &) const;
+
+        // stream insertor / extractors
+        friend ostream & operator<<(ostream &, const MTCdictRecord &);
+        friend istream & operator>>(istream &, MTCdictRecord &); 
+};
+
+#endif // __DICTREC_H_
+@
+
+
+1.5
+log
+@added freq
+@
+text
+@d11 1
+a11 1
+ * $Id: dictrec.h,v 1.4 1995/11/08 18:45:04 chapman Exp markc $
+d14 3
+d34 2
+@
+
+
+1.4
+log
+@Converted from mstrdict.h
+@
+text
+@d6 1
+a6 1
+ * class MTCdictRecord - value, typeIndex, bitstring
+d11 5
+a15 1
+ * $Id: mstrdict.h,v 1.3 1995/11/08 04:21:47 chapman Exp chapman $
+a16 1
+ * $Log: mstrdict.h,v $
+d39 1
+d43 2
+a44 2
+	MTCdictRecord() : typeIndex(0), bitstring(0) {};
+	MTCdictRecord(const MTCdictRecord &src) : value(src.value), typeIndex(src.typeIndex), bitstring(src.bitstring) { };
+d50 1
+d54 1
+@
+
+
+1.3
+log
+@temp version
+@
+text
+@a0 1
+
+d3 1
+a3 1
+ * Master Dictionary Structure 
+d6 6
+a11 2
+ * class MTCmstrDict - value, typeIndex, bitstring
+ * Base class sorted by value.
+d13 3
+a15 1
+ * $Id: distdict.h,v 1.2 1995/08/24 20:14:40 markc Exp chapman $
+a16 1
+ * $Log: distdict.h,v $
+d26 2
+a27 2
+#ifndef __MSTRDICT_H_
+#define __MSTRDICT_H_
+d29 1
+a29 1
+#define MSTRDICT_VALUE_MAX_LENGTH 512
+d31 1
+a31 1
+class MTCmstrDict {
+d39 2
+a40 2
+	MTCmstrDict() : typeIndex(0), bitstring(0) {};
+	MTCmstrDict(const MTCmstrDict &src) : value(src.value), typeIndex(src.typeIndex), bitstring(src.bitstring) { };
+d51 9
+a59 9
+	MTCmstrDict & operator=(const MTCmstrDict &);
+	virtual int isLessThan(const MTCmstrDict &) const=0;
+        virtual int isEqual(const MTCmstrDict &) const=0;
+     	BOOL operator==(const MTCmstrDict &) const;
+        BOOL operator!=(const MTCmstrDict &) const;
+        BOOL operator<(const MTCmstrDict &)  const;
+        BOOL operator<=(const MTCmstrDict &) const;
+        BOOL operator>(const MTCmstrDict &)  const;
+        BOOL operator>=(const MTCmstrDict &) const;
+d62 2
+a63 2
+        friend ostream & operator<<(ostream &, const MTCmstrDict &);
+        friend istream & operator>>(istream &, MTCmstrDict &); 
+d66 1
+a66 1
+#endif // __MSTRDICT_H_
+@
+
+
+1.2
+log
+@Changed jump to typeIndex -- to be more clear on purpose
+@
+text
+@d4 1
+a4 1
+ * Master Dict Structure 
+d7 2
+a8 1
+ * class MTCmstrDict - _value_, typeIndex - where in mstrtype.jmp is the type? 
+d10 1
+a10 1
+ * Note: raof.h from the MTC++ library must be included _BEFORE_ this file.
+d12 3
+a14 1
+ * $Id: mstrdict.h,v 1.1 1995/07/29 17:05:22 markc Exp markc $
+d16 1
+a16 2
+ * $Log: mstrdict.h,v $
+ * Revision 1.1  1995/07/29  17:05:22  markc
+d22 2
+a23 2
+#ifndef __MSTRDICT_H
+#define __MSTRDICT_H
+d31 1
+d35 2
+a36 2
+	MTCmstrDict() : typeIndex(0) {};
+	MTCmstrDict(const MTCmstrDict &src) : value(src.value), typeIndex(src.typeIndex) { };
+d41 1
+d44 1
+d48 2
+a49 2
+	int isLessThan(const MTCmstrDict &) const;
+        int isEqual(const MTCmstrDict &) const;
+d62 1
+a62 1
+#endif // __MSTRDICT_H
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+a7 1
+ * class MTCmstrDict - _value_, jump - where in mstrtype.jmp is the type? 
+d11 5
+a15 1
+ * $Id$
+a16 1
+ * $Log$
+d28 1
+a28 1
+	JUMP_TABLE_TYPE jump;
+d32 2
+a33 2
+	MTCmstrDict() : jump(0) {};
+	MTCmstrDict(const MTCmstrDict &src) : value(src.value), jump(src.jump) { };
+d37 1
+a37 1
+	JUMP_TABLE_TYPE getJump() const  { return jump;  };
+d39 1
+a39 1
+	void setJump(JUMP_TABLE_TYPE aNum)  { jump=aNum; };
+@

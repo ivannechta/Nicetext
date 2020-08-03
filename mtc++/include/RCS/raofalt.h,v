@@ -1,0 +1,434 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.6
+date	97.03.05.15.58.28;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.04.10.20.39.44;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.20.17.20.02;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.11.10.21.09.43;	author chapman;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.11.08.18.03.04;	author chapman;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.11.08.17.25.54;	author chapman;	state Exp;
+branches;
+next	;
+
+
+desc
+@First Try -- DOES NOT COMPILE!!!
+But it was an approach to minimize memory by using a read(index) for comparison
+instead of just loading the whole .dat file
+@
+
+
+1.6
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+/*
+ * MTC++ Create Alternate Jumpfiles for Random Access Objects in Files Template
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ ********************************************************************
+ * (see raof.h)
+ *
+ * Now that you have a MTCreadRAOF<T> how do you create alternate "keys" for
+ * the find() method?
+ *
+ * 1.  Somehow you need to define a class Y that has the operator<() and 
+ *     operator==() overloaded to "sort" the T objects in a different order.
+ *     Note that Y must use a T compatible stream extractor (at least for the
+ *     new key fields).
+ *    
+ *     Suggestions...
+ *     A. define class Y : public T {}
+ *     B. Or manually create a minimal class Y with a T compatible extractor
+ *
+ * 2.  Remember -- these keys MUST BE UNIQUE.  One easy way is to use the
+ *     primary key as a tie-breaker.  
+ *
+ ********************************************************************
+ *
+ * class MTCcreateAltJmpRAOF -- used to create an alternat .jmp for a readRAOF
+ * class MTCAltJmpNode - used within a MTCcreateAltJmpRAOF to sort
+ *
+ ********************************************************************
+ * $Id: raofalt.h,v 1.5 1996/04/10 20:39:44 markc Exp markc $
+ *
+ * $Log: raofalt.h,v $
+ * Revision 1.5  1996/04/10 20:39:44  markc
+ * fixed sizeof() for the raofJumpTableType to be unsigned int.
+ * this allows different machines to use the same .jmp and .alt files
+ *
+ * Revision 1.4  1996/01/20 17:20:02  markc
+ * updated to use rbt instead of bst
+ *
+ * Revision 1.3  1995/11/10  21:09:43  chapman
+ * Added load() method for doIt() so that
+ * it can better handle partially sorted raof.
+ *
+ * Revision 1.2  1995/11/08  18:03:04  chapman
+ * Now it works!
+ *
+ * Revision 1.1  1995/11/08  17:25:54  chapman
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef  __RAOFALT_H_
+#define  __RAOFALT_H_
+
+static char rcsid__RAOFALT_H_ []  = "@@(#)$Id$";
+
+// class to sort the indexes in a MTCreadRAOF in a MTCcreateAltJmpRAOF
+
+template <class T>
+class MTCaltJmpNode {
+private:
+	T value;
+	raofJumpTableType jumpPos;
+protected:
+public:
+	// default constructor
+	MTCaltJmpNode()
+		: jumpPos(0) {};
+
+	// copy constructor
+	MTCaltJmpNode(MTCaltJmpNode &aSrc)
+		: value(aSrc.value), jumpPos(aSrc.jumpPos) {};
+
+	// parameterized constructor
+	MTCaltJmpNode(T aT, raofJumpTableType aPos)
+		: value(aT), jumpPos(aPos) {};
+
+	// set attribute
+	void setValue(const T &aT) { value=aT; };
+	void setJumpPos(raofJumpTableType aPos) { jumpPos=aPos; };
+
+	// get attribute
+	const T & getValue() const { return value; };
+	raofJumpTableType getJumpPos() const { return jumpPos; };
+
+	// overloaded assignment operator
+	MTCaltJmpNode & operator=(const MTCaltJmpNode <T> &aSrc)
+		{ value=aSrc.getValue(); jumpPos=aSrc.getJumpPos(); };
+
+	// minimal set of comparison operators
+	BOOL operator<(const MTCaltJmpNode <T> &aSrc) const
+		{ return getValue()<aSrc.getValue(); };
+
+	BOOL operator==(const MTCaltJmpNode <T> &aSrc) const
+		{ return getValue()==aSrc.getValue(); };
+};
+
+
+// class to create alternate jump file for a RAOF
+// WARNING -- DO NOT MAKE TWO CONCURRENT INSTANCES OF THE FOLLOWING TEMPLATE 
+// GLOBAL DATA IS USED BY THE STATIC DUMP METHOD
+// (dump must be static to work with the rbt.forEach() method)
+
+ofstream *altJmpFile=NULL;	// fix this some day...
+
+template <class T>
+class MTCcreateAltJmpRAOF {
+private:
+	MTCreadRAOF <T> readRAOF;
+	MTCaltJmpNode <T> tempJmpNode; 
+	MTCRBT <MTCaltJmpNode <T> > rbt;
+protected:
+public:
+	// constructor
+	MTCcreateAltJmpRAOF(const MTCstring &prefix)
+		: readRAOF(prefix)
+		{
+			MTCstring temp(prefix);
+			temp+=".alt";
+
+			if ((altJmpFile=new ofstream(temp.c_str()))==NULL) 
+			{
+				cerr << "could not open output file" << temp << endl;
+			}
+		};
+
+	MTCcreateAltJmpRAOF(const MTCstring &datName, 
+		const MTCstring &jmpName, const MTCstring &altName) 
+		: readRAOF(datName, jmpName)
+		{
+			if ((altJmpFile=new ofstream(altName.c_str()))==NULL) 
+			{
+				cerr << "could not open output file" << altName << endl;
+			}
+		};
+
+	// destructor
+	virtual ~MTCcreateAltJmpRAOF()
+		{ 
+			if (altJmpFile!=NULL)
+			{
+				delete altJmpFile;
+				altJmpFile=NULL;
+			}
+		}
+
+	// dump an jump index to .alt file
+
+	static void dump(MTCaltJmpNode <T> *anAltJmp)
+	{
+		if (altJmpFile!=NULL)
+		{
+			long count=anAltJmp->getJumpPos();
+
+			altJmpFile->write((void *)&count, sizeof(raofJumpTableType));
+		}
+	}
+
+	// doIt() -- usually called only once...
+
+	BOOL doIt()
+		{
+			for(long i=0; i<readRAOF.getCount(); i++)
+			{
+				tempJmpNode.setValue(*readRAOF.read(i));
+				tempJmpNode.setJumpPos(readRAOF.getPos());
+				rbt.add(tempJmpNode);
+			}
+
+			if (rbt.getCount()!=readRAOF.getCount())
+			{
+				char buffer[400];
+
+				sprintf(buffer, "I had read %d objects from the readRAOF, but I only had %d objects in the rbt.", readRAOF.getCount(), rbt.getCount()); 
+				errorMsg(EMT_WARNING, buffer, "MTCcreateAltJmpRAOF::doIt()");
+			}
+			
+			rbt.forEach(dump);
+		}
+
+};
+
+#endif __ROAFALT_H_
+@
+
+
+1.5
+log
+@fixed sizeof() for the raofJumpTableType to be unsigned int.
+this allows different machines to use the same .jmp and .alt files
+@
+text
+@d30 1
+a30 1
+ * $Id: raofalt.h,v 1.4 1996/01/20 17:20:02 markc Exp markc $
+d33 4
+d55 2
+@
+
+
+1.4
+log
+@updated to use rbt instead of bst
+@
+text
+@d30 1
+a30 1
+ * $Id: raofalt.h,v 1.3 1995/11/10 21:09:43 chapman Exp markc $
+d33 3
+d150 1
+a150 1
+			altJmpFile->write((void *)&count, sizeof(long));
+@
+
+
+1.3
+log
+@Added load() method for doIt() so that
+it can better handle partially sorted raof.
+@
+text
+@d30 1
+a30 1
+ * $Id: raofalt.h,v 1.2 1995/11/08 18:03:04 chapman Exp chapman $
+d33 4
+d94 1
+a94 1
+// (dump must be static to work with the bst.forEach() method)
+d103 1
+a103 1
+	MTCBST <MTCaltJmpNode <T> > bst;
+d139 1
+a139 1
+	// dump a string to stdout
+a150 18
+	// load the bst from raof in a nice order...
+
+	void load(long low, long high)
+	{
+		if (high<low)
+		{
+			return;
+		}
+
+		long middle=(low+high)/2;
+
+		tempJmpNode.setValue(*readRAOF.read(middle));
+		tempJmpNode.setJumpPos(readRAOF.getPos());
+		bst.add(tempJmpNode);
+
+		load(low, middle-1);
+		load(middle+1, high);
+	}
+d153 1
+a153 1
+	BOOL doIt(BOOL inorder=TRUE)
+d155 1
+a155 5
+			if (inorder==TRUE)
+			{
+				load(0, readRAOF.getCount()-1);
+			}
+			else
+d157 3
+a159 6
+				for(long i=0; i<readRAOF.getCount(); i++)
+				{
+					tempJmpNode.setValue(*readRAOF.read(i));
+					tempJmpNode.setJumpPos(readRAOF.getPos());
+					bst.add(tempJmpNode);
+				}
+d162 1
+a162 1
+			if (bst.getCount()!=readRAOF.getCount())
+d166 1
+a166 1
+				sprintf(buffer, "I had read %d objects from the readRAOF, but I only had %d objects in the bst.", readRAOF.getCount(), bst.getCount()); 
+d170 1
+a170 1
+			bst.forEach(dump);
+@
+
+
+1.2
+log
+@Now it works!
+@
+text
+@d30 1
+a30 1
+ * $Id: raofalt.h,v 1.1 1995/11/08 17:25:54 chapman Exp chapman $
+d33 3
+d90 1
+a90 1
+// (dump must be static to work with the bsd.forEach() method)
+d147 18
+d167 1
+a167 1
+	BOOL doIt()
+d169 5
+a173 1
+			for(long i=0; i<readRAOF.getCount(); i++)
+d175 6
+a180 3
+				tempJmpNode.setValue(*readRAOF.read(i));
+				tempJmpNode.setJumpPos(readRAOF.getPos());
+				bst.add(tempJmpNode);
+d183 8
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d30 5
+a34 1
+ * $Id$
+a35 1
+ * $Log$
+d47 2
+a48 2
+	MTCreadRAOF <T> * readRAOF;
+	long index;
+d53 1
+a53 1
+		: readRAOF(NULL), index(0) {};
+d57 1
+a57 1
+		: readRAOF(aSrc.readRAOF), index(aSrc.index) {};
+d60 2
+a61 2
+	MTCaltJmpNode(MTCreadRAOF <T> * aRAOF, long anIndex)
+		: readRAOF(aRAOF), index(anIndex) {};
+d64 2
+a65 2
+	void setReadRAOF(MTCreadRAOF <T> * anRAOF) { readRAOF=anRAOF; };
+	void setIndex(long aLong) { index=aLong; };
+d68 2
+a69 2
+	MTCreadRAOF <T> * getReadRAOF() { return readRAOF; };
+	long getIndex() const { return index; };
+d72 2
+a73 2
+	MTCaltJmpNode & operator=(MTCaltJmpNode <T> &aSrc)
+		{ readRAOF=aSrc.readRAOF; index=aSrc.index; }
+d76 5
+a80 7
+	BOOL operator<(MTCaltJmpNode <T> &aSrc)
+		{ return (getReadRAOF()->read(getIndex())<
+		(aSrc.getReadRAOF()->read(aSrc.getIndex()))); };
+
+	BOOL operator==(const MTCaltJmpNode <T> &aSrc)
+		{ return (getReadRAOF()->read(getIndex())==
+		(aSrc.getReadRAOF()->read(aSrc.getIndex()))); }; 
+d85 5
+d94 1
+a94 1
+	MTCreadRAOF <T> * readRAOF;
+d100 11
+a110 1
+	MTCcreateAltJmpRAOF(const MTCstring &prefix);
+d113 8
+a120 1
+		const MTCstring &jmpName, const MTCstring &altName); 
+d123 20
+a142 2
+	virtual ~MTCcreateAltJmpRAOF() 
+		{ if (readRAOF!=NULL) { delete readRAOF; readRAOF=NULL; } };
+d148 1
+a148 1
+			for(long i=0; i<readRAOF.getCount; i++)
+d150 2
+a151 3
+
+				tempJmpNode.setReadRAOF(readRAOF);
+				tempJmpNode.setIndex(i);
+d155 1
+a155 1
+			bsd.forEach();
+d157 1
+@

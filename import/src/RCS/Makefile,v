@@ -1,0 +1,370 @@
+head	1.10;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.10
+date	98.08.19.16.14.52;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	98.07.13.16.25.57;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	98.06.25.17.54.49;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	97.03.02.04.47.51;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.03.21.17.20.08;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.02.14.16.40.07;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.02.14.15.24.32;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.02.14.01.22.47;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.02.14.00.37.08;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.02.14.00.23.04;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@#
+# Makefile
+# Mark T. Chapman
+# 
+
+LIBTARGET=
+LIBOBJS=
+LIBDEPEND=$(LIBTARGET) ../../mtc++/lib/libmtc++.a
+
+CFLAGS+=$(DEBUG) -I../include -I../../mtc++/include 
+LFLAGS= -L../../mtc++/lib -L../lib 
+
+SRCS=impkimmo.cc impwbstr.cc impmsc.cc printint.cc
+CC=g++
+LEX=flex -f 
+
+.cc.o:
+	$(CC) $(CFLAGS) -c -o $@@ $<
+
+all: $(LIBTARGET) impkimmo impwbstr impmsc printint  
+
+install: all
+	cp impkimmo ../../bin
+	cp impwbstr ../../bin
+	cp impmsc ../../bin
+	cp printint ../../bin
+	strip ../../bin/impkimmo ../../bin/impwbstr ../../bin/impmsc ../../bin/printint
+
+depend:
+	makedepend -- $(CFLAGS) -- $(SRCS)
+
+clean:
+	rm -f *.o impkimmo impwbstr impmsc printint $(LIBTARGET) 
+	rm -f ../bin/impkimmo ../../bin/impkimmo
+	rm -f ../bin/impwbstr ../../bin/impwbstr
+	rm -f ../bin/impmsc ../../bin/impmsc
+	rm -f ../bin/printint ../../bin/printint
+
+impkimmo: impkimmo.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o impkimmo impkimmo.o -ll -lmtc++ $(LFLAGS)
+
+impkimmo.cc: impkimmo.l impmsc.cc  
+	rm -f lex.yy.c
+	$(LEX) impkimmo.l 
+	mv lex.yy.c impkimmo.cc
+
+impmsc: impmsc.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o impmsc impmsc.o -ll $(LFLAGS)
+
+impmsc.cc: impmsc.l impwbstr.cc  
+	rm -f lex.yy.c
+	$(LEX) impmsc.l 
+	mv lex.yy.c impmsc.cc
+	
+impwbstr: impwbstr.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o impwbstr impwbstr.o -ll $(LFLAGS)
+
+impwbstr.cc: impwbstr.l 
+	rm -f lex.yy.c
+	$(LEX) impwbstr.l 
+	mv lex.yy.c impwbstr.cc
+
+printint: printint.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o printint printint.o -ll $(LFLAGS)
+
+# DO NOT DELETE
+@
+
+
+1.9
+log
+@removed -I/usr/local/include
+@
+text
+@d27 1
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@d10 1
+a10 1
+CFLAGS+=$(DEBUG) -I../include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+d15 1
+a15 1
+LEX=lex -f 
+@
+
+
+1.7
+log
+@renamed impnum to printint
+@
+text
+@a9 1
+#DEBUG=-g
+d15 1
+a15 2
+LEX=flex -f -p  
+#LEX=lex -p  
+d33 3
+a35 3
+	rm -f impkimmo.cc ../bin/impkimmo ../../bin/impkimmo
+	rm -f impwbstr.cc ../bin/impwbstr ../../bin/impwbstr
+	rm -f impmsc.cc ../bin/impmsc ../../bin/impmsc
+@
+
+
+1.6
+log
+@changed program names
+@
+text
+@d14 1
+a14 1
+SRCS=impkimmo.cc impwbstr.cc impmsc.cc impnum.cc
+d22 1
+a22 1
+all: $(LIBTARGET) impkimmo impwbstr impmsc impnum  
+a24 1
+	cp impkimmo ../bin
+a25 1
+	cp impwbstr ../bin
+a26 1
+	cp impmsc ../bin
+d28 1
+a28 2
+	cp impnum ../bin
+	cp impnum ../../bin
+d34 1
+a34 1
+	rm -f *.o impkimmo impwbstr impmsc impnum $(LIBTARGET) 
+d38 1
+a38 1
+	rm -f ../bin/impnum ../../bin/impnum
+d64 2
+a65 2
+impnum: impnum.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o impnum impnum.o -ll $(LFLAGS)
+a67 31
+
+impkimmo.o: /usr/include/stdio.h /usr/include/sys/types.h
+impkimmo.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+impkimmo.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+impkimmo.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+impkimmo.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+impkimmo.o: ../../mtc++/include/MTC++.h /usr/include/g++/fstream.h
+impkimmo.o: /usr/include/string.h /usr/include/unistd.h
+impkimmo.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+impkimmo.o: /usr/include/runetype.h /usr/include/sys/stat.h
+impkimmo.o: /usr/include/sys/time.h /usr/include/sys/time.h
+impkimmo.o: ../../mtc++/include/errormsg.h ../../mtc++/include/mstring.h
+impkimmo.o: /usr/include/stdlib.h
+impwbstr.o: /usr/include/stdio.h /usr/include/sys/types.h
+impwbstr.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+impwbstr.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+impwbstr.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+impwbstr.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+impwbstr.o: /usr/include/stdlib.h
+impmsc.o: /usr/include/stdio.h /usr/include/sys/types.h
+impmsc.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+impmsc.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+impmsc.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+impmsc.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+impmsc.o: /usr/include/string.h /usr/include/ctype.h /usr/include/runetype.h
+impmsc.o: /usr/include/stdlib.h
+impnum.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+impnum.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+impnum.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+impnum.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+impnum.o: /usr/include/machine/types.h
+@
+
+
+1.5
+log
+@lex->flex
+@
+text
+@d14 1
+a14 1
+SRCS=kimmo.cc wbstr.cc impmsc.cc impnum.cc
+d22 1
+a22 1
+all: $(LIBTARGET) kimmo wbstr impmsc impnum  
+d25 4
+a28 4
+	cp kimmo ../bin
+	cp kimmo ../../bin
+	cp wbstr ../bin
+	cp wbstr ../../bin
+d38 3
+a40 3
+	rm -f *.o kimmo wbstr impmsc impnum $(LIBTARGET) 
+	rm -f kimmo.cc ../bin/kimmo ../../bin/kimmo
+	rm -f wbstr.cc ../bin/wbstr ../../bin/wbstr
+d44 2
+a45 2
+kimmo: kimmo.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o kimmo kimmo.o -ll -lmtc++ $(LFLAGS)
+d47 1
+a47 1
+kimmo.cc: kimmo.l impmsc.cc  
+d49 2
+a50 2
+	$(LEX) kimmo.l 
+	mv lex.yy.c kimmo.cc
+d55 1
+a55 1
+impmsc.cc: impmsc.l wbstr.cc  
+d60 2
+a61 2
+wbstr: wbstr.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o wbstr wbstr.o -ll $(LFLAGS)
+d63 1
+a63 1
+wbstr.cc: wbstr.l 
+d65 2
+a66 2
+	$(LEX) wbstr.l 
+	mv lex.yy.c wbstr.cc
+d73 18
+a90 16
+kimmo.o: /usr/include/stdio.h /usr/include/sys/types.h
+kimmo.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+kimmo.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+kimmo.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+kimmo.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+kimmo.o: ../../mtc++/include/MTC++.h /usr/include/g++/fstream.h
+kimmo.o: /usr/include/string.h /usr/include/unistd.h
+kimmo.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+kimmo.o: /usr/include/runetype.h /usr/include/sys/stat.h
+kimmo.o: /usr/include/sys/time.h /usr/include/sys/time.h
+kimmo.o: ../../mtc++/include/errormsg.h ../../mtc++/include/mstring.h
+kimmo.o: /usr/include/stdlib.h
+wbstr.o: /usr/include/stdio.h /usr/include/sys/types.h
+wbstr.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+wbstr.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+wbstr.o: /usr/include/stdlib.h
+d94 2
+@
+
+
+1.4
+log
+@initial
+@
+text
+@d16 1
+a16 1
+LEX=lex -f -p  
+@
+
+
+1.3
+log
+@CFLAGS
+@
+text
+@d8 1
+a8 1
+LIBDEPEND=$(LIBTARGET)
+d45 1
+a45 1
+	g++  $(CFLAGS) -o kimmo kimmo.o -ll $(LFLAGS)
+d76 8
+@
+
+
+1.2
+log
+@added impnum.cc
+@
+text
+@d11 1
+a11 1
+CFLAGS=$(DEBUG) -O4 -m486 -I../include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d14 1
+a14 1
+SRCS=kimmo.cc wbstr.cc impmsc.cc
+d22 1
+a22 1
+all: $(LIBTARGET) kimmo wbstr impmsc  
+d31 2
+d38 1
+a38 1
+	rm -f *.o kimmo wbstr impmsc $(LIBTARGET) 
+d42 1
+d68 3
+d86 5
+@

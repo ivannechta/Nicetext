@@ -1,0 +1,760 @@
+head	1.16;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.16
+date	98.08.19.16.14.36;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	98.06.27.16.48.47;	author markc;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	98.06.22.18.16.01;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	98.03.13.03.56.21;	author root;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	98.03.13.03.47.17;	author root;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.03.21.17.17.26;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.02.14.01.08.13;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.02.14.00.42.05;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.02.07.03.11.23;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.20.17.40.21;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.20.17.30.34;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.15.13.04.44;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.13.15.13.56;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.12.23.48.19;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.10.20.41.59;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.09.19.22.07;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@#
+# Makefile
+# Mark T. Chapman
+# 
+
+LIBTARGET=../lib/libbabb.a
+LIBOBJS= bits2txt.o txt2bits.o bitstrm.o bitinput.o bitoutput.o grammar.o rule.o lexgram.o yaccgram.o
+LIBDEPEND=../../gendict/lib/libgndct.a ../../mtc++/lib/libmtc++.a $(LIBTARGET) 
+
+CFLAGS+=$(CDEBUG) -I../include -I../../gendict/include -I../../mtc++/include 
+LFLAGS= -L../lib -L../../mtc++/lib -L../../gendict/lib -lbabb -lgndct -lmtc++ 
+
+SRCS=bits2txt.cc txt2bits.cc nicetext.cc scramble.cc expgram.cc gramtest.cc bitcp.cc bitstrm.cc bitinput.cc bitoutput.cc grammar.cc rule.cc lexgram.cc yaccgram.cc
+CC=g++
+#LEX=lex
+YACC=yacc -d 
+
+.cc.o:
+	$(CC) $(CFLAGS) -c -o $@@ $<
+
+all: $(LIBTARGET) nicetext scramble expgram gramtest bitcp
+
+depend:
+	makedepend -- $(CFLAGS) -- $(SRCS)
+
+clean:
+	rm -f *.o *.core $(LIBTARGET) nicetext scramble expgram gramtest bitcp 
+	rm -f y.output 
+	rm -f ../../bin/nicetext ../../bin/scramble ../../bin/expgram ../../bin/gramtest ../../bin/bitcp
+	rm -f ../bin/nicetext ../bin/scramble ../bin/expgram ../bin/gramtest ../bin/bitcp
+
+install: all
+	cp nicetext ../../bin
+	cp scramble ../../bin
+	cp gramtest ../../bin
+	cp expgram ../../bin
+	cp bitcp ../../bin
+	strip ../../bin/nicetext ../../bin/scramble ../../bin/gramtest ../../bin/expgram ../../bin/bitcp
+
+$(LIBTARGET): $(LIBOBJS)
+	ar -rc $(LIBTARGET) $(LIBOBJS)
+	ranlib $(LIBTARGET)
+
+nicetext: nicetext.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o nicetext nicetext.o $(LFLAGS) 
+
+scramble: scramble.o txt2bits.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o scramble scramble.o txt2bits.o -lgndct $(LFLAGS) 
+
+bitcp: bitcp.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o bitcp bitcp.o $(LFLAGS) 
+
+gramtest: gramtest.o $(LIBDEPEND)
+	g++ $(CFLAGS) -o gramtest gramtest.o $(LFLAGS)
+
+expgram: expgram.o $(LIBDEPEND)
+	g++ $(CFLAGS) -o expgram expgram.o $(LFLAGS)
+
+lexgram.cc: yaccgram.cc lexgram.l 
+	rm -f lex.yy.c
+	$(LEX) lexgram.l 
+	mv lex.yy.c lexgram.cc
+
+y.tab.h: yaccgram.cc
+
+yaccgram.cc: yaccgram.y
+	rm -f y.tab.c y.tab.h
+	$(YACC) yaccgram.y
+	mv y.tab.c yaccgram.cc
+
+# Manual dependancies -- used for parallel make before makedepend...
+grammar.o: y.tab.h
+
+# makedepend from here on down...
+
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d38 1
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@d15 2
+a16 2
+LEX=lex
+YACC=yacc 
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@a9 6
+ifdef DEBUG
+CDEBUG=-g -DDEBUG_YACC_VERBOSE
+YDEBUG= -l 
+LDEBUG= -L -d 
+endif
+
+d15 2
+a16 2
+LEX=flex -f -p $(LDEBUG)  
+YACC=yacc -d -v $(YDEBUG) 
+@
+
+
+1.12
+log
+@*** empty log message ***
+@
+text
+@d34 1
+a34 1
+	rm -f y.output y.tab.h
+@
+
+
+1.11
+log
+@added bitcp
+@
+text
+@d16 1
+a16 1
+CFLAGS+=$(CDEBUG) -I../include -I../../gendict/include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+d33 1
+a33 1
+	rm -f *.o *.core $(LIBTARGET) nicetext scramble expgram gramtest bitcp lexgram.cc yaccgram.cc
+a79 1
+# DO NOT DELETE
+a80 209
+bits2txt.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bits2txt.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bits2txt.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bits2txt.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bits2txt.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bits2txt.o: /usr/include/stdio.h /usr/include/stdlib.h
+bits2txt.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+bits2txt.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+bits2txt.o: /usr/include/ctype.h /usr/include/runetype.h
+bits2txt.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+bits2txt.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+bits2txt.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+bits2txt.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+bits2txt.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+bits2txt.o: ../../gendict/include/dictarec.h ../../gendict/include/typerec.h
+bits2txt.o: ../../gendict/include/typearec.h ../../gendict/include/sentnode.h
+bits2txt.o: ../../gendict/include/sentmdl.h ../../gendict/include/dconst.h
+bits2txt.o: ../include/bitstrm.h ../include/bitinput.h ../include/rule.h
+bits2txt.o: ../include/grammar.h ../include/bits2txt.h
+txt2bits.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+txt2bits.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+txt2bits.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+txt2bits.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+txt2bits.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+txt2bits.o: /usr/include/stdio.h /usr/include/stdlib.h
+txt2bits.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+txt2bits.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+txt2bits.o: /usr/include/ctype.h /usr/include/runetype.h
+txt2bits.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+txt2bits.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+txt2bits.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+txt2bits.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+txt2bits.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+txt2bits.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+txt2bits.o: ../../gendict/include/lexword.h ../../gendict/include/dconst.h
+txt2bits.o: ../include/bitstrm.h ../include/bitoutput.h ../include/txt2bits.h
+nicetext.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+nicetext.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+nicetext.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+nicetext.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+nicetext.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+nicetext.o: /usr/include/stdio.h /usr/include/stdlib.h
+nicetext.o: /usr/include/sys/time.h /usr/include/sys/time.h
+nicetext.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+nicetext.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+nicetext.o: /usr/include/ctype.h /usr/include/runetype.h
+nicetext.o: /usr/include/sys/stat.h ../../mtc++/include/mstring.h
+nicetext.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+nicetext.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+nicetext.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+nicetext.o: ../../gendict/include/dictarec.h ../../gendict/include/typerec.h
+nicetext.o: ../../gendict/include/typearec.h ../../gendict/include/sentnode.h
+nicetext.o: ../../gendict/include/sentmdl.h ../../gendict/include/dconst.h
+nicetext.o: ../include/bitstrm.h ../include/bitinput.h ../include/rule.h
+nicetext.o: ../include/grammar.h ../include/bits2txt.h
+scramble.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+scramble.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+scramble.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+scramble.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+scramble.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+scramble.o: /usr/include/stdio.h /usr/include/stdlib.h
+scramble.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+scramble.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+scramble.o: /usr/include/ctype.h /usr/include/runetype.h
+scramble.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+scramble.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+scramble.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+scramble.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+scramble.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+scramble.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+scramble.o: ../../gendict/include/lexword.h ../include/bitstrm.h
+scramble.o: ../include/bitoutput.h ../include/txt2bits.h
+expgram.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+expgram.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+expgram.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+expgram.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+expgram.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+expgram.o: /usr/include/stdio.h /usr/include/stdlib.h
+expgram.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+expgram.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+expgram.o: /usr/include/ctype.h /usr/include/runetype.h
+expgram.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+expgram.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+expgram.o: ../../mtc++/include/errormsg.h ../../mtc++/include/rbt.h
+expgram.o: ../../mtc++/include/raof.h ../../gendict/include/dconst.h
+expgram.o: ../../gendict/include/typerec.h
+gramtest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+gramtest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+gramtest.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+gramtest.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+gramtest.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+gramtest.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+gramtest.o: /usr/include/string.h /usr/include/unistd.h
+gramtest.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+gramtest.o: /usr/include/runetype.h /usr/include/sys/stat.h
+gramtest.o: /usr/include/sys/time.h /usr/include/sys/time.h
+gramtest.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+gramtest.o: ../../mtc++/include/list.h ../../mtc++/include/bst.h
+gramtest.o: ../../gendict/include/sentnode.h ../../gendict/include/sentmdl.h
+gramtest.o: ../../gendict/include/typerec.h ../include/rule.h
+gramtest.o: ../include/grammar.h
+bitcp.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bitcp.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bitcp.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bitcp.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bitcp.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bitcp.o: /usr/include/stdio.h /usr/include/stdlib.h /usr/include/g++/String.h
+bitcp.o: /usr/include/g++/Regex.h ../../mtc++/include/MTC++.h
+bitcp.o: /usr/include/string.h /usr/include/unistd.h
+bitcp.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+bitcp.o: /usr/include/runetype.h /usr/include/sys/stat.h
+bitcp.o: /usr/include/sys/time.h /usr/include/sys/time.h
+bitcp.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+bitcp.o: ../../mtc++/include/bst.h ../../mtc++/include/list.h
+bitcp.o: ../../mtc++/include/raof.h ../include/bitstrm.h
+bitcp.o: ../include/bitinput.h ../include/bitoutput.h
+bitstrm.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bitstrm.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bitstrm.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bitstrm.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bitstrm.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bitstrm.o: /usr/include/stdio.h /usr/include/stdlib.h /usr/include/sys/stat.h
+bitstrm.o: /usr/include/sys/time.h /usr/include/sys/time.h
+bitstrm.o: /usr/include/sys/errno.h ../../mtc++/include/MTC++.h
+bitstrm.o: /usr/include/string.h /usr/include/unistd.h
+bitstrm.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+bitstrm.o: /usr/include/runetype.h ../../mtc++/include/mstring.h
+bitstrm.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+bitstrm.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+bitstrm.o: ../include/bitstrm.h
+bitinput.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bitinput.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bitinput.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bitinput.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bitinput.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bitinput.o: /usr/include/stdio.h /usr/include/stdlib.h
+bitinput.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+bitinput.o: /usr/include/sys/time.h /usr/include/sys/errno.h
+bitinput.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+bitinput.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+bitinput.o: /usr/include/ctype.h /usr/include/runetype.h
+bitinput.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+bitinput.o: ../../mtc++/include/bst.h ../../mtc++/include/list.h
+bitinput.o: ../../mtc++/include/raof.h ../include/bitstrm.h
+bitinput.o: ../include/bitinput.h
+bitoutput.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bitoutput.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bitoutput.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bitoutput.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bitoutput.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bitoutput.o: /usr/include/stdio.h /usr/include/stdlib.h
+bitoutput.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+bitoutput.o: /usr/include/sys/time.h /usr/include/sys/errno.h
+bitoutput.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+bitoutput.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+bitoutput.o: /usr/include/ctype.h /usr/include/runetype.h
+bitoutput.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+bitoutput.o: ../../mtc++/include/bst.h ../../mtc++/include/list.h
+bitoutput.o: ../../mtc++/include/raof.h ../include/bitstrm.h
+bitoutput.o: ../include/bitoutput.h
+grammar.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+grammar.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+grammar.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+grammar.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+grammar.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+grammar.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+grammar.o: /usr/include/string.h /usr/include/unistd.h
+grammar.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+grammar.o: /usr/include/runetype.h /usr/include/sys/stat.h
+grammar.o: /usr/include/sys/time.h /usr/include/sys/time.h
+grammar.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+grammar.o: ../../mtc++/include/list.h ../../mtc++/include/bst.h
+grammar.o: ../../mtc++/include/raof.h ../../mtc++/include/raof2bst.h
+grammar.o: ../../gendict/include/sentnode.h ../../gendict/include/sentmdl.h
+grammar.o: ../../gendict/include/typerec.h ../include/rule.h
+grammar.o: ../include/grammar.h y.tab.h
+rule.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+rule.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+rule.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+rule.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+rule.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+rule.o: /usr/include/stdlib.h ../../mtc++/include/MTC++.h
+rule.o: /usr/include/stdio.h /usr/include/string.h /usr/include/unistd.h
+rule.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+rule.o: /usr/include/runetype.h /usr/include/sys/stat.h
+rule.o: /usr/include/sys/time.h /usr/include/sys/time.h
+rule.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+rule.o: ../../mtc++/include/list.h ../../gendict/include/sentnode.h
+rule.o: ../../gendict/include/sentmdl.h ../include/rule.h
+lexgram.o: /usr/include/stdio.h /usr/include/sys/types.h
+lexgram.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+lexgram.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+lexgram.o: /usr/include/string.h y.tab.h /usr/include/stdlib.h
+yaccgram.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+yaccgram.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+yaccgram.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+yaccgram.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+yaccgram.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+yaccgram.o: /usr/include/stdio.h /usr/include/stdlib.h
+yaccgram.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+yaccgram.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+yaccgram.o: /usr/include/ctype.h /usr/include/runetype.h
+yaccgram.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+yaccgram.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+yaccgram.o: ../../mtc++/include/errormsg.h ../../mtc++/include/list.h
+yaccgram.o: ../../mtc++/include/bst.h ../../mtc++/include/raof.h
+yaccgram.o: ../../mtc++/include/raof2bst.h ../../gendict/include/sentnode.h
+yaccgram.o: ../../gendict/include/sentmdl.h ../../gendict/include/typerec.h
+yaccgram.o: ../include/rule.h ../include/grammar.h
+@
+
+
+1.10
+log
+@added y.tab.h to clean and parallel targets
+@
+text
+@d19 1
+a19 1
+SRCS=bits2txt.cc txt2bits.cc babble.cc unbabble.cc expgram.cc gramtest.cc bitest.cc bitstrm.cc bitinput.cc bitoutput.cc grammar.cc rule.cc lexgram.cc yaccgram.cc
+d27 1
+a27 1
+all: $(LIBTARGET) babble unbabble expgram gramtest bitest
+d33 1
+a33 1
+	rm -f *.o *.core $(LIBTARGET) babble unbabble expgram gramtest bitest lexgram.cc yaccgram.cc
+d35 2
+a36 2
+	rm -f ../../bin/babble ../../bin/unbabble ../../bin/expgram ../../bin/gramtest ../../bin/bitest
+	rm -f ../bin/babble ../bin/unbabble ../bin/expgram ../bin/gramtest ../bin/bitest
+d39 2
+a40 2
+	cp babble ../../bin
+	cp unbabble ../../bin
+d43 1
+a43 1
+	cp bitest ../../bin
+d49 2
+a50 2
+babble: babble.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o babble babble.o $(LFLAGS) 
+d52 2
+a53 2
+unbabble: unbabble.o txt2bits.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o unbabble unbabble.o txt2bits.o -lgndct $(LFLAGS) 
+d55 2
+a56 2
+bitest: bitest.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o bitest bitest.o $(LFLAGS) 
+d118 36
+a153 36
+babble.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+babble.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+babble.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+babble.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+babble.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+babble.o: /usr/include/stdio.h /usr/include/stdlib.h /usr/include/sys/time.h
+babble.o: /usr/include/sys/time.h ../../mtc++/include/MTC++.h
+babble.o: /usr/include/string.h /usr/include/unistd.h
+babble.o: /usr/include/sys/unistd.h /usr/include/ctype.h
+babble.o: /usr/include/runetype.h /usr/include/sys/stat.h
+babble.o: ../../mtc++/include/mstring.h ../../mtc++/include/errormsg.h
+babble.o: ../../mtc++/include/bst.h ../../mtc++/include/list.h
+babble.o: ../../mtc++/include/raof.h ../../mtc++/include/raof2bst.h
+babble.o: ../../gendict/include/dictrec.h ../../gendict/include/dictarec.h
+babble.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+babble.o: ../../gendict/include/sentnode.h ../../gendict/include/sentmdl.h
+babble.o: ../../gendict/include/dconst.h ../include/bitstrm.h
+babble.o: ../include/bitinput.h ../include/rule.h ../include/grammar.h
+babble.o: ../include/bits2txt.h
+unbabble.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+unbabble.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+unbabble.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+unbabble.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+unbabble.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+unbabble.o: /usr/include/stdio.h /usr/include/stdlib.h
+unbabble.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+unbabble.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+unbabble.o: /usr/include/ctype.h /usr/include/runetype.h
+unbabble.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+unbabble.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+unbabble.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+unbabble.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+unbabble.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+unbabble.o: ../../gendict/include/typerec.h ../../gendict/include/typearec.h
+unbabble.o: ../../gendict/include/lexword.h ../include/bitstrm.h
+unbabble.o: ../include/bitoutput.h ../include/txt2bits.h
+d183 15
+a197 15
+bitest.o: /usr/include/g++/iostream.h /usr/include/g++/streambuf.h
+bitest.o: /usr/include/g++/libio.h /usr/include/g++/_G_config.h
+bitest.o: /usr/include/sys/types.h /usr/include/sys/cdefs.h
+bitest.o: /usr/include/machine/endian.h /usr/include/machine/ansi.h
+bitest.o: /usr/include/machine/types.h /usr/include/g++/fstream.h
+bitest.o: /usr/include/stdio.h /usr/include/stdlib.h
+bitest.o: /usr/include/g++/String.h /usr/include/g++/Regex.h
+bitest.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+bitest.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+bitest.o: /usr/include/ctype.h /usr/include/runetype.h
+bitest.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+bitest.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+bitest.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+bitest.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+bitest.o: ../include/bitstrm.h ../include/bitinput.h ../include/bitoutput.h
+d271 4
+@
+
+
+1.9
+log
+@added y.tab.h and y.output to clean target
+@
+text
+@d76 4
+d123 14
+a136 14
+babble.o: /usr/include/stdio.h /usr/include/stdlib.h
+babble.o: ../../mtc++/include/MTC++.h /usr/include/string.h
+babble.o: /usr/include/unistd.h /usr/include/sys/unistd.h
+babble.o: /usr/include/ctype.h /usr/include/runetype.h
+babble.o: /usr/include/sys/stat.h /usr/include/sys/time.h
+babble.o: /usr/include/sys/time.h ../../mtc++/include/mstring.h
+babble.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+babble.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+babble.o: ../../mtc++/include/raof2bst.h ../../gendict/include/dictrec.h
+babble.o: ../../gendict/include/dictarec.h ../../gendict/include/typerec.h
+babble.o: ../../gendict/include/typearec.h ../../gendict/include/sentnode.h
+babble.o: ../../gendict/include/sentmdl.h ../../gendict/include/dconst.h
+babble.o: ../include/bitstrm.h ../include/bitinput.h ../include/rule.h
+babble.o: ../include/grammar.h ../include/bits2txt.h
+d165 2
+a166 2
+expgram.o: ../../mtc++/include/errormsg.h ../../mtc++/include/bst.h
+expgram.o: ../../mtc++/include/list.h ../../mtc++/include/raof.h
+a270 4
+lexgram.o: /usr/include/stdio.h /usr/include/sys/types.h
+lexgram.o: /usr/include/sys/cdefs.h /usr/include/machine/endian.h
+lexgram.o: /usr/include/machine/ansi.h /usr/include/machine/types.h
+lexgram.o: /usr/include/string.h y.tab.h /usr/include/stdlib.h
+@
+
+
+1.8
+log
+@added expgram
+@
+text
+@d34 1
+@
+
+
+1.7
+log
+@back to 1.5
+@
+text
+@d19 1
+a19 1
+SRCS=bits2txt.cc txt2bits.cc babble.cc unbabble.cc gramtest.cc bitest.cc bitstrm.cc bitinput.cc bitoutput.cc grammar.cc rule.cc lexgram.cc yaccgram.cc
+d27 1
+a27 1
+all: $(LIBTARGET) babble unbabble gramtest bitest
+d33 3
+a35 3
+	rm -f *.o *.core $(LIBTARGET) babble unbabble gramtest bitest lexgram.cc yaccgram.cc
+	rm -f ../../bin/babble ../../bin/unbabble ../../bin/gramtest ../../bin/bitest
+	rm -f ../bin/babble ../bin/unbabble ../bin/gramtest ../bin/bitest
+d41 1
+d60 3
+d92 4
+a95 4
+bits2txt.o: ../../gendict/include/typearec.h ../../gendict/include/sentmdl.h
+bits2txt.o: ../../gendict/include/dconst.h ../include/bitstrm.h
+bits2txt.o: ../include/bitinput.h ../include/rule.h ../include/grammar.h
+bits2txt.o: ../include/bits2txt.h
+d110 3
+a112 3
+txt2bits.o: ../../gendict/include/dictarec.h ../../gendict/include/typerec.h
+txt2bits.o: ../../gendict/include/sentmdl.h ../../gendict/include/dconst.h
+txt2bits.o: ../include/bitstrm.h ../include/bitinput.h
+d128 4
+a131 4
+babble.o: ../../gendict/include/typearec.h ../../gendict/include/sentmdl.h
+babble.o: ../../gendict/include/dconst.h ../include/bitstrm.h
+babble.o: ../include/bitinput.h ../include/rule.h ../include/grammar.h
+babble.o: ../include/bits2txt.h
+d148 15
+a162 1
+unbabble.o: ../include/bitoutput.h
+d175 3
+a177 2
+gramtest.o: ../../gendict/include/sentmdl.h ../../gendict/include/typerec.h
+gramtest.o: ../include/rule.h ../include/grammar.h
+d250 3
+a252 2
+grammar.o: ../../gendict/include/sentmdl.h ../../gendict/include/typerec.h
+grammar.o: ../include/rule.h ../include/grammar.h y.tab.h
+d264 2
+a265 2
+rule.o: ../../mtc++/include/list.h ../../gendict/include/sentmdl.h
+rule.o: ../include/rule.h
+d283 3
+a285 3
+yaccgram.o: ../../mtc++/include/raof2bst.h ../../gendict/include/sentmdl.h
+yaccgram.o: ../../gendict/include/typerec.h ../include/rule.h
+yaccgram.o: ../include/grammar.h
+@
+
+
+1.6
+log
+@added -O -pipe
+@
+text
+@d16 1
+a16 1
+CFLAGS+=$(CDEBUG) -O -pipe -I../include -I../../gendict/include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+@
+
+
+1.5
+log
+@gmake
+@
+text
+@d16 1
+a16 1
+CFLAGS+=$(CDEBUG) -I../include -I../../gendict/include -I../../mtc++/include -I/usr/include -I/usr/include/g++ 
+@
+
+
+1.4
+log
+@txt2bits.o now working, unbabble takes parameters like babble
+@
+text
+@d10 1
+a10 1
+.ifdef DEBUG
+d14 1
+a14 1
+.endif
+d21 1
+a21 1
+LEX=lex -f -p $(LDEBUG)  
+@
+
+
+1.3
+log
+@dynamic grammars work system wide -- next step, constant expressions
+@
+text
+@d50 2
+a51 2
+unbabble: unbabble.o $(LIBDEPEND)
+	g++  $(CFLAGS) -o unbabble unbabble.o -lgndct $(LFLAGS) 
+@
+
+
+1.2
+log
+@correctly parses and sets up grammar rules -- does not yet makeModel()
+@
+text
+@d7 1
+a7 1
+LIBOBJS= bitstrm.o bitinput.o bitoutput.o grammar.o rule.o lexgram.o yaccgram.o
+d19 1
+a19 1
+SRCS=babble.cc unbabble.cc gramtest.cc bitest.cc bitstrm.cc bitinput.cc bitoutput.cc grammar.cc rule.cc lexgram.cc yaccgram.cc
+d51 1
+a51 1
+	g++  $(CFLAGS) -o unbabble unbabble.o $(LFLAGS) 
+d73 36
+d124 4
+a127 2
+babble.o: ../../gendict/include/sentmdl.h ../../gendict/include/dconst.h
+babble.o: ../include/bitstrm.h ../include/bitinput.h
+d156 3
+a158 3
+gramtest.o: ../../mtc++/include/list.h ../include/rule.h
+gramtest.o: ../../mtc++/include/bst.h ../../gendict/include/sentmdl.h
+gramtest.o: ../include/grammar.h
+d229 4
+a232 3
+grammar.o: ../../mtc++/include/list.h ../include/rule.h
+grammar.o: ../../mtc++/include/bst.h ../../gendict/include/sentmdl.h
+grammar.o: ../include/grammar.h y.tab.h
+d238 4
+a241 3
+rule.o: ../../mtc++/include/MTC++.h /usr/include/stdio.h
+rule.o: /usr/include/string.h /usr/include/unistd.h /usr/include/sys/unistd.h
+rule.o: /usr/include/ctype.h /usr/include/runetype.h /usr/include/sys/stat.h
+d244 2
+a245 1
+rule.o: ../../mtc++/include/list.h ../include/rule.h
+d262 4
+a265 2
+yaccgram.o: ../include/rule.h ../../mtc++/include/bst.h
+yaccgram.o: ../../gendict/include/sentmdl.h ../include/grammar.h
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 3
+a13 1
+CDEBUG=-g -DDEBUG_LEX_VERBOSE -DDEBUG_YACC_VERBOSE
+d21 2
+a22 2
+LEX=lex -f -p  
+YACC=yacc -d -v 
+d34 2
+d63 2
+@

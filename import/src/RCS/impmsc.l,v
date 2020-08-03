@@ -1,0 +1,149 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	97.03.05.17.53.41;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.03.21.17.20.31;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.02.14.00.19.26;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.3
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@%{
+/*
+ * Import from a misc file type (see below) 
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ **************************************
+ * Example Format:
+ * "word"             POS
+ * "dog" 		N
+ * "run"		V
+ **************************************
+ *
+ * $Id: impmsc.l,v 1.2 1996/03/21 17:20:31 markc Exp markc $
+ *
+ * $Log: impmsc.l,v $
+ * Revision 1.2  1996/03/21 17:20:31  markc
+ * modified program names and messages (minor)
+ *
+ * Revision 1.1  1996/02/14 00:19:26  markc
+ * Initial revision
+ *
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id$";
+
+#include <iostream.h>
+#include <string.h>
+#include <ctype.h>
+
+#define IMPMSC_WORD 	1	
+#define IMPMSC_TYPE	2
+#define MAX_WORDLENGTH	511
+
+void toLower(char *);
+
+%}
+%%
+^\".*\"		return IMPMSC_WORD; 
+" "[A-Z]+$	return IMPMSC_TYPE;
+.|\n		;
+%%
+
+main()
+{
+	cerr << "reading msc format from stdin, writing dct format to stdout..." << endl;
+
+	int retval;
+	int x;
+	char buffer[MAX_WORDLENGTH+1];
+
+	buffer[MAX_WORDLENGTH]='\0';
+
+	for(;;) 
+	{
+		retval=yylex();
+
+		if (yytext[0]=='\0')
+			break;
+
+		switch (retval)
+		{
+			case IMPMSC_WORD:
+						strncpy(buffer, yytext, MAX_WORDLENGTH);
+						if ((x=strlen(buffer))>1)
+						{
+							buffer[x-1]='\0';
+						}
+
+						toLower(buffer);
+
+						break;
+			case IMPMSC_TYPE:
+						fprintf(yyout, "%s %s\n", yytext, &buffer[1]);
+						break;
+		}
+	}
+}
+
+void toLower(char *aCharPtr)
+{
+	for(int i=0; i< strlen(aCharPtr); i++)
+		aCharPtr[i]=tolower(aCharPtr[i]);
+}
+@
+
+
+1.2
+log
+@modified program names and messages (minor)
+@
+text
+@d13 1
+a13 1
+ * $Id: impmsc.l,v 1.1 1996/02/14 00:19:26 markc Exp markc $
+d16 3
+d24 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+a7 1
+ * Example:
+d13 5
+a17 1
+ * $Id$
+a18 1
+ * $Log$
+d22 1
+d41 2
+@

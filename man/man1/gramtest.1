@@ -1,0 +1,64 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" gramtest.1 by Mark T. Chapman
+.\"
+.TH GRAMTEST 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+gramtest
+.SH SYNOPSIS
+.B gramtest 
+.RB [\-c\ sampleCount]
+.RB [\-d\ dictionary] 
+.RB [\-g\ grammar]
+.SH DESCRIPTION
+The 
+.I gramtest
+program tests the syntax of  
+.I grammars
+in the
+.B NICETEXT
+system.
+It also can generate sample sentence models from the grammar definition. 
+
+The purpose of the tool is to assist in writing grammar style-sources. 
+.SH "OPTIONS"
+.TP
+.BI \-c\ sampleCount
+Generate
+.I sampleCount
+example sentence models from the grammar.  These are sent to stdout.
+.TP
+.BI \-d\ dictionary
+The prefix for the input dictionary database.  The default is mstr.
+The only information loaded from the dictionary is the type-table. 
+The purpose is to check the terminals in the grammar to make sure they
+are either valid types in the dictionary or punctuation.
+.TP
+.BI \-g\ grammar
+The file name of the grammar definition file.  The default is 
+.I grammar.def.
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "DIAGNOSTICS"
+.I gramtest
+returns a non-zero value if it detects any errors.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).

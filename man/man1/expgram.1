@@ -1,0 +1,92 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" expgram.1 by Mark T. Chapman
+.\"
+.TH EXPGRAM 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+expgram
+.SH SYNOPSIS
+.B expgram 
+.RB [\-d\ dictionary] 
+.RB [\-o\ outputFile]
+.RB [\-s\ sampleFile]
+.RB [\-n\]
+
+.SH DESCRIPTION
+
+.I expgram
+automatically creates "merged-type" grammar rules from a dictionary
+in the
+.B NICETEXT
+system.
+The rules are in the format of a grammar-definition file  and may be 
+appended to existing grammar definition files. 
+The purpose of the tool is to help with grammar definition file creation.
+It does not apply to the
+.B genmodel
+approach to creating custom style sources.
+
+Each word in the dictionary is categorized into unique types.  These types
+are sometimes a concatenation of multiple type categories.  For example "bill" may be both a male_name and an object.  Since "bill" can only appear once
+in the dictionary, 
+.B sortdct
+automatically creates a new type called "male_name,object".   
+
+A grammar definition style source could specify a "male_name,object", but
+is sometimes would be nice to have a rule that says "all types that
+have male_name as a subtype".  The 
+.I expgram
+program creates such "merged-type" rules in the format of "mMALE_NAME" and "mOBJECT".  The "mMALE_NAME" rule would be rewritten as "male_name | male_name,object | male_name,female_name", etc.  The "mOBJECT" rules may have a RHS of "object | male_name,object | female_name,object", etc.  
+The weight of each RHS of the rules corresponds to the number of words of each sub-type in the dictionary. 
+.SH "OPTIONS"
+.TP
+.BI \-d\ dictionary
+The prefix for the input dictionary database.  The default is mstr.
+.TP
+.BI \-o\ outputFile
+The destination for the generated rules.  The default is stdout.
+.TP
+.BI \-s\ sampleFile
+Create another set of rules that will generate examples of each type of
+word via. the 
+.I nicetext  
+program.  Note that this set of rules may generate text that is not invertable by 
+.I scramble
+since it uses "quoted" rules.
+.TP
+.BI -n
+"Normalize" the weights of each RHS of the merged types.  For example, if there are 16 male_names,objects then the default weight in both mMALE_NAMES and mOBJECTS would be 16.  The 
+.B -n
+option tells 
+.I expgram
+to divide the weight by the number of sub-types in each RHS.   In this case,
+male_names,objects would have a weight of 16/2 = 8 in each of mMALE_NAMES and mOBJECTS.  
+
+The purpose is to help match the probability distribution of merged types
+better.  (Otherwise, a merged type with 100 sub-components would incorrectly 
+very roughly have 100 times the chance of appearing than it should.) 
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "DIAGNOSTICS"
+.I expgram
+returns a non-zero value if it detects any errors.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).

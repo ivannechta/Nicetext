@@ -1,0 +1,132 @@
+
+
+
+SORTDCT(1L)					      SORTDCT(1L)
+
+
+NNAAMMEE
+       sortdct
+
+SSYYNNOOPPSSIISS
+       ssoorrttddcctt [-e errorLevel] [-q] [-r] [-u updateFreq] [-x]
+
+DDEESSCCRRIIPPTTIIOONN
+       _s_o_r_t_d_c_t	converts  type-word  lists  into a sorted merged-
+       type-word   lists   suitable   for   processing	 by   the
+       ddcctt22mmssttrr((11LL))  program in the NNIICCEETTEEXXTT system.  The purpose
+       is to help create new  dictionaries  for  use  with  _n_i_c_e_-
+       _t_e_x_t_(_1_L_) and _s_c_r_a_m_b_l_e_(_1_L_)
+
+       A  type-word list is simply a text file where there is one
+       record per line.  The word follows the type definition  of
+       the  word on each line.	_s_o_r_t_d_c_t makes sure that each word
+       only occurs once on the output.	If a word is defined mul-
+       tiple  times  in the type-word list then _s_o_r_t_d_c_t creates a
+       new "merged-type" category for  that  word.   The  way  to
+       merge types is to simply concatenate the list of types for
+       a word in alphabetical order separated by  a  comma.   For
+       example,  if  the word "bill" is both a "male_name" and an
+       "object",    then    the    merged    type    would     be
+       "male_name,object".
+
+       It  reads input from stdin and sends the output to stdout.
+
+OOPPTTIIOONNSS
+       --ee eerrrroorrLLeevveell
+	      Print error messages up to _e_r_r_o_r_l_e_v_e_l_.  The default
+	      of  1  is  probably  best on a scale of 0 to 9.  (0
+	      disables errors reporting.) The messages relate  to
+	      words  that cannot be parsed by the scanner used in
+	      both ssccrraammbbllee and lliissttwwoorrdd..
+
+       --qq     Be quiet.  Do NOT print status updates  or  errors.
+	      This is the same as --uu 00 --ee 00..
+
+       --rr     Rerun  option: input should be the output of a pre-
+	      vious run.  The difference is that  the  commas  as
+	      interpreted  as  merged  types  in  the input file.
+	      Otherwise, it ignores the entries  with  commas  in
+	      the type.
+
+       --uu uuppddaatteeFFrreeqq
+	      Print  a	count  of  the number of input lines pro-
+	      cessed to stderr every _u_p_d_a_t_e_F_r_e_q lines.
+
+       --xx     Expand the dictionary by adding suffixes	to  every
+	      word  and type such as "s", "ing", "ly", etc.  This
+	      was an experiment used early in the development  of
+	      the  NNIICCEETTEEXXTT system for English. It has since been
+	      replaced with the "import" concept of _i_m_p_k_i_m_m_o_(_1_L_)_,
+	      _i_m_p_w_b_s_t_r_(_1_L_)_, etc.
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+SORTDCT(1L)					      SORTDCT(1L)
+
+
+EEXXAAMMPPLLEESS
+       It  is strongly suggested that you try the examples in the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+SSEEEE AALLSSOO
+       bitcp(1L),   dct2mstr(1L),   expgram(1L),    genmodel(1L),
+       gramtest(1L),   impkimmo(1L),   impmsc(1L),  impwbstr(1L),
+       listword(1L),  nicetext(1L),  printint(1L),  scramble(1L),
+       txt2dct(1L).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+

@@ -1,0 +1,52 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	98.08.18.16.22.29;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" printin.1 by Mark T. Chapman
+.\"
+.TH PRINTINT 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+printint
+.SH SYNOPSIS
+.B printint
+.SH DESCRIPTION
+.I printint
+sends a series of numbers to stdout.  The purpose is to be a word-list
+for the
+.B NICETEXT
+system. 
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).
+
+@

@@ -1,0 +1,271 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.2
+date	95.11.08.19.32.11;	author chapman;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.07.29.17.06.12;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial Check In
+@
+
+
+1.2
+log
+@Converted from dictent.cc
+@
+text
+@/*
+ * Dictionary Entry Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: rawdict.cc,v 1.1 1995/07/29 17:06:12 markc Exp chapman $
+ *
+ * $Log: rawdict.cc,v $
+// Revision 1.1  1995/07/29  17:06:12  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: rawdict.cc,v 1.1 1995/07/29 17:06:12 markc Exp chapman $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../include/rawdict.h"
+
+// rawDictEnt stream insertor operator
+
+ostream & operator<<(ostream & anOStream, const MTCrawDictEnt & aRawDictEnt)
+{
+	anOStream << aRawDictEnt.getCode() << " " << aRawDictEnt.getValue() << endl;
+	return anOStream;
+}
+
+// rawDictEnt stream extractor operator
+
+istream & operator>>(istream & anIStream, MTCrawDictEnt & aRawDictEnt)
+{
+	MTCstring temp;
+	char buffer[RAWDICT_MAX_LENGTH+1];
+	char *startbuffer=NULL;
+
+	anIStream >> temp;
+
+	aRawDictEnt.setCode(temp);
+
+	anIStream.getline(buffer, RAWDICT_MAX_LENGTH);
+
+	int i;
+
+	for(i=0; i<strlen(buffer); i++)
+	{
+//		if (isalnum(buffer[i]))
+		if (isprint(buffer[i])&&(buffer[i]!=' '))
+		{
+			startbuffer=&buffer[i];
+			break;
+		}
+	}
+
+	temp=startbuffer;
+
+	aRawDictEnt.setValue(temp);
+
+	return anIStream;
+}
+
+// < comparison
+
+int MTCrawDictEnt::isLessThan(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (value<aRawDictEnt.value);
+}
+
+// equivalence test
+
+int MTCrawDictEnt::isEqual(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (value==aRawDictEnt.value);
+}
+
+// == operator
+
+BOOL MTCrawDictEnt::operator==(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (isEqual(aRawDictEnt));
+}
+
+// != operator
+
+BOOL MTCrawDictEnt::operator!=(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (!isEqual(aRawDictEnt));
+}
+
+// RawDictEnt < operator
+
+BOOL MTCrawDictEnt::operator<(const MTCrawDictEnt & aRawDictEnt)  const
+{
+	return (isLessThan(aRawDictEnt));
+}
+
+// RawDictEnt <= operator
+
+BOOL MTCrawDictEnt::operator<=(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (isLessThan(aRawDictEnt)||isEqual(aRawDictEnt));
+}
+
+// RawDictEnt > operator
+
+BOOL MTCrawDictEnt::operator>(const MTCrawDictEnt & aRawDictEnt)  const
+{
+	return (!(isLessThan(aRawDictEnt)||(isEqual(aRawDictEnt))));
+}
+
+// RawDictEnt >= operator
+
+BOOL MTCrawDictEnt::operator>=(const MTCrawDictEnt & aRawDictEnt) const
+{
+	return (!(isLessThan(aRawDictEnt)));
+}
+
+// overloaded = operator
+
+MTCrawDictEnt & MTCrawDictEnt::operator=(const MTCrawDictEnt &aRawDictEnt)
+{
+	value=aRawDictEnt.value;
+	code=aRawDictEnt.code;
+
+	return *this;
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d21 1
+a21 1
+#include "../include/dictent.h"
+d23 1
+a23 1
+// dictEnt stream insertor operator
+d25 1
+a25 1
+ostream & operator<<(ostream & anOStream, const MTCdictEnt & aDictEnt)
+d27 1
+a27 1
+	anOStream << aDictEnt.getCode() << " " << aDictEnt.getValue() << endl;
+d31 1
+a31 1
+// dictEnt stream extractor operator
+d33 1
+a33 1
+istream & operator>>(istream & anIStream, MTCdictEnt & aDictEnt)
+d36 1
+a36 1
+	char buffer[DICTENT_MAX_LENGTH+1];
+d41 1
+a41 1
+	aDictEnt.setCode(temp);
+d43 1
+a43 1
+	anIStream.getline(buffer, DICTENT_MAX_LENGTH);
+d59 1
+a59 1
+	aDictEnt.setValue(temp);
+d66 1
+a66 1
+int MTCdictEnt::isLessThan(const MTCdictEnt & aDictEnt) const
+d68 1
+a68 1
+	return (value<aDictEnt.value);
+d73 1
+a73 1
+int MTCdictEnt::isEqual(const MTCdictEnt & aDictEnt) const
+d75 1
+a75 1
+	return (value==aDictEnt.value);
+d80 1
+a80 1
+BOOL MTCdictEnt::operator==(const MTCdictEnt & aDictEnt) const
+d82 1
+a82 1
+	return (isEqual(aDictEnt));
+d87 1
+a87 1
+BOOL MTCdictEnt::operator!=(const MTCdictEnt & aDictEnt) const
+d89 1
+a89 1
+	return (!isEqual(aDictEnt));
+d92 1
+a92 1
+// DictEnt < operator
+d94 1
+a94 1
+BOOL MTCdictEnt::operator<(const MTCdictEnt & aDictEnt)  const
+d96 1
+a96 1
+	return (isLessThan(aDictEnt));
+d99 1
+a99 1
+// DictEnt <= operator
+d101 1
+a101 1
+BOOL MTCdictEnt::operator<=(const MTCdictEnt & aDictEnt) const
+d103 1
+a103 1
+	return (isLessThan(aDictEnt)||isEqual(aDictEnt));
+d106 1
+a106 1
+// DictEnt > operator
+d108 1
+a108 1
+BOOL MTCdictEnt::operator>(const MTCdictEnt & aDictEnt)  const
+d110 1
+a110 1
+	return (!(isLessThan(aDictEnt)||(isEqual(aDictEnt))));
+d113 1
+a113 1
+// DictEnt >= operator
+d115 1
+a115 1
+BOOL MTCdictEnt::operator>=(const MTCdictEnt & aDictEnt) const
+d117 1
+a117 1
+	return (!(isLessThan(aDictEnt)));
+d122 1
+a122 1
+MTCdictEnt & MTCdictEnt::operator=(const MTCdictEnt &aDictEnt)
+d124 2
+a125 2
+	value=aDictEnt.value;
+	code=aDictEnt.code;
+@

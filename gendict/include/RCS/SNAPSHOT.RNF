@@ -1,0 +1,71 @@
+
+SNAPSHOT into ./gendict/include/RCS/SNAPSHOT.RNF
+	When:	 Jan 10, 1996  20:43 
+	Who:	 Mark Chapman (on BERNIEDOG) 
+	Notes:	 gramtest in babble section now can parse a grammar.def file into rules.  What is left to do is   1.  makeModel()   2. stop coding and start making dicitonaries and grammars and such 3. enhancements... 
+
+1.2 	rawdict.h,v
+1.3 	dconst.h,v
+1.4 	dictarec.h,v
+1.1 	lexword.h,v
+1.1 	wordclass.h,v
+1.4 	dictrec.h,v
+1.4 	typerec.h,v
+1.1 	sentmdl.h,v
+
+SNAPSHOT into ./gendict/include/RCS/SNAPSHOT.RNF
+	When:	 Jan 13, 1996  7:45 am 
+	Who:	 markc 
+	Notes:	 Basic dynamic models work with babble, but sentence models are temporarily not implemented and there is not punctuation. 
+
+1.2 	rawdict.h,v
+1.3 	dconst.h,v
+1.4 	dictarec.h,v
+1.1 	lexword.h,v
+1.1 	wordclass.h,v
+1.4 	dictrec.h,v
+1.4 	typerec.h,v
+1.2 	sentmdl.h,v
+
+SNAPSHOT into ./gendict/include/RCS/SNAPSHOT.RNF
+	When:	 March 21, 1996  11:30 
+	Who:	 markc 
+	Notes:	 Changed program names and messages i.e. (babble -> nicetext, unbabble->scramble) 
+
+1.2 	rawdict.h,v
+1.3 	dconst.h,v
+1.4 	dictarec.h,v
+1.1 	lexword.h,v
+1.5 	dictrec.h,v
+1.4 	typerec.h,v
+1.5 	sentmdl.h,v
+1.1 	sentnode.h,v
+
+SNAPSHOT into ./gendict/include/RCS/SNAPSHOT.RNF
+	When:	 Feb 23, 1997  11:00 p.m. 
+	Who:	 Mark T. Chapman 
+	Notes:	 A snapshot after statistics added and some clean-up 
+
+1.1 	sentnode.h,v
+1.3 	dconst.h,v
+1.4 	dictarec.h,v
+1.1 	lexword.h,v
+1.5 	dictrec.h,v
+1.4 	typerec.h,v
+1.6 	sentmdl.h,v
+1.2 	rawdict.h,v
+
+SNAPSHOT into ./gendict/include/RCS/SNAPSHOT.RNF
+	When:	 August 25, 1998  4:45pm CDT 
+	Who:	 Mark Chapman 
+	Notes:	 0.9 Version Ready for Packaging & Release 
+
+1.2 	sentnode.h,v
+1.4 	dconst.h,v
+1.5 	dictarec.h,v
+1.2 	lexword.h,v
+1.6 	dictrec.h,v
+1.5 	typerec.h,v
+1.9 	sentmdl.h,v
+1.3 	rawdict.h,v
+1.1 	typearec.h,v

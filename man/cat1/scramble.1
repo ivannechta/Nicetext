@@ -1,0 +1,132 @@
+
+
+
+SCRAMBLE(1L)					     SCRAMBLE(1L)
+
+
+NNAAMMEE
+       scramble
+
+SSYYNNOOPPSSIISS
+       ssccrraammbbllee -o outputFile [-d dictionary] [-e] [-i inputFile]
+       [-s]
+
+DDEESSCCRRIIPPTTIIOONN
+       _s_c_r_a_m_b_l_e converts text-files  containing  natural-language
+       text into binary files.
+
+       If  nniicceetteexxtt((11LL))  was  the  author of the text file and if
+       ssccrraammbbllee is using the same dictionary that  nniicceetteexxtt  used
+       then  ssccrraammbbllee  will recover the original input from nniiccee--
+       tteexxtt..  Otherwise, ssccrraammbbllee is a pretty useless program.
+
+       Note that although ssccrraammbbllee is  the  inverse  function  of
+       nniicceetteexxtt  , nniicceetteexxtt is NOT the inverse function of ssccrraamm--
+       bbllee..
+
+       Also note that certain modification can	be  made  to  the
+       output  of  nniicceetteexxtt  that will not effect the ability for
+       ssccrraammbbllee to recover  the  original  input.   For  example,
+       punctuation,  whitespace,  and uppercase/lowercase conver-
+       sion will not make  any	difference.   Furthermore,  words
+       that  are not in the dictionary may be freely added to the
+       text without any  problems.   Finally,  any  text  may  be
+       appended to the _n_i_c_e_t_e_x_t_.
+
+       It  is  strongly recommended that you go through the tuto-
+       rial supplied with  the	software.   It	demonstrates  the
+       flexibility in defining dictionaries and style sources for
+       _n_i_c_e_t_e_x_t generation. The .ps or	.pdf  files  in  the  doc
+       directory  of  the distribution contain detailed papers on
+       the theory of operation, etc.
+
+OOPPTTIIOONNSS
+       --dd ddiiccttiioonnaarryy
+	      Use _d_i_c_t_i_o_n_a_r_y as the prefix to select the  dictio-
+	      nary definition database.
+
+	      The default _d_i_c_t_i_o_n_a_r_y is _m_s_t_r
+
+       --ee     Print undefined words to stderr.	 The lliissttwwoorrdd((11LL))
+	      program is another way to do this.
+
+       --ii iinnppuuttFFiillee
+	      Read sample natural-language texts from  _i_n_p_u_t_F_i_l_e_.
+	      The default is stdin.
+
+       --oo oouuttppuuttFFiillee
+	      Send the scrambled output to this file name.
+
+       --ss     Normally,  the  software	loads all database tables
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			1
+
+
+
+
+
+SCRAMBLE(1L)					     SCRAMBLE(1L)
+
+
+	      into  RAM  before  processing.	The   --ss   option
+	      instructs the software to read each record from the
+	      database tables on disk during analysis.	The  pri-
+	      mary  advantage is that the software has a signifi-
+	      cantly smaller memory footprint.	Another advantage
+	      is that you do not need to wait to load the dictio-
+	      nary into RAM - which can take some time.  The dis-
+	      advantage  is  that processing of large input files
+	      is significantly slower.
+
+	      Use this option if you are processing a  relatively
+	      small  input  file or if you get memory errors when
+	      running without --ss set.
+
+EEXXAAMMPPLLEESS
+       It is strongly suggested that you try the examples in  the
+       ttuuttoorriiaall directory of the NNIICCEETTEEXXTT distribution.  For fur-
+       ther information, please read the documentation in the ddoocc
+       directory.
+
+SSEEEE AALLSSOO
+       bitcp(1L),    dct2mstr(1L),   expgram(1L),   genmodel(1L),
+       gramtest(1L),  impkimmo(1L),   impmsc(1L),   impwbstr(1L),
+       listword(1L), nicetext(1L), nttpd(1L), printint(1L), sort-
+       dct(1L), txt2dct(1L).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NICETEXT	       Aug 17, 1998 (v0.9)			2
+
+

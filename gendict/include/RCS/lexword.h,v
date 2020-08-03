@@ -1,0 +1,75 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	97.03.05.17.39.05;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.07.26.13.42.47;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial check-in
+@
+
+
+1.2
+log
+@Added static char rcsid__DICTAREC_H_ []  = "@@(#)$Id$";
+@
+text
+@/*
+ *
+ * Lexword Header File 
+ * Copyright (c) 1995 Mark T. Chapman 
+ *
+ * $Id: lexword.h,v 1.1 1995/07/26 13:42:47 markc Exp markc $
+ * 
+ * $Log: lexword.h,v $
+ * Revision 1.1  1995/07/26 13:42:47  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __LEXWORD_H_
+#define __LEXWORD_H_
+
+static char rcsid__LEXWORD_H_ []  = "@@(#)$Id$";
+
+
+#define END_OF_WORD	0
+#define END_OF_SENTENCE 1
+#define PUNCTUATION	3
+
+#endif __LEXWORD_H_
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 1
+a6 1
+ * $Id$
+d8 4
+a11 1
+ * $Log$
+d15 5
+a19 2
+#ifndef __LEXWORD_H
+#define __LEXWORD_H
+d25 1
+a25 1
+#endif __LEXWORD_H
+@

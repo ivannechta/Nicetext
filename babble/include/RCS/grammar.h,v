@@ -1,0 +1,363 @@
+head	1.11;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.11
+date	97.03.05.17.44.52;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	97.02.23.20.40.45;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	97.02.16.06.58.07;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.02.08.01.28.07;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.01.13.12.01.06;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.13.10.18.50;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.12.23.51.25;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.10.22.16.20;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.10.20.42.55;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.08.21.53.59;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.08.17.32.54;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.11
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+/*
+ *
+ * Grammar Processing Class -- Used to randomly generate sentence models
+ * Copyright (c) 1995, Mark T. Chapman
+ *
+ * $Id: grammar.h,v 1.10 1997/02/23 20:40:45 markc Exp markc $
+ *
+ * $Log: grammar.h,v $
+ * Revision 1.10  1997/02/23 20:40:45  markc
+ * Added quotedPunctUsed BOOL
+ *
+ * Revision 1.9  1997/02/16 06:58:07  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.8  1996/02/08 01:28:07  markc
+ * updated maxSize to 1024 from 50 in makeModel
+ *
+ * Revision 1.7  1996/01/13  12:01:06  markc
+ * added punctuation processing to grammar definition language using {}
+ *
+ * Revision 1.6  1996/01/13  10:18:50  markc
+ * use new sentnode enabled sentence models
+ *
+ * Revision 1.5  1996/01/12  23:51:25  markc
+ * dynamic grammar generated models work -- next step punctuation?
+ *
+ * Revision 1.4  1996/01/10  22:16:20  markc
+ * makeModel() works
+ *
+ * Revision 1.3  1996/01/10  20:42:55  markc
+ *  correctly parses and sets up grammar rules -- does not yet makeModel()
+ *
+ * Revision 1.2  1996/01/08  21:53:59  markc
+ * not quite ready
+ *
+ * Revision 1.1  1996/01/08  17:32:54  markc
+ * Initial revision
+ *
+ *
+ */
+
+#ifndef __GRAMMAR_H_
+#define __GRAMMAR_H_
+
+static char rcsid__GRAMMAR_H_ []  = "@@(#)$Id$";
+
+// concrete class for randomly generating sentence models according to a grammar
+
+class MTCgrammar {
+private:
+	BOOL quotedPunctUsed;	// was quoted punctuation used in a rule?
+	MTCstring fileName;	// grammar definition file name
+	FILE *inputFile;	// input file pointer
+	BOOL okay;		// is *this okay?
+	MTCsentenceModel model;	// the target model
+	MTCRBT<MTCrule> rules;	// a storage place for rules instances
+	MTCrule *baseRule;	// the start of it all...
+	MTCrule nextRule; 	// used while parsing grammar in yyparse() 
+	MTCstring typeName;	// used for RAOF
+	MTCRBT<MTCtypeRecord> typeRecRBT;	// as in mstrtype.dat RAOF
+	void loadTypeRecRBT(const MTCstring &); // used by ctor
+	BOOL validate();		 	// check terminals, etc. 
+
+	MTCrule * findRule(const char * ruleName, BOOL isPunct);
+
+protected:
+	void setOkay(BOOL aBool) { okay=(aBool!=FALSE); };
+
+public:
+	// actions used ONLY by yyparse()
+	BOOL commitRule(const char * ruleName);
+
+	void commitRHSSet(unsigned long aWeight)
+	{
+		nextRule.commitRHSSet(aWeight);
+	};
+
+	BOOL appendRHS(const char *ruleName, BOOL isPunct=FALSE)
+	{
+		return nextRule.appendRHS(findRule(ruleName, isPunct));
+	};
+
+public:
+	// constructors and destructors
+	MTCgrammar(const MTCstring &aGramName, const MTCstring &aTypeName);
+	virtual ~MTCgrammar();	
+
+	// attribute access methods
+	BOOL getOkay() const { return okay; };
+	MTCsentenceModel * getModel() { return &model; };
+	const MTCstring & getFileName() const { return fileName; };
+	BOOL getQuotedPunctUsed() const { return quotedPunctUsed; };
+
+	// generate a "random" sentence model according to this grammar
+	BOOL isReady();	
+	MTCsentenceModel * makeModel(int maxSize=1024, BOOL checkIfReady=TRUE);
+	void allPunct();	// do not recognize terminals in makeModel() 
+
+	// stream insertor -- used for dumping rules only! 
+	friend ostream & operator<<(ostream &s, MTCgrammar &);
+};
+
+#endif  __GRAMMAR_H_
+
+@
+
+
+1.10
+log
+@Added quotedPunctUsed BOOL
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.9 1997/02/16 06:58:07 markc Exp markc $
+d10 3
+d45 2
+@
+
+
+1.9
+log
+@BST replaced with RBT
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.8 1996/02/08 01:28:07 markc Exp markc $
+d10 3
+d47 1
+d88 1
+@
+
+
+1.8
+log
+@updated maxSize to 1024 from 50 in makeModel
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.7 1996/01/13 12:01:06 markc Exp markc $
+d10 3
+d48 1
+a48 1
+	MTCBST<MTCrule> rules;	// a storage place for rules instances
+d52 2
+a53 2
+	MTCBST<MTCtypeRecord> typeRecBST;	// as in mstrtype.dat RAOF
+	void loadTypeRecBST(const MTCstring &); // used by ctor
+@
+
+
+1.7
+log
+@added punctuation processing to grammar definition language using {}
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.6 1996/01/13 10:18:50 markc Exp markc $
+d10 3
+d84 1
+a84 1
+	MTCsentenceModel * makeModel(int maxSize=50, BOOL checkIfReady=TRUE);
+@
+
+
+1.6
+log
+@use new sentnode enabled sentence models
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.5 1996/01/12 23:51:25 markc Exp markc $
+d10 3
+d50 1
+a50 1
+	MTCrule * findRule(const char * ruleName);
+d64 1
+a64 1
+	BOOL appendRHS(const char *ruleName)
+d66 1
+a66 1
+		return nextRule.appendRHS(findRule(ruleName));
+@
+
+
+1.5
+log
+@dynamic grammar generated models work -- next step punctuation?
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.4 1996/01/10 22:16:20 markc Exp markc $
+d10 3
+d79 1
+@
+
+
+1.4
+log
+@makeModel() works
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.3 1996/01/10 20:42:55 markc Exp markc $
+d10 3
+d39 4
+d47 1
+a47 1
+	void setOk(BOOL aBool) { okay=(aBool!=FALSE); };
+d65 1
+a65 1
+	MTCgrammar(const char *aFileName);
+d69 1
+a69 1
+	BOOL isOk() const { return okay; };
+d74 2
+a75 1
+	MTCsentenceModel & makeModel(int maxSize=50);
+a77 1
+
+@
+
+
+1.3
+log
+@ correctly parses and sets up grammar rules -- does not yet makeModel()
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.2 1996/01/08 21:53:59 markc Exp markc $
+d10 3
+a38 5
+	static void dumpRule(MTCrule *r)
+	{
+		cerr << *r << endl;
+	}
+
+d67 3
+a69 1
+	MTCsentenceModel * makeModel();
+d71 1
+a71 2
+	// dump the rules to cout
+	void dump();
+@
+
+
+1.2
+log
+@not quite ready
+@
+text
+@d7 1
+a7 1
+ * $Id: grammar.h,v 1.1 1996/01/08 17:32:54 markc Exp markc $
+d10 3
+d32 8
+d45 14
+a62 3
+	// actions used ONLY by yyparse()
+	
+
+d70 3
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 5
+a11 1
+ * $Id$
+a12 1
+ * $Log$
+d38 3
+d44 1
+a47 1
+
+d51 1
+@

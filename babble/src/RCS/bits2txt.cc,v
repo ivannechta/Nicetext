@@ -1,0 +1,1734 @@
+head	1.22;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.22
+date	98.08.23.02.47.07;	author markc;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	98.02.19.19.31.25;	author markc;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	97.03.05.17.49.59;	author markc;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	97.03.02.04.23.26;	author markc;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	97.02.27.17.52.25;	author markc;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	97.02.27.17.12.00;	author markc;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	97.02.27.15.56.30;	author markc;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	97.02.27.13.35.31;	author chapman;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	97.02.24.05.01.40;	author markc;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	97.02.24.04.27.49;	author markc;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	97.02.24.00.12.19;	author markc;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	97.02.23.20.39.35;	author markc;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	97.02.16.06.58.59;	author markc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	96.02.17.16.44.07;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	96.02.14.15.06.35;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	96.02.08.01.26.02;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.02.08.00.53.48;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.20.18.40.19;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.13.13.33.36;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.13.13.02.28;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.10.18.10;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.13.09.53.08;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.22
+log
+@fixed check for quoted punctuation in printPunct
+@
+text
+@/*
+ * Bitstream to text stream class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: bits2txt.cc,v 1.21 1998/02/19 19:31:25 markc Exp markc $
+ *
+ * $Log: bits2txt.cc,v $
+ * Revision 1.21  1998/02/19 19:31:25  markc
+ * *** empty log message ***
+ *
+ * Revision 1.20  1997/03/05 17:49:59  markc
+ * Added static char rcsid []  = "@@(#)$Id: bits2txt.cc,v 1.21 1998/02/19 19:31:25 markc Exp markc $";
+ *
+ * Revision 1.19  1997/03/02 04:23:26  markc
+ * Added MINIMAL_EXTRA_BITS
+ * otherwise the bits2txt may fall short
+ *
+ * Revision 1.18  1997/02/27 17:52:25  markc
+ * Fixed usage()
+ *
+ * Revision 1.17  1997/02/27 17:12:00  markc
+ * Shortened status G:, etc.
+ *
+ * Revision 1.16  1997/02/27 15:56:30  markc
+ * Adjusted isReady()
+ *
+ * Revision 1.15  1997/02/27 13:35:31  chapman
+ * Enabled -s parameter for smaller memory usage
+ *
+ * Revision 1.14  1997/02/24 05:01:40  markc
+ * Increased PRINTSTAT_FREQ from 1000 to 10000
+ *
+ * Revision 1.13  1997/02/24 04:27:49  markc
+ * Added bit-input and output statistics
+ *
+ * Revision 1.12  1997/02/24 00:12:19  markc
+ * Added printStats and fixed maxModelLength
+ *
+ * Revision 1.11  1997/02/23 20:39:35  markc
+ * Added quoted punctutation {^xxxxx^} processing
+ *
+ * Revision 1.10  1997/02/16 06:58:59  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.9  1996/02/17 16:44:07  markc
+ * eolAfterModel default changed to FALSE
+ *
+// Revision 1.8  1996/02/14  15:06:35  markc
+// added space BOOL
+// adjustment for "(" punctuation
+//
+// Revision 1.7  1996/02/08  01:26:02  markc
+// always complete a model at the end of input stream + extra bits
+// freshModel is used
+//
+// Revision 1.6  1996/02/08  00:53:48  markc
+// added {low} {cap} {shift} to models
+//
+// Revision 1.5  1996/01/20  18:40:19  markc
+// added eolAfterModel
+//
+// Revision 1.4  1996/01/13  13:33:36  markc
+// -m option for babble added -- both models and grammars work!
+//
+// Revision 1.3  1996/01/13  13:02:28  markc
+// Cap first letter of first word in each sentence
+//
+// Revision 1.2  1996/01/13  10:18:10  markc
+// use new sentnode enabled sentence models
+//
+// Revision 1.1  1996/01/13  09:53:08  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: bits2txt.cc,v 1.21 1998/02/19 19:31:25 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/dictrec.h"
+#include "../../gendict/include/dictarec.h"
+#include "../../gendict/include/typerec.h"
+#include "../../gendict/include/typearec.h"
+#include "../../gendict/include/sentnode.h"
+#include "../../gendict/include/sentmdl.h"
+#include "../../gendict/include/dconst.h"
+#include "../include/bitstrm.h"
+#include "../include/bitinput.h"
+#include "../include/rule.h"
+#include "../include/grammar.h"
+#include "../include/bits2txt.h"
+
+#define MINIMAL_EXTRA_BITS (sizeof(unsigned long)*8) 
+
+int strlenNL=strlen("\n");
+
+// constructor
+
+MTCbitsToTextBase::MTCbitsToTextBase()
+	: 	inputBitStream(NULL), outputStream(NULL), okay(TRUE), 
+		model(NULL), capFirstWord(FALSE), firstWord(TRUE),
+		eolAfterModel(FALSE), cap(FALSE), shift(FALSE), 
+		freshModel(FALSE), space(FALSE), maxModelLength(1024),
+		modelsSkipped(0), modelsUsed(0), totalLengthUsed(0),
+		inputBits(-8*sizeof(bitBucketType)), 
+		extraBits(8*sizeof(bitBucketType)), outputBytes(0),
+		smallMode(FALSE), dictAltRecRAOF(NULL), 
+		statFreq(DEFAULT_PRINTSTAT_FREQ)
+{
+	return;
+}
+
+// destructor
+
+MTCbitsToTextBase::~MTCbitsToTextBase()
+{
+	if (inputBitStream!=NULL)
+	{
+		delete inputBitStream;
+		inputBitStream=NULL;
+	}
+
+	if (outputStream!=NULL)
+	{
+		if (outputStream!=&cout)
+		{
+			delete outputStream;
+		}
+		outputStream=NULL;
+	}
+
+	if (dictAltRecRAOF!=NULL)
+	{
+		delete dictAltRecRAOF;
+		dictAltRecRAOF=NULL;
+	}
+
+	return;
+}
+
+// set dictionary raof file name and open it
+
+BOOL MTCbitsToTextBase::openDictName(const MTCstring &aFileName, BOOL useSmallMode)
+{
+	// clear the dictAltRecRBT
+	dictAltRecRBT.clear();
+
+	if (dictAltRecRAOF!=NULL)
+	{
+		delete dictAltRecRAOF;
+		dictAltRecRAOF=NULL;
+	}
+
+	// if small mode then load the dictAltRecRBT from the RAOF
+	// otherwise just set up dictAltRecRAOF
+
+	smallMode=useSmallMode;
+
+	dictName=aFileName;
+
+	MTCraofToRBT <MTCdictAltRecord> loader;
+
+	dictAltRecRAOF = new MTCreadRAOF <MTCdictAltRecord> (dictName+".dat", dictName+".alt");
+
+	if (dictAltRecRAOF==NULL)
+	{
+		errorMsg(EMT_ERROR, "I could not open the dictionary specified", "MTCbitsToTextBase::openDictName()");
+		return FALSE;
+	}
+
+	if (dictAltRecRAOF->getOkay()==TRUE)
+	{
+		if (smallMode==FALSE)
+		{
+			loader.doIt(*dictAltRecRAOF, dictAltRecRBT);
+		}
+	}
+	else
+	{
+		errorMsg(EMT_ERROR, "I could not open the dictionary specified", "MTCbitsToTextBase::openDictName()");
+		return FALSE;
+	}
+
+	if (((smallMode==FALSE)&&(dictAltRecRBT.getCount()==0))
+	||(dictAltRecRAOF->getCount()==0))
+	{
+		errorMsg(EMT_ERROR, "The dictionary specified is empty", "MTCbitsToTextBase::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// set type RAOF name and open it
+
+BOOL MTCbitsToTextBase::openTypeName(const MTCstring &aFileName)
+{
+	// clear the typeAltRecRBT
+	typeAltRecRBT.clear();
+
+	// assign type name
+	typeName=aFileName;
+
+	// load the typeAltRecRBT from the RAOF
+
+	MTCraofToRBT <MTCtypeAltRecord> loader;
+	MTCreadRAOF <MTCtypeAltRecord> typeAltRecRAOF(typeName);
+
+	if (typeAltRecRAOF.getOkay()==TRUE)
+	{
+		loader.doIt(typeAltRecRAOF, typeAltRecRBT);
+	}
+	else
+	{
+		errorMsg(EMT_ERROR, "I could not open the type table specified", "MTCbitsToTextBase::openTypeName()");
+		return FALSE;
+	}
+
+	if (typeAltRecRBT.getCount()==0)
+	{
+		errorMsg(EMT_ERROR, "The type table specified is empty", "MTCbitsToTextBase::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// open the input file bitstream
+
+BOOL MTCbitsToTextBase::openInputName(const MTCstring &aFileName)
+{
+	// close it if one is already open...
+
+	if (inputBitStream!=NULL)
+	{
+		delete inputBitStream;
+	}
+
+	// open the input file
+
+	inputName=aFileName;
+	inputBitStream=new MTCinputBitStream(inputName);
+
+	if (inputBitStream->getStreamBitsLeft()==0)
+	{
+		errorMsg(EMT_WARNING, "I could not open the input file specified", "MTCbitsToTextBase::openInputName()"); 
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// open the output file 
+
+BOOL MTCbitsToTextBase::openOutputName(const MTCstring &aFileName)
+{
+	// close it if one is already open...
+
+	if ((outputStream!=NULL)&&(outputStream!=&cout))
+	{
+		delete outputStream;
+	}
+
+	// open the output file
+
+	outputName=aFileName;
+	outputStream=new ofstream(outputName.c_str());
+
+	if (outputStream==NULL)
+	{
+		errorMsg(EMT_WARNING, "I could not open the output file specified", "MTCbitsToTextBase::openOutputName()"); 
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// get the next type
+long MTCbitsToTextBase::getNextType()
+{
+	long answer;
+
+	if (model==NULL)
+	{
+		getNextModel();
+		if (eolAfterModel==TRUE)
+		{
+			*outputStream << endl;
+			incOutputBytes();
+		}
+		firstWord=TRUE;
+		return getNextType();
+	}
+	else
+	{
+		do
+		{
+			MTCstring punctuation;
+			answer=model->getNext(&punctuation);
+			printPunctuation(punctuation);
+		} while (answer==SENTMDL_MORE_PUNCT);
+
+		if (answer==SENTMDL_GETNEXT_DONE)
+		{
+			model=NULL;
+			firstWord=TRUE;
+			return getNextType();
+		}
+	}
+
+	return answer;
+}
+
+// print punctuation
+
+void MTCbitsToTextBase::printPunctuation(MTCstring &aStr)
+{
+	if (aStr==SENTMDL_CAP_NEXT_LETTER)
+	{
+		shift=TRUE;
+		return;
+	}
+
+	if (aStr==SENTMDL_CAPSLOCK_ON)
+	{
+		cap=TRUE;
+		return;
+	}
+
+	if (aStr==SENTMDL_CAPSLOCK_OFF)
+	{
+		cap=FALSE;
+		return;
+	}
+
+	// processing for quoted punctuation {^xxxx^}
+	// it will just be printed as-is without interpretation
+
+	int i;
+
+	if (aStr.length()>1)
+	{
+		if ((aStr.c_str()[0]=='^')&&(aStr.c_str()[aStr.length()-1]=='^'))
+		{
+			for(i=1; i<aStr.length()-1; i++)
+			{
+				*outputStream << aStr.c_str()[i];
+			}
+
+	 		incOutputBytes(aStr.length()-2);
+	
+			return;
+		}
+
+		if (aStr.c_str()[0]=='(')
+		{
+			*outputStream << ' ';
+			incOutputBytes();
+			space=FALSE;
+		}
+	}
+
+	for(i=0; i<aStr.length(); i++)
+	{
+		switch (aStr.c_str()[i]) {
+
+		case 'n':  	*outputStream << endl;
+				incOutputBytes(strlenNL);
+				space=FALSE;
+				break;
+		case 'e':	break;
+		case ' ':
+				if (space==TRUE)
+				{
+					*outputStream << ' ';
+					incOutputBytes();
+				}
+				break;
+		default:
+				*outputStream << aStr.c_str()[i];
+				incOutputBytes();
+				space=TRUE;
+				break;
+		}
+	}
+}
+
+// am I ready to doIt()?
+
+BOOL MTCbitsToTextBase::isReady()
+{
+	if (getOkay()==FALSE)
+	{
+		errorMsg(EMT_ERROR, "I am not okay to convert.  See previous messages for a reason.", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if (dictName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a dictionary has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if (typeName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a type table name has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if (outputName.length()==0)
+	{
+		if ((outputStream!=NULL)&&(outputStream!=&cout))
+		{
+			delete outputStream;
+		}
+
+		outputStream=&cout;
+	}
+
+	if (inputBitStream==NULL)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because an input bitstream has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if (outputStream==NULL)
+	{
+		outputStream=&cout;
+	}
+	
+	if (((smallMode==FALSE)&&(dictAltRecRBT.getCount()==0))
+	||(dictAltRecRAOF->getCount()==0))
+	{
+		errorMsg(EMT_ERROR, "The dictionary specified is empty", "MTCbitsToTextBase::openDictName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// take bits and generate text
+
+BOOL MTCbitsToTextBase::doIt(BOOL checkIfReady)
+{
+	if (checkIfReady==TRUE)
+	{
+		if (isReady()==FALSE)
+		{
+			return FALSE;
+		}
+	}
+
+	MTCtypeAltRecord typeAltRec;
+	MTCtypeAltRecord *foundType;
+	MTCdictAltRecord dictAltRec;
+	const MTCdictAltRecord *foundDict;
+	BOOL usingExtraBits=FALSE;
+
+	for(;;)
+	{
+		freshModel=FALSE;
+
+		typeAltRec.setIndex(getNextType());
+
+		if ((foundType=typeAltRecRBT.find(typeAltRec))==NULL)
+		{
+			errorMsg(EMT_WARNING,"BAD TYPE FOUND","MTCbitsToTextBase::doIt()"); 
+			cerr << typeAltRec << endl;
+			continue;
+		}
+
+		if (foundType->getFreq()==0)
+		{
+			errorMsg(EMT_WARNING, "ZERO WORDS OF THIS TYPE FOUND IN DICTIONARY", "MTCbitsToTextBase::doIt()");
+			cerr << typeAltRec << endl;
+			continue;
+		}
+
+		// compute the inputBits properly and switch to counting extras
+
+		if (usingExtraBits==FALSE)
+		{
+			if (inputBitStream->getStreamBitsLeft()==0)
+			{
+				long bitDelta=(foundType->getBitCount()-inputBitStream->getBufferSize());
+
+				if (bitDelta>=0)
+				{
+					incInputBits(inputBitStream->getBufferSize());
+					incExtraBits(-1*inputBitStream->getBufferSize());
+					usingExtraBits=TRUE;
+				}
+			}
+		}
+
+		dictAltRec.setTypeIndex(foundType->getIndex());
+
+		dictAltRec.setBitString(inputBitStream->readBits(foundType->getBitCount()));
+
+		// update statistics
+
+		if (usingExtraBits==TRUE)
+		{
+			// use extra bits just to the end of this model...
+			// well -- add a few more to flush things out...
+
+			if ((freshModel==TRUE)&&(getExtraBits()>=MINIMAL_EXTRA_BITS))
+			{
+			 	break;
+			}
+			else
+			{
+				incExtraBits(foundType->getBitCount());
+			}
+		}
+		else
+		{
+			incInputBits(foundType->getBitCount());
+		}
+
+		if (smallMode==TRUE)
+		{
+			foundDict=dictAltRecRAOF->find(dictAltRec);
+		}
+ 		else
+		{
+			foundDict=dictAltRecRBT.find(dictAltRec);
+		}
+
+		if (foundDict==NULL)
+		{
+			errorMsg(EMT_WARNING, "WORD NOT FOUND", "MTCbitsToTextBase::doIt()");
+		}
+		else
+		{
+			// put space between words?
+
+			if (space==TRUE)
+			{
+				*outputStream << ' ';
+				incOutputBytes();
+			}
+
+			space=TRUE;
+
+			if (cap==TRUE)
+			{
+				MTCstring temp(foundDict->getValue());
+				temp.toUpper();
+				*outputStream << temp;
+				incOutputBytes(temp.length());
+			}
+			else if (((firstWord==TRUE)&&(capFirstWord==TRUE))
+				||(shift==TRUE))
+			{
+				if (foundDict->getValue().length()!=0)
+				{
+					*outputStream << (char)toupper(foundDict->getValue().c_str()[0]);
+					*outputStream << &foundDict->getValue().c_str()[1];
+					incOutputBytes(foundDict->getValue().length());
+				}
+	
+				firstWord=shift=FALSE;
+			}
+			else
+			{
+				*outputStream << foundDict->getValue();
+				incOutputBytes(foundDict->getValue().length());
+			}
+		}
+	}
+
+	*outputStream << endl;
+	incOutputBytes(strlenNL);
+
+	return TRUE;
+}
+
+// print statistics to stderr
+
+void MTCbitsToTextBase::printStats()
+{
+	if ((getInputBits()+getExtraBits())==0)
+	{
+		return;
+	}
+
+	cerr << "I: " << getInputBits();
+	cerr << " E: " << getExtraBits();
+	cerr << " O: " << getOutputBytes()*8;
+	cerr << " G: " << (long)(((long)getOutputBytes()*800L)/((long)getExtraBits()+(long)getInputBits()));
+	cerr << " U: " << getModelsUsed();
+	cerr << " S: " << getModelsSkipped();
+	cerr << " N: " << getTotalLengthUsed();
+
+	if (getModelsUsed()==0)
+	{
+		cerr << " A: 0";
+	}
+	else
+	{
+		cerr << " A: " << (getTotalLengthUsed()/getModelsUsed());
+	}
+
+	cerr << "     \r";
+}
+
+// constructor
+
+MTCbitsToTextGrammar::MTCbitsToTextGrammar()
+	:	grammar(NULL)
+{
+	return;
+}
+
+// destructor
+
+MTCbitsToTextGrammar::~MTCbitsToTextGrammar()
+{
+	if (grammar!=NULL)
+	{
+		delete grammar;
+		grammar=NULL;
+	}
+
+	return;
+}
+
+// open the grammar definition file and the type record table
+
+BOOL MTCbitsToTextGrammar::openGrammarName(const MTCstring &aFileName)
+{
+	gramName=aFileName;
+
+	// check type alt rec dependency
+
+	if (getTypeName().length()==0)
+	{
+		errorMsg(EMT_ERROR, "I cannot open the grammar definition file until the type record alt table is loaded", "MTCbitsToTextGrammar::openGrammarName()");
+		return FALSE;
+	}
+
+	// delete existing grammar (if any)
+
+	if (grammar!=NULL)
+	{
+		delete grammar;
+		grammar=NULL;
+	}
+
+	// create the new grammar
+
+	grammar=new MTCgrammar(gramName, getTypeName()); 
+
+	if (grammar==NULL)
+	{
+		errorMsg(EMT_ABORT, "I could not allocate a grammar object", "MTCbitsToTextGrammar::openGramName()");
+	}
+
+	if (grammar->getOkay()!=TRUE)
+	{
+		errorMsg(EMT_ERROR, "I could not create an 'okay' grammar object", "MTCbitsToTextGrammar::openGramName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// get the next model using a grammar
+
+void MTCbitsToTextGrammar::getNextModel()
+{
+	freshModel=TRUE;
+
+	if (grammar==NULL)
+	{
+		errorMsg(EMT_ABORT, "I cannot use a NULL grammar", "MTCbitsToTextGrammar::getNextModel()");
+	}
+
+	if (getStatFreq()!=0)
+	{
+		if (((getModelsUsed()+getModelsSkipped())%getStatFreq())==0)
+		{
+			printStats();
+		}
+	}
+
+	int modelLength=getMaxModelLength();
+
+	if ((model=grammar->makeModel(modelLength, TRUE))==NULL)
+	{
+		errorMsg(EMT_ABORT, "The grammar did not return a model", "MTCbitsToTextGrammar::getNextModel()");
+	}
+
+	// check the length of the model
+
+	if (model->getLength()>getMaxModelLength())
+	{
+		incModelsSkipped();
+		getNextModel();
+	}
+
+	incModelsUsed();
+
+	incTotalLengthUsed(model->getLength());
+
+	return;
+}
+
+// am I ready to doIt()?
+
+BOOL MTCbitsToTextGrammar::isReady()
+{
+	if (grammar==NULL)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a grammar has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if (grammar->isReady()==FALSE)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because the grammar is not ready.", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	if ((getSmallMode()==TRUE)&&(getDictAltRecRAOF()==NULL))
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because the dictionary is not ready.", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+
+	return MTCbitsToTextBase::isReady();
+}
+
+// constructor
+
+MTCbitsToTextModel::MTCbitsToTextModel()
+	: modelRAOF(NULL)
+{
+	return;
+}
+
+// destructor
+
+MTCbitsToTextModel::~MTCbitsToTextModel()
+{
+
+	if (modelRAOF!=NULL)
+	{
+		delete modelRAOF;
+		modelRAOF=NULL;
+	}
+
+	return;
+}
+
+// am I ready to doIt()?
+
+BOOL MTCbitsToTextModel::isReady()
+{
+	if (modelRAOF==NULL)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a model table has not been assigned", "MTCbitsToTextModel::isReady()"); 
+		return FALSE;
+	}
+
+	if (modelRAOF->getCount()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because an EMPTY model table has been assigned", "MTCbitsToTextModel::isReady()"); 
+		return FALSE;
+	}
+
+	return MTCbitsToTextBase::isReady();
+}
+
+// get next model -- from the model RAOF
+
+void MTCbitsToTextModel::getNextModel()
+{
+	freshModel=TRUE;
+
+	long randomJump=random()%modelRAOF->getCount();
+
+	if ((modelRAOF==NULL)||(modelRAOF->getCount()==0))
+	{
+		errorMsg(EMT_ABORT, "I cannot get the next model because the model is empty or not specified.", "MTCbitsToTextModel::getNextModel()");
+	}
+
+	model=modelRAOF->read(randomJump);
+
+	if (getStatFreq()!=0)
+	{ 
+		if (((getModelsUsed()+getModelsSkipped())%getStatFreq())==0)
+		{
+			printStats();
+		}
+	}
+
+	if (model->getLength()>getMaxModelLength())
+	{
+		incModelsSkipped();
+		getNextModel();
+	}
+
+	if (model==NULL)
+	{
+		cerr << "* * * ERROR: getNextModel() failed...trying again..." << endl;
+		getNextModel();
+	}
+
+	incModelsUsed();
+
+	incTotalLengthUsed(model->getLength());
+
+	return;
+}
+
+// open the model table
+
+BOOL MTCbitsToTextModel::openModelName(const MTCstring &aFileName)
+{
+	modelName=aFileName;
+
+	// close existing table
+
+	if (modelRAOF!=NULL)
+	{
+		delete modelRAOF;
+		modelRAOF=NULL;
+	}
+
+	// allocate a new table
+
+	if ((modelRAOF=new MTCreadRAOF <MTCsentenceModel> (modelName))==NULL)
+	{
+		errorMsg(EMT_ERROR, "I could not allocate a model table access object", "MTCbitsToTextModel::openModelName()");
+		return FALSE;
+	}
+
+	// is the model empty?
+
+	if (modelRAOF->getCount()==0)
+	{
+		errorMsg(EMT_ERROR, "The model table specified is empty.", "MTCbitsToTextModel::openModelName()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.20 1997/03/05 17:49:59 markc Exp markc $
+d8 3
+d12 1
+a12 1
+ * Added static char rcsid []  = "@@(#)$Id$";
+d77 1
+a77 1
+static char rcsid []  = "@@(#)$Id: bits2txt.cc,v 1.20 1997/03/05 17:49:59 markc Exp markc $";
+d351 1
+a351 2
+	if ((aStr.c_str()[0]=='^')&&(aStr.length()>0)
+		 &&(aStr.c_str()[aStr.length()-1]=='^'))
+d353 1
+a353 1
+		for(i=1; i<aStr.length()-1; i++)
+d355 8
+a362 1
+			*outputStream << aStr.c_str()[i];
+d365 6
+a370 10
+	 	incOutputBytes(aStr.length()-2);
+
+		return;
+	}
+
+	if (aStr.c_str()[0]=='(')
+	{
+		*outputStream << ' ';
+		incOutputBytes();
+		space=FALSE;
+a401 1
+
+@
+
+
+1.20
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.19 1997/03/02 04:23:26 markc Exp markc $
+d8 3
+d74 1
+a74 1
+static char rcsid []  = "@@(#)$Id$";
+d100 1
+a100 1
+#define MINIMAL_EXTRA_BITS 128
+d513 1
+a513 1
+			if ((freshModel==TRUE)&&(getExtraBits()>MINIMAL_EXTRA_BITS+(random()%MINIMAL_EXTRA_BITS))) 
+@
+
+
+1.19
+log
+@Added MINIMAL_EXTRA_BITS
+otherwise the bits2txt may fall short
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.18 1997/02/27 17:52:25 markc Exp markc $
+d8 4
+d70 2
+@
+
+
+1.18
+log
+@Fixed usage()
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.17 1997/02/27 17:12:00 markc Exp markc $
+d8 3
+d91 1
+a91 3
+#define CAP_COMMAND 	"cap"
+#define UNCAP_COMMAND 	"low"
+#define SHIFT_COMMAND 	"shift"
+d316 1
+a316 1
+	if (aStr==SHIFT_COMMAND)
+d322 1
+a322 1
+	if (aStr==CAP_COMMAND)
+d328 1
+a328 1
+	if (aStr==UNCAP_COMMAND)
+d502 1
+d504 1
+a504 1
+			if (freshModel==TRUE) 
+@
+
+
+1.17
+log
+@Shortened status G:, etc.
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.16 1997/02/27 15:56:30 markc Exp markc $
+d8 3
+a90 1
+#define PRINTSTAT_FREQ	10000
+d104 2
+a105 1
+		smallMode(FALSE), dictAltRecRAOF(NULL)
+a577 4
+	cerr << "I: " << getInputBits();
+	cerr << " E: " << getExtraBits();
+	cerr << " O: " << getOutputBytes()*8;
+
+d580 1
+a580 5
+		cerr << " G: 0"; 
+	}
+	else
+	{
+		cerr << " G: " << (long)(((long)getOutputBytes()*800L)/((long)getExtraBits()+(long)getInputBits()));
+d583 4
+d675 1
+a675 1
+	if ((getModelsUsed()+getModelsSkipped())%PRINTSTAT_FREQ)
+d677 4
+a680 1
+		printStats();
+d786 6
+a791 3
+	if ((getModelsUsed()+getModelsSkipped())%PRINTSTAT_FREQ)
+	{
+		printStats();
+@
+
+
+1.16
+log
+@Adjusted isReady()
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.15 1997/02/27 13:35:31 chapman Exp markc $
+d8 3
+d575 3
+a577 3
+	cerr << "Ib: " << getInputBits();
+	cerr << " Eb: " << getExtraBits();
+	cerr << " Ob: " << getOutputBytes()*8;
+d581 1
+a581 1
+		cerr << " GR: 0"; 
+d585 1
+a585 1
+		cerr << " GR: " << ((getOutputBytes()*800)/(getExtraBits()+getInputBits()));
+d588 3
+a590 3
+	cerr << " MU: " << getModelsUsed();
+	cerr << " MS: " << getModelsSkipped();
+	cerr << " TN: " << getTotalLengthUsed();
+d594 1
+a594 1
+		cerr << " AN: 0";
+d598 1
+a598 1
+		cerr << " AN: " << (getTotalLengthUsed()/getModelsUsed());
+@
+
+
+1.15
+log
+@Enabled -s parameter for smaller memory usage
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.14 1997/02/24 05:01:40 markc Exp chapman $
+d8 3
+d176 1
+a176 1
+	||((smallMode==TRUE)&&(dictAltRecRAOF->getCount()==0)))
+d421 7
+@
+
+
+1.14
+log
+@Increased PRINTSTAT_FREQ from 1000 to 10000
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.13 1997/02/24 04:27:49 markc Exp markc $
+d8 3
+d94 3
+a96 1
+		inputBits(-8*sizeof(bitBucketType)), extraBits(8*sizeof(bitBucketType)), outputBytes(0)
+d120 6
+d131 1
+a131 1
+BOOL MTCbitsToTextBase::openDictName(const MTCstring &aFileName)
+d136 10
+a145 1
+	// load the dictAltRecRBT from the RAOF
+d148 1
+a149 1
+	MTCreadRAOF <MTCdictAltRecord> dictAltRecRAOF(dictName+".dat", dictName+".alt");
+d151 9
+a159 1
+	if (dictAltRecRAOF.getOkay()==TRUE)
+d161 4
+a164 1
+		loader.doIt(dictAltRecRAOF, dictAltRecRBT);
+d172 2
+a173 1
+	if (dictAltRecRBT.getCount()==0)
+d436 1
+a436 1
+	MTCdictAltRecord *foundDict;
+d500 10
+a509 1
+		if ((foundDict=dictAltRecRBT.find(dictAltRec))==NULL)
+d703 6
+@
+
+
+1.13
+log
+@Added bit-input and output statistics
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.12 1997/02/24 00:12:19 markc Exp markc $
+d8 3
+d79 1
+a79 1
+#define PRINTSTAT_FREQ	1000
+d521 1
+a521 1
+	cerr << "\tIb: " << getInputBits();
+@
+
+
+1.12
+log
+@Added printStats and fixed maxModelLength
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.11 1997/02/23 20:39:35 markc Exp markc $
+d8 3
+d76 4
+d87 2
+a88 1
+		modelsSkipped(0), modelsUsed(0), totalLengthUsed(0)
+d242 1
+d301 3
+d310 1
+d319 1
+d327 1
+d332 1
+d402 1
+a402 1
+	long extraBits=0;
+d410 1
+a410 2
+		if ((inputBitStream->getStreamBitsLeft()==0)
+		   &&(extraBits++>=EXTRA_BITS)&&(freshModel==TRUE)) 
+d412 3
+a414 1
+			 	break;
+d417 1
+a417 1
+		if ((foundType=typeAltRecRBT.find(typeAltRec))==NULL)
+d419 2
+a420 1
+			*outputStream << "\n* * * * ERROR - BAD TYPE FOUND: " << typeAltRec << endl;
+d424 3
+a426 1
+		if (foundType->getFreq()==0)
+d428 11
+a438 2
+			*outputStream << "\n* * * * WARNING - ZERO WORDS OF THIS TYPE FOUND IN DICTIONARY: " << typeAltRec << endl;
+			continue;
+d445 20
+d467 1
+a467 1
+			*outputStream << "* * * ERROR - WORD NOT FOUND" << endl;
+d476 1
+d486 1
+d495 1
+d503 1
+d509 1
+d518 27
+a544 4
+	cerr << "\tTotal Models Used: " << getModelsUsed() << endl;
+	cerr << "\tTotal Models Skipped: " << getModelsSkipped() << endl;
+	cerr << "\tTotal Length Used: " << getTotalLengthUsed() << endl;
+	cerr << "\tAverage Length Used: " << getTotalLengthUsed()/getModelsUsed() << endl;
+d619 5
+d720 5
+@
+
+
+1.11
+log
+@Added quoted punctutation {^xxxxx^} processing
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.10 1997/02/16 06:58:59 markc Exp markc $
+d8 3
+d79 2
+a80 1
+		freshModel(FALSE), space(FALSE)
+a452 3
+
+
+
+d459 11
+d542 3
+a544 1
+	if ((model=grammar->makeModel())==NULL)
+d549 12
+d639 6
+d650 4
+@
+
+
+1.10
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.9 1996/02/17 16:44:07 markc Exp markc $
+d8 3
+d276 15
+d297 1
+a297 1
+	for(int i=0; i<aStr.length(); i++)
+@
+
+
+1.9
+log
+@eolAfterModel default changed to FALSE
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.8 1996/02/14 15:06:35 markc Exp markc $
+d8 3
+d47 1
+a47 1
+#include "../../mtc++/include/bst.h"
+d50 1
+a50 1
+#include "../../mtc++/include/raof2bst.h"
+d104 2
+a105 2
+	// clear the dictAltRecBST
+	dictAltRecBST.clear();
+d107 1
+a107 1
+	// load the dictAltRecBST from the RAOF
+d110 1
+a110 1
+	MTCraofToBST <MTCdictAltRecord> loader;
+d115 1
+a115 1
+		loader.doIt(dictAltRecRAOF, dictAltRecBST);
+d123 1
+a123 1
+	if (dictAltRecBST.getCount()==0)
+d136 2
+a137 2
+	// clear the typeAltRecBST
+	typeAltRecBST.clear();
+d142 1
+a142 1
+	// load the typeAltRecBST from the RAOF
+d144 1
+a144 1
+	MTCraofToBST <MTCtypeAltRecord> loader;
+d149 1
+a149 1
+		loader.doIt(typeAltRecRAOF, typeAltRecBST);
+d157 1
+a157 1
+	if (typeAltRecBST.getCount()==0)
+d378 1
+a378 1
+		if ((foundType=typeAltRecBST.find(typeAltRec))==NULL)
+d394 1
+a394 1
+		if ((foundDict=dictAltRecBST.find(dictAltRec))==NULL)
+@
+
+
+1.8
+log
+@added space BOOL
+adjustment for "(" punctuation
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.7 1996/02/08 01:26:02 markc Exp markc $
+d8 4
+d69 1
+a69 1
+		eolAfterModel(TRUE), cap(FALSE), shift(FALSE), 
+d539 1
+a540 4
+	modelRAOF=NULL;
+
+	setEOLAfterModel(FALSE);
+
+@
+
+
+1.7
+log
+@always complete a model at the end of input stream + extra bits
+freshModel is used
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.6 1996/02/08 00:53:48 markc Exp markc $
+d8 4
+d66 1
+a66 1
+		freshModel(FALSE)
+d266 6
+d277 1
+d280 6
+d288 2
+d393 9
+d406 1
+a406 1
+				*outputStream << ' ' << temp;
+d413 1
+a413 1
+					*outputStream << ' ' << (char)toupper(foundDict->getValue().c_str()[0]);
+d421 1
+a421 1
+				*outputStream << ' ' << foundDict->getValue();
+@
+
+
+1.6
+log
+@added {low} {cap} {shift} to models
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.5 1996/01/20 18:40:19 markc Exp markc $
+d8 3
+d61 2
+a62 1
+		eolAfterModel(TRUE), cap(FALSE), shift(FALSE)
+d342 2
+d346 6
+d397 2
+a398 4
+		if ((inputBitStream->getStreamBitsLeft()==0)&&(extraBits++>=EXTRA_BITS)) 
+		{
+			 break;
+		}
+d470 2
+d552 2
+@
+
+
+1.5
+log
+@added eolAfterModel
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.4 1996/01/13 13:33:36 markc Exp markc $
+d8 3
+d50 3
+d57 2
+a58 2
+		model(NULL), capFirstWord(TRUE), firstWord(TRUE),
+		eolAfterModel(TRUE)
+a203 1
+	MTCstring punctuation;
+d218 1
+a218 1
+		if ((answer=model->getNext(&punctuation))==SENTMDL_GETNEXT_DONE)
+d220 2
+d223 4
+a232 2
+	printPunctuation(punctuation);
+
+d240 18
+d362 8
+a369 1
+			if (firstWord==TRUE)
+d377 1
+a377 1
+				firstWord=FALSE;
+@
+
+
+1.4
+log
+@-m option for babble added -- both models and grammars work!
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.3 1996/01/13 13:02:28 markc Exp markc $
+d8 3
+d51 2
+a52 1
+		model(NULL), capFirstWord(TRUE), firstWord(TRUE)
+d204 4
+a207 1
+		*outputStream << endl;
+d463 2
+@
+
+
+1.3
+log
+@Cap first letter of first word in each sentence
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.2 1996/01/13 10:18:10 markc Exp markc $
+d8 3
+d237 117
+d379 2
+d399 1
+a399 1
+	grammar=new MTCgrammar(aFileName, getTypeName()); 
+d455 2
+d464 7
+d478 5
+a482 1
+	// if (the sentence model BST or RAOF is loaded....
+d484 5
+a488 1
+	// otherwise it's up to my parent class to decide if I'm ready
+d497 1
+a497 2
+#ifdef NOTYET
+	long randomJump=random()%modelRAOF.getCount();
+d499 1
+a499 1
+	if (model!=NULL)
+d501 1
+a501 1
+		model->clear();
+d504 1
+a504 1
+	model=modelRAOF.read(randomJump);
+d508 1
+a508 1
+		cerr << "getNextModel() failed...trying agian..." << endl;
+a510 1
+#endif NOTYET
+d515 1
+a515 1
+// am I ready to doIt()?
+d517 1
+a517 1
+BOOL MTCbitsToTextBase::isReady()
+d519 1
+d521 3
+a523 1
+	if (getOkay()==FALSE)
+d525 2
+a526 2
+		errorMsg(EMT_ERROR, "I am not okay to convert.  See previous messages for a reason.", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+d529 1
+a529 5
+	if (dictName.length()==0)
+	{
+		errorMsg(EMT_ERROR, "I am not ready to convert because a dictionary has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+		return FALSE;
+	}
+d531 1
+a531 1
+	if (typeName.length()==0)
+d533 1
+a533 1
+		errorMsg(EMT_ERROR, "I am not ready to convert because a type table name has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+d537 1
+a537 9
+	if (outputName.length()==0)
+	{
+		if ((outputStream!=NULL)&&(outputStream!=&cout))
+		{
+			delete outputStream;
+		}
+
+		outputStream=&cout;
+	}
+d539 1
+a539 1
+	if (inputBitStream==NULL)
+d541 1
+a541 1
+		errorMsg(EMT_ERROR, "I am not ready to convert because an input bitstream has not been assigned", "MTCbitsToTextGrammar::isReady()"); 
+a543 76
+
+	if (outputStream==NULL)
+	{
+		outputStream=&cout;
+	}
+	
+	return TRUE;
+}
+
+// take bits and generate text
+
+BOOL MTCbitsToTextBase::doIt(BOOL checkIfReady)
+{
+	if (checkIfReady==TRUE)
+	{
+		if (isReady()==FALSE)
+		{
+			return FALSE;
+		}
+	}
+
+	MTCtypeAltRecord typeAltRec;
+	MTCtypeAltRecord *foundType;
+	MTCdictAltRecord dictAltRec;
+	MTCdictAltRecord *foundDict;
+	long extraBits=0;
+
+	for(;;)
+	{
+		typeAltRec.setIndex(getNextType());
+
+		if ((foundType=typeAltRecBST.find(typeAltRec))==NULL)
+		{
+			*outputStream << "\n* * * * ERROR - BAD TYPE FOUND: " << typeAltRec << endl;
+			continue;
+		}
+
+		if (foundType->getFreq()==0)
+		{
+			*outputStream << "\n* * * * WARNING - ZERO WORDS OF THIS TYPE FOUND IN DICTIONARY: " << typeAltRec << endl;
+			continue;
+		}
+
+		dictAltRec.setTypeIndex(foundType->getIndex());
+
+		dictAltRec.setBitString(inputBitStream->readBits(foundType->getBitCount()));
+
+		if ((foundDict=dictAltRecBST.find(dictAltRec))==NULL)
+		{
+			*outputStream << "* * * ERROR - WORD NOT FOUND" << endl;
+		}
+		else
+		{
+			if (firstWord==TRUE)
+			{
+				if (foundDict->getValue().length()!=0)
+				{
+					*outputStream << ' ' << (char)toupper(foundDict->getValue().c_str()[0]);
+					*outputStream << &foundDict->getValue().c_str()[1];
+				}
+	
+				firstWord=FALSE;
+			}
+			else
+			{
+				*outputStream << ' ' << foundDict->getValue();
+			}
+		}
+
+		if ((inputBitStream->getStreamBitsLeft()==0)&&(extraBits++>=EXTRA_BITS)) 
+		{
+			 break;
+		}
+	}
+
+	*outputStream << endl;
+@
+
+
+1.2
+log
+@use new sentnode enabled sentence models
+@
+text
+@d5 1
+a5 1
+ * $Id: bits2txt.cc,v 1.1 1996/01/13 09:53:08 markc Exp markc $
+d8 3
+d44 2
+a45 1
+	: inputBitStream(NULL), outputStream(NULL), okay(TRUE), model(NULL)
+d198 1
+d207 1
+d469 14
+a482 1
+			*outputStream << ' ' << foundDict->getValue();
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d29 1
+@

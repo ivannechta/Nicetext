@@ -1,0 +1,103 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	98.08.18.15.51.02;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" listword.1 by Mark T. Chapman
+.\"
+.TH LISTWORD 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+listword
+.SH SYNOPSIS
+.B listword
+.RB [\-c\] 
+.RB [\-l\]
+.RB [\-p\]
+.RB [[\-u\ updateFreq] | [\-q\]]
+.RB [\-x\]
+.SH DESCRIPTION
+.I listword
+creates word-lists from sample natural-language texts.  It uses the
+same parser as the
+.B scramble(1L)
+program in the
+.B NICETEXT
+system.
+
+It reads input from stdin and sends the output to stdout.
+.SH "OPTIONS"
+.TP
+.BI -c
+Print word frequency along with each unique word to stdout. 
+.TP
+.BI -l 
+Convert all words to lower-case.
+.TP
+.BI -p
+Print words as they are read.  This changes the behavior of 
+.I listword
+so that it does not keep track of frequency.  It does not print any status
+information to stderr if the
+.B -p
+parameter is set. 
+This is extremely useful when creating 
+.B NICETEXT
+scanners for other natural-languages.  
+.TP
+.BI \-u\ updateFreq 
+Print status updates to stderr every
+.I updateFreq
+sentences.  Use zero to disable updates.
+
+The status shows the number of unique words read and the total number
+of words read.
+.TP
+.BI -q
+Be quiet.  This is the same as
+.B -u 0
+.TP
+.BI -x
+Exclude non-words (numbers, punctuation, etc.).
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1L).
+
+@

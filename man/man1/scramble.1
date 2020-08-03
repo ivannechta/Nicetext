@@ -1,0 +1,121 @@
+.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" scramble.1 by Mark T. Chapman
+.\"
+.TH SCRAMBLE 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+scramble
+.SH SYNOPSIS
+.B scramble
+.RB \-o\ outputFile
+.RB [\-d\ dictionary]
+.RB [\-e\]
+.RB [\-i\ inputFile] 
+.RB [\-s\]
+.SH DESCRIPTION
+.I scramble
+converts text-files containing natural-language text into binary files.
+
+If 
+.B nicetext(1L)
+was the author of the text file and if 
+.B scramble 
+is using the same dictionary that
+.B nicetext
+used then 
+.B scramble
+will recover the original input from
+.B nicetext.
+Otherwise, 
+.B scramble
+is a pretty useless program.
+
+Note that although 
+.B scramble
+is the inverse function of
+.B nicetext
+,
+.B nicetext
+is NOT the inverse function of
+.B scramble.
+
+Also note that certain modification can be made to the output of 
+.B nicetext
+that will not effect the ability for
+.B scramble
+to recover the original input.  For example, punctuation, whitespace, and
+uppercase/lowercase conversion will not make any difference.  Furthermore,
+words that are not in the dictionary may be freely added to the text without
+any problems.  Finally, any text may be appended to the 
+.I nicetext.
+
+It is strongly recommended that you go through the tutorial supplied with
+the software.  It demonstrates the flexibility in defining dictionaries and
+style sources for
+.I nicetext
+generation. The .ps or .pdf files in the doc directory of the distribution
+contain detailed papers on the theory of operation, etc.
+.SH "OPTIONS"
+.TP
+.BI \-d\ dictionary
+Use 
+.I dictionary
+as the prefix to select the dictionary definition database.  
+
+The default 
+.I dictionary
+is 
+.I mstr
+.TP
+.BI -e
+Print undefined words to stderr.   The
+.B listword(1L)
+program is another way to do this.   
+.TP
+.BI \-i\ inputFile
+Read sample natural-language texts from
+.I inputFile.
+The default is stdin.
+.TP
+.BI \-o\ outputFile
+Send the scrambled output to this file name.
+.TP
+.BI -s 
+Normally, the software loads all database tables into RAM before processing.
+The 
+.B -s
+option instructs the software to read each record from the database
+tables on disk during analysis.  The primary advantage is that the 
+software has a significantly
+smaller memory footprint.  Another advantage is that you do not need to wait
+to load the dictionary into RAM - which can take some time.  The disadvantage
+is that processing of large input files is significantly slower.  
+
+Use this option if you are processing a relatively small input file or if you 
+get memory errors when running without 
+.B -s 
+set.
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+nttpd(1L),
+printint(1L),
+sortdct(1L),
+txt2dct(1L).
+

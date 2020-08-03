@@ -1,0 +1,118 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	98.08.18.16.21.50;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	98.08.17.19.04.01;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" dct2mstr.1 by Mark T. Chapman
+.\"
+.TH DCT2MSTR 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+dct2mstr
+.SH SYNOPSIS
+.B dct2mstr 
+.RB \-i\ inputFile 
+.RB [\-d\ dictionary]
+.SH DESCRIPTION
+.I dct2mstr
+formats the sorted type-word list from
+.I sortdct
+into the proper dictionary database format for the 
+.B NICETEXT
+system. 
+.SH "OPTIONS"
+.TP
+.B \-i\ inputFile
+The name of the file that contains a sorted type-word list that is the output
+of 
+.I sortdct
+.TP
+.B \-d\ dictionary
+The output dictionary database prefix.  The default is mstr. 
+.SH "FILES"
+(
+.B -d
+would replace 
+.I mstr
+below with a new file prefix.)
+.IP mstrdict.dat
+Contains one dictionary record per line.  Each record consists of
+the type-index, the bit-code, the frequency (optional), and the string
+value of the word. 
+.IP mstrdict.jmp
+A hash-table index that sorts mstrdict.dat records in alphabetical order 
+by word.  
+.B scramble(1L)
+uses this index.
+.IP mstrdict.alt
+A hash-table index that sorts mstrdict.dat
+records in order by type-index, bit-code.
+.B nicetext(1L)
+uses this index.
+.IP mstrtype.dat
+Contains one type definition record per line.  The purpose is to normalize
+the mstrdict.dat records.  Each record consists of a type-index and a
+description.  
+.IP mstrtype.jmp 
+A hash-table index that sorts the type records by type-index.
+.SH "EXAMPLES"
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "DIAGNOSTICS"
+.I dct2mstr
+returns a non-zero value if it detects any errors.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nicetext(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1).
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d53 9
+d66 1
+@

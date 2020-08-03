@@ -1,0 +1,84 @@
+
+SNAPSHOT into ./gendict/src/RCS/SNAPSHOT.RNF
+	When:	 Jan 10, 1996  20:43 
+	Who:	 Mark Chapman (on BERNIEDOG) 
+	Notes:	 gramtest in babble section now can parse a grammar.def file into rules.  What is left to do is   1.  makeModel()   2. stop coding and start making dicitonaries and grammars and such 3. enhancements... 
+
+1.3 	sortdict.cc,v
+1.4 	sentmdl.cc,v
+1.12 	genmodel.cc,v
+1.8 	dct2mstr.cc,v
+1.2 	rawdict.cc,v
+1.2 	lexword.l,v
+1.3 	dictrec.cc,v
+1.4 	typerec.cc,v
+1.2 	Makefile,v
+
+SNAPSHOT into ./gendict/src/RCS/SNAPSHOT.RNF
+	When:	 Jan 13, 1996  7:45 am 
+	Who:	 markc 
+	Notes:	 Basic dynamic models work with babble, but sentence models are temporarily not implemented and there is not punctuation. 
+
+1.3 	sortdict.cc,v
+1.6 	sentmdl.cc,v
+1.12 	genmodel.cc,v
+1.8 	dct2mstr.cc,v
+1.2 	rawdict.cc,v
+1.2 	lexword.l,v
+1.3 	dictrec.cc,v
+1.4 	typerec.cc,v
+1.3 	Makefile,v
+
+SNAPSHOT into ./gendict/src/RCS/SNAPSHOT.RNF
+	When:	 March 21, 1996  11:30 
+	Who:	 markc 
+	Notes:	 Changed program names and messages i.e. (babble -> nicetext, unbabble->scramble) 
+
+1.9 	sentmdl.cc,v
+1.21 	genmodel.cc,v
+1.13 	dct2mstr.cc,v
+1.2 	rawdict.cc,v
+1.2 	lexword.l,v
+1.4 	dictrec.cc,v
+1.5 	typerec.cc,v
+1.12 	Makefile,v
+1.2 	sentnode.cc,v
+1.2 	txt2dct.cc,v
+1.3 	listword.cc,v
+1.11 	sortdct.cc,v
+
+SNAPSHOT into ./gendict/src/RCS/SNAPSHOT.RNF
+	When:	 Feb 23, 1997  11:00 p.m. 
+	Who:	 Mark T. Chapman 
+	Notes:	 A snapshot after statistics added and some clean-up 
+
+1.11 	sortdct.cc,v
+1.22 	genmodel.cc,v
+1.15 	dct2mstr.cc,v
+1.2 	rawdict.cc,v
+1.2 	lexword.l,v
+1.4 	dictrec.cc,v
+1.5 	typerec.cc,v
+1.13 	Makefile,v
+1.2 	sentnode.cc,v
+1.2 	txt2dct.cc,v
+1.4 	listword.cc,v
+1.10 	sentmdl.cc,v
+
+SNAPSHOT into ./gendict/src/RCS/SNAPSHOT.RNF
+	When:	 August 25, 1998  4:45pm CDT 
+	Who:	 Mark Chapman 
+	Notes:	 0.9 Version Ready for Packaging & Release 
+
+1.18 	sortdct.cc,v
+1.27 	genmodel.cc,v
+1.16 	dct2mstr.cc,v
+1.2 	rawdict.cc,v
+1.10 	lexword.l,v
+1.4 	dictrec.cc,v
+1.5 	typerec.cc,v
+1.19 	Makefile,v
+1.2 	sentnode.cc,v
+1.4 	txt2dct.cc,v
+1.17 	listword.cc,v
+1.10 	sentmdl.cc,v

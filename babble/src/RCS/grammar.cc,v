@@ -1,0 +1,734 @@
+head	1.9;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.9
+date	97.02.23.22.33.21;	author markc;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	97.02.23.20.37.13;	author markc;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	97.02.16.06.58.59;	author markc;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	96.01.13.13.56.02;	author markc;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.01.13.12.00.33;	author markc;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.01.13.10.18.10;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.12.23.48.19;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.10.22.15.49;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.01.10.20.57.16;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.9
+log
+@Fixed spelling errors in the punctutation routine ;)
+@
+text
+@/*
+ * Grammar Class
+ * Copyright (c) Mark T. Chapman 1995
+ *
+ * $Id: grammar.cc,v 1.8 1997/02/23 20:37:13 markc Exp markc $
+ *
+ * $Log: grammar.cc,v $
+ * Revision 1.8  1997/02/23 20:37:13  markc
+ * Added quotedPunctUsed messages and processing
+ *
+ * Revision 1.7  1997/02/16 06:58:59  markc
+ * BST replaced with RBT
+ *
+ * Revision 1.6  1996/01/13 13:56:02  markc
+ * Added typeRec->getFreq()==0 check in validation of grammar
+ *
+// Revision 1.5  1996/01/13  12:00:33  markc
+// added punctuation processing to grammar definition language using {}
+//
+// Revision 1.4  1996/01/13  10:18:10  markc
+// use new sentnode enabled sentence models
+//
+// Revision 1.3  1996/01/12  23:48:19  markc
+// dynamic grammars work system wide -- next step, constant expressions
+//
+// Revision 1.2  1996/01/10  22:15:49  markc
+// makeModel() works
+//
+// Revision 1.1  1996/01/10  20:57:16  markc
+// Initial revision
+//
+ *
+ */
+
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.8 1997/02/23 20:37:13 markc Exp markc $";
+
+#include <iostream.h>
+#include <fstream.h>
+#include "../../mtc++/include/MTC++.h"
+#include "../../mtc++/include/mstring.h"
+#include "../../mtc++/include/errormsg.h"
+#include "../../mtc++/include/list.h"
+#include "../../mtc++/include/rbt.h"
+#include "../../mtc++/include/raof.h"
+#include "../../mtc++/include/raof2rbt.h"
+#include "../../gendict/include/sentnode.h"
+#include "../../gendict/include/sentmdl.h"
+#include "../../gendict/include/typerec.h"
+#include "../include/rule.h"
+#include "../include/grammar.h"
+#include "y.tab.h"
+
+// yyparse() information
+int yyparse();		// function prototype
+extern FILE *yyin; 	// within lexgram.o  -- the input file
+MTCgrammar *yGram;	// used by yyparse() -- let yacc drive!
+
+// stream insertor information
+void dumpRule(MTCrule *);
+ostream *dumpTarget;
+MTCrule *dumpBaseRule;
+
+// validate information
+MTCRBT <MTCtypeRecord> *checkTypeRecRBT;
+void checkRule(MTCrule *);
+BOOL checkOkay;
+BOOL foundQuotedRule;
+
+// set allPunct 
+void rulesAllPunct(MTCrule *);
+
+// constructor
+
+MTCgrammar::MTCgrammar(const MTCstring & aGramName, const MTCstring & aTypeName)
+	: 	fileName(aGramName), inputFile(NULL), 
+		okay(TRUE), baseRule(NULL), typeName(aTypeName),
+		quotedPunctUsed(FALSE)
+{
+	// open the file
+
+	if ((inputFile=fopen(fileName.c_str(), "r"))==NULL)
+	{
+		errorMsg(EMT_ABORT, "I could not open the grammar input file.", "MTCgrammar::MTCgrammar()");
+	}
+
+	// open the type RAOF and load into typeRecRBT
+
+	loadTypeRecRBT(aTypeName);
+
+	// use yacc to parse the grammar file
+
+	yGram=this;
+
+	yyin=inputFile;
+
+	yyparse();
+
+	// validate the grammar
+
+	validate();
+}
+
+// destructor
+
+MTCgrammar::~MTCgrammar()
+{
+	// close the input file
+
+	if (inputFile!=NULL)
+	{
+		fclose(inputFile);
+		inputFile=NULL;
+	}
+}
+
+// load the type record RBT 
+
+void MTCgrammar::loadTypeRecRBT(const MTCstring & aTypeName)
+{
+	MTCraofToRBT <MTCtypeRecord> loader;
+	MTCreadRAOF <MTCtypeRecord> typeRecRAOF(aTypeName);
+
+	if (typeRecRAOF.getOkay()==TRUE)
+	{
+		loader.doIt(typeRecRAOF, typeRecRBT);
+	}
+	else
+	{
+		errorMsg(EMT_ABORT, "I could not open the type table specified", "MTCgrammar::MTCgrammar()");
+	}
+
+	if (typeRecRBT.getCount()==0)
+	{
+		errorMsg(EMT_ABORT, "The type table specified is empty", "MTCgrammar::MTCgrammar()");
+	}
+}
+
+// validate the rules in the grammar -- check for terminals, etc.
+
+BOOL MTCgrammar::validate()
+{
+	checkOkay=TRUE;
+
+	checkTypeRecRBT=&typeRecRBT;
+
+	foundQuotedRule=FALSE;
+
+	rules.forEach(checkRule);
+
+	if ((quotedPunctUsed=foundQuotedRule)==TRUE)
+	{
+		errorMsg(EMT_WARNING, "At least one rule uses quoted punctuations with the {^xxxx^} syntax.  If 'xxxx' contains a word in the dictionary (where there are multiple words of that type) then the scramble program will not be able to recover the original text.","MTCgrammar::validate()");
+	}
+
+	if ((okay=checkOkay)==FALSE)
+	{
+		errorMsg(EMT_ERROR, "There is a problem with this grammar.  It may not generate models correctly", "MTCgrammar::validate()");
+	}
+
+	return okay;
+}
+
+// check each rule, if it is a terminal, then look it up in typeRecRBT
+
+void checkRule(MTCrule *r)
+{
+	// check if rule is a terminal -- if so, assign terminal=typeIndex
+
+	// if the rule is punctuation, make sure a RHS is not defined!
+	// also, warn if quoted punctuation {^xxx^} was used
+	// TODO: check if punctuation is in the dictionary -- complex...
+
+	if (r->getIsPunct()==TRUE)
+	{
+		if (r->getRHSSetCount()!=0)
+		{
+			MTCstring message("A punctuation rule has a RHS defined: ");
+			message+=r->getName();
+			errorMsg(EMT_ERROR, message.c_str(), "MTCgrammar::checkRule()");
+			checkOkay=FALSE;
+		}
+
+		// was quoted punctuation used?
+
+		int nameLength=r->getName().length();
+
+		if ((nameLength>2)
+		&& (r->getName().c_str()[0]=='^')
+		&& (r->getName().c_str()[nameLength-1]=='^'))
+		{
+			foundQuotedRule=TRUE;
+		}
+	}
+	else
+	{
+		if (r->getRHSSetCount()==0)
+		{
+			MTCtypeRecord findTypeRec;
+			findTypeRec.setCode(r->getName());
+			MTCtypeRecord *trec=checkTypeRecRBT->find(findTypeRec);
+	
+			if (trec==NULL)
+			{
+				MTCstring message("I could not find a matching terminal in the type table for a rule: ");
+				message+=r->getName();
+				errorMsg(EMT_ERROR, message.c_str(), "MTCgrammar::checkRule()");
+				checkOkay=FALSE;
+			}
+			else
+			{
+				if (trec->getFreq()==0)
+				{
+					MTCstring message("There are no words of this VALID type in the dictionary (typeFreq=0): ");
+					message+=r->getName();
+					errorMsg(EMT_ERROR, message.c_str(), "MTCgrammar::checkRule()");
+					checkOkay=FALSE;
+				}
+				else
+				{
+					r->setTerminal(trec->getIndex());
+				}
+			}
+		}
+	}
+}
+	
+// set all rules to just use punctuation, no terminals
+
+void MTCgrammar::allPunct()
+{
+	rules.forEach(rulesAllPunct);
+}
+
+// ruleAllPunct -- set a rule to all punctuarion, no terminals
+
+void rulesAllPunct(MTCrule *r)
+{
+	r->setAllPunct(TRUE);
+}
+
+// find a rule in the rules bst by name
+
+MTCrule * MTCgrammar::findRule(const char * ruleName, BOOL isPunct)
+{
+	MTCrule *retVal=NULL;
+	MTCrule tempRule(ruleName);
+	
+	if ((retVal=rules.find(tempRule))==NULL)
+	{
+		rules.add(tempRule);
+		retVal=rules.find(tempRule);
+	}
+
+	if (isPunct==TRUE)
+	{
+		retVal->setIsPunct();
+	}
+
+	return retVal;
+}
+
+// commit the nextrule to the rules table
+
+BOOL MTCgrammar::commitRule(const char * ruleName)
+{
+	// set the rule name
+
+	nextRule.setName(ruleName);
+	
+	// add the rule -- with overwrite=ON
+
+	rules.add(nextRule, TRUE);
+
+	// if this is the first rule, then it is the base rule
+
+	if (baseRule==NULL)
+	{
+		baseRule=rules.find(nextRule);
+	}
+
+	// get ready to define the next rule
+
+	nextRule.clear();
+
+	return TRUE;
+}
+
+// stream insertor -- used for dumping rules only! 
+ostream & operator<<(ostream &s, MTCgrammar &g)
+{
+	s << "// DUMPING " << g.rules.getCount() << " GRAMMAR RULES in alphabetical order" << endl;
+
+	s << "// (#'s are adjusted weights used to select a rule by the previous @@ sum.)" << endl;
+
+	s << endl;
+
+	dumpBaseRule=g.baseRule;
+	dumpTarget=&s;
+
+	g.rules.forEach(dumpRule);
+
+	cout << "// END OF GRAMMAR RULE DUMP" << endl;
+}
+
+// dump a rule to the dumpRuleTarget (ostream)
+// purposely NOT part of the class
+
+void dumpRule(MTCrule *r) 
+{
+	if (r==dumpBaseRule)
+	{
+		*dumpTarget << "// NEXT RULE IS BASE RULE * * * " << endl;
+	}
+
+	*dumpTarget << *r;
+}
+
+// ready to makeModel?
+
+BOOL MTCgrammar::isReady()
+{
+	if (fileName.length()==0)
+	{
+		errorMsg(EMT_WARNING, "The grammar file name is empty", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (inputFile==NULL)
+	{
+		errorMsg(EMT_WARNING, "The grammar file is not open", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (getOkay()==FALSE)
+	{
+		errorMsg(EMT_WARNING, "The grammar state is not okay. (Maybe terminals are not in type master file...)", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (rules.getCount()==0)
+	{
+		errorMsg(EMT_WARNING, "The grammar does not have any rules defined!)", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (baseRule==NULL)
+	{
+		errorMsg(EMT_WARNING, "The grammar does not have a BASE rule defined!)", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (typeName.length()==0)
+	{
+		errorMsg(EMT_WARNING, "The type table does not have a file name", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (typeRecRBT.getCount()==0)
+	{
+		errorMsg(EMT_WARNING, "The type table is empty", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	if (typeRecRBT.getCount()==0)
+	{
+		errorMsg(EMT_WARNING, "The type table is empty", "MTCgrammar::isReady()");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+// "randomly" generate a sentence model that corresponds to the grammar
+
+MTCsentenceModel * MTCgrammar::makeModel(int maxSize, BOOL checkIfReady)
+{
+	// am I ready?
+
+	if ((checkIfReady==TRUE)&&(isReady()!=TRUE))
+	{
+		return NULL;
+	}
+
+	// clear the sentence model
+
+	model.clear();
+
+	// fill the sentence model according to the grammar
+
+	if (baseRule==NULL)
+	{
+		errorMsg(EMT_WARNING, "I cannot make a model from an empty grammar!", "MTCgrammar::makeModel()");
+	}
+	else
+	{
+		baseRule->makeModel(model, maxSize);
+	}
+
+	// return the sentence model
+
+	return &model;
+}
+
+@
+
+
+1.8
+log
+@Added quotedPunctUsed messages and processing
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.7 1997/02/16 06:58:59 markc Exp markc $
+d8 3
+d35 1
+a35 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.7 1997/02/16 06:58:59 markc Exp markc $";
+d152 1
+a152 2
+		errorMsg(EMT_WARNING, "At least one rule uses quoted punctutions with the {^xxxx^} syntax.  If the 'xxxx' is a word in the dictionary then the
+scramble program will not be able to recover the original text.","MTCgrammar::validate()");
+@
+
+
+1.7
+log
+@BST replaced with RBT
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.6 1996/01/13 13:56:02 markc Exp markc $
+d8 3
+d32 1
+a32 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.6 1996/01/13 13:56:02 markc Exp markc $";
+d64 1
+d73 2
+a74 1
+		okay(TRUE), baseRule(NULL), typeName(aTypeName)
+d143 2
+d147 6
+d168 1
+d179 11
+@
+
+
+1.6
+log
+@Added typeRec->getFreq()==0 check in validation of grammar
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.5 1996/01/13 12:00:33 markc Exp markc $
+d8 3
+d29 1
+a29 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.5 1996/01/13 12:00:33 markc Exp markc $";
+d37 1
+a37 1
+#include "../../mtc++/include/bst.h"
+d39 1
+a39 1
+#include "../../mtc++/include/raof2bst.h"
+d58 1
+a58 1
+MTCBST <MTCtypeRecord> *checkTypeRecBST;
+d78 1
+a78 1
+	// open the type RAOF and load into typeRecBST
+d80 1
+a80 1
+	loadTypeRecBST(aTypeName);
+d108 1
+a108 1
+// load the type record BST 
+d110 1
+a110 1
+void MTCgrammar::loadTypeRecBST(const MTCstring & aTypeName)
+d112 1
+a112 1
+	MTCraofToBST <MTCtypeRecord> loader;
+d117 1
+a117 1
+		loader.doIt(typeRecRAOF, typeRecBST);
+d124 1
+a124 1
+	if (typeRecBST.getCount()==0)
+d136 1
+a136 1
+	checkTypeRecBST=&typeRecBST;
+d148 1
+a148 1
+// check each rule, if it is a terminal, then look it up in typeRecBST
+d173 1
+a173 1
+			MTCtypeRecord *trec=checkTypeRecBST->find(findTypeRec);
+d331 1
+a331 1
+	if (typeRecBST.getCount()==0)
+d337 1
+a337 1
+	if (typeRecBST.getCount()==0)
+@
+
+
+1.5
+log
+@added punctuation processing to grammar definition language using {}
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.4 1996/01/13 10:18:10 markc Exp markc $
+d8 3
+d26 1
+a26 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.4 1996/01/13 10:18:10 markc Exp markc $";
+d181 11
+a191 1
+				r->setTerminal(trec->getIndex());
+@
+
+
+1.4
+log
+@use new sentnode enabled sentence models
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.3 1996/01/12 23:48:19 markc Exp markc $
+d8 3
+d23 1
+a23 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.3 1996/01/12 23:48:19 markc Exp markc $";
+d146 4
+a149 1
+	// we only need to check each rule if it is a terminal
+d151 1
+a151 1
+	if (r->getRHSSetCount()==0)
+d153 1
+a153 5
+		MTCtypeRecord findTypeRec;
+		findTypeRec.setCode(r->getName());
+		MTCtypeRecord *trec=checkTypeRecBST->find(findTypeRec);
+
+		if (trec==NULL)
+d155 1
+a155 1
+			MTCstring message("I could not find a matching terminal in the type table for a rule: ");
+d160 4
+a163 1
+		else
+d165 15
+a179 1
+			r->setTerminal(trec->getIndex());
+d183 1
+a183 1
+
+d200 1
+a200 1
+MTCrule * MTCgrammar::findRule(const char * ruleName)
+d211 5
+a216 1
+
+@
+
+
+1.3
+log
+@dynamic grammars work system wide -- next step, constant expressions
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.2 1996/01/10 22:15:49 markc Exp markc $
+d8 3
+d20 1
+a20 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.2 1996/01/10 22:15:49 markc Exp markc $";
+d31 1
+d53 3
+d163 14
+@
+
+
+1.2
+log
+@makeModel() works
+@
+text
+@d5 1
+a5 1
+ * $Id: grammar.cc,v 1.1 1996/01/10 20:57:16 markc Exp markc $
+d8 3
+d17 1
+a17 1
+static char rcsid []  = "@@(#)$Id: grammar.cc,v 1.1 1996/01/10 20:57:16 markc Exp markc $";
+d25 3
+d29 1
+a30 1
+#include "../../mtc++/include/bst.h"
+d44 5
+d51 3
+a53 2
+MTCgrammar::MTCgrammar(const char * aFileName)
+	: fileName(aFileName), inputFile(NULL), okay(TRUE), baseRule(NULL)
+d62 4
+d73 4
+d92 66
+d231 55
+d288 1
+a288 1
+MTCsentenceModel & MTCgrammar::makeModel(int maxSize)
+d290 7
+d314 1
+a314 1
+	return model;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+ * $Id$
+d7 4
+a10 1
+ * $Log$
+d14 1
+a14 1
+static char rcsid []  = "@@(#)$Id$";
+d22 1
+a24 1
+#include "../../gendict/include/sentmdl.h"
+d28 3
+a30 2
+int yyparse();			// function prototype
+extern FILE *yyin;	 	// within lexgram.o  -- the input file
+d33 5
+d115 16
+a130 1
+// dump the rules to stderr
+d132 4
+a135 1
+void MTCgrammar::dump()
+d137 4
+a140 1
+	cerr << "DUMPING " << rules.getCount() << " GRAMMAR RULES" << endl;
+d142 1
+a142 3
+	rules.forEach(dumpRule);
+
+	cerr << "END OF GRAMMAR RULE DUMP" << endl;
+d147 1
+a147 1
+MTCsentenceModel * MTCgrammar::makeModel()
+d155 8
+a162 1
+	// ????????????
+d166 1
+a166 1
+	return &model;
+@

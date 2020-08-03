@@ -1,0 +1,342 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	98.08.19.16.41.09;	author markc;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	98.08.19.15.26.45;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	98.08.18.16.21.50;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	98.08.17.18.26.19;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@.\" Copyright (C) 1995-1998 Dr. George Davida and Mark T. Chapman
+.\" nicetext.1 by Mark T. Chapman
+.\"
+.TH NICETEXT 1L "Aug 17, 1998 (v0.9)" NICETEXT 
+.SH NAME
+nicetext
+.SH SYNOPSIS
+.B nicetext
+.RB \-i\ inputFile 
+.RB [[\-g\ grammar] | [\-m\ model]]
+.RB [\-d\ dictionary]
+.RB [\-o\ outputFile]
+.RB [\-s\]
+.RB [\-l\ maxModelLength]
+.RB [[\-u\ updateFreq] | [-q]]
+.SH DESCRIPTION
+.I nicetext
+is a program that converts any file into pseudo-natural-language text.
+.LP
+A companion program
+.RI ( scramble (1L)),
+converts the natural-language text back into the original file as long as
+the 
+.I dictionary
+is the same for both applications.
+
+The
+.I nicetext
+program may generate different pseudo-natural-language texts for the
+same input file with the same dictionary.
+
+It is strongly recommended that you go through the tutorial supplied with
+the software.  It demonstrates the flexibility in defining dictionaries and
+style sources for 
+.I nicetext
+generation. The .ps or .pdf files in the doc directory of the distribution
+contain detailed papers on the theory of operation, etc. 
+.SH "QUICK-AND-DIRTY-DEMONSTRATION"
+If you are looking for a quick demonstration, try running the
+.I qstart-nttpd
+shell-script.  You may then go to http://localhost:2119/ with your 
+favorite browser to try some transformations. 
+.SH "OPTIONS"
+.TP
+.BI \-d\ dictionary
+Use 
+.I dictionary
+as the prefix to select the dictionary definition database.  For example:
+.I mstr
+specifies the database in the files 
+.I mstrdict.dat 
+.I mstrdict.alt 
+.I mstrdict.jmp 
+.I mstrtype.dat 
+.I mstrtype.alt 
+and  
+.I mstrtype.jmp 
+You may also include directory information in the prefix: 
+.I ~/mydict/shak 
+would point to 
+.I ~/mydict/shakdict.dat 
+.I ~/mydict/shakdict.jmp 
+etc.
+
+The default 
+.I dictionary
+is 
+.I mstr
+
+See 
+.RI sortdct(1L)  
+and 
+.RI dct2mstr(1L)
+, to learn how to create the proper format dictionary tables.
+.TP
+.BI \-g\ grammar
+Use the 
+.I grammar
+defined in this (fully qualified) file name as the style-source.
+
+Note that
+.B -g
+and
+.B -m
+are mutually exclusive.
+.TP
+.BI \-i\ inputFile
+This is the file that will be used for input.  Right now, 
+.I nicetext
+is not designed to work with non-file streams because it stores the
+length of the file within the pseudo-natural-language output.
+.TP
+.BI \-l\ maxModelLength
+This is the maximum sentence-model length that will be used if 
+you are using a grammar-definition file  
+.B (-g)
+for a style-source.  This is important, since cyclic grammars could produce
+an infinitly long sentence model which would take forever to complete!
+
+Note that the length of a sentence model counts punctuation as elements
+in the sentence model.
+
+The default value is 1024. 
+.TP
+.BI \-m\ model
+Use 
+.I model
+as the prefix to select the style-source definition database.  For example:
+.I mstr
+specifies the database in the files 
+.I mstrmodel.dat 
+and  
+.I mstrmodel.jmp
+You may also include directory information in the prefix: 
+.I ~/mymodels/shak 
+would point to 
+.I ~/mymodels/shakmodel.dat 
+and
+.I ~/mymodels/shakmodel.jmp
+
+The default 
+.I model
+is 
+.I mstr
+
+See 
+.RI ( genmodel (1L)),
+to find out how to create custom sentence-model style sources from sample 
+texts. 
+
+Note that
+.B -g
+and
+.B -m
+are mutually exclusive.
+.TP
+.BI \-o\ outputFile
+Send the pseudo-natural-language text to 
+.I outputFile 
+The default is standard output.
+.TP
+.BI -s 
+Normally, the software loads all database tables into RAM before processing.
+The 
+.B -s
+option instructs the software to read each record from the database
+tables on disk during text generation.  The primary advantage is that the 
+software has a significantly
+smaller memory footprint.  Another advantage is that you do not need to wait
+to load the dictionary into RAM - which can take some time.  The disadvantage
+is that processing of large input files is significantly slower.  
+
+Use this option if you are processing a relatively small input file or if you 
+get memory errors when running without 
+.B -s 
+set.
+.TP
+.BI \-u\ updateFreq 
+Print status updates to stder revery
+.I updateFreq
+sentences.  Use zero to disable updates.
+
+The following is the definition of the status information: 
+
+.RS
+.IP I:
+Number of input bits read.
+.IP E:
+Number of extra bits appended to input to complete the last sentence model.
+.IP O:
+Number of output bits written.
+.IP G:
+Growth ration (100*0)/(I+E)
+.IP U:
+Number of models used.
+.IP S:
+Number of models skipped because more than 
+.B -l maxModelLength
+elements were generated by the grammar in
+.B -g grammar
+.IP N:
+Total number of model elements used.
+.IP A:
+Average number of elements per model.
+.RE
+.TP
+.BI -q
+Be quiet.  This is the same as
+.B -u 0
+.SH "EXAMPLES"
+A classic example:
+.IP
+\fCnicetext -i /etc/passwd -m shak -d shak -s\fP
+.LP
+converts the /etc/passwd file into pseudo-Shakespeare.
+.IP
+\fCnicetext -i /etc/passwd -m jfk -d jfk -s\fP
+.LP
+converts the /etc/passwd file into random sentences inspired by
+JFK's inaugural address.
+
+It is strongly suggested that you try the examples in the
+.B tutorial 
+directory of the
+.B NICETEXT
+distribution.
+For further information, please read the documentation in the 
+.B doc 
+directory.
+.SH "SEE ALSO"
+bitcp(1L),
+dct2mstr(1L),
+expgram(1L),
+genmodel(1L),
+gramtest(1L),
+impkimmo(1L),
+impmsc(1L),
+impwbstr(1L),
+listword(1L),
+nttpd(1L),
+printint(1L),
+scramble(1L),
+sortdct(1L),
+txt2dct(1L).
+
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d38 5
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d215 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d10 6
+a15 7
+.RB [[ \-g\ grammar] | [ \-m\ model]]
+.RB [ \-d\ dictionary ]
+.RB [ \-o\ outputFile ]
+.RB [ \-s\ ]
+.RB [ \-l\ maxModelLength ]
+.RB [[ \-u\ updateFreq ] | [ -q]]
+.PP
+d27 5
+d40 1
+a40 1
+.B \-d\ dictionary
+d88 1
+a88 1
+.B \-l\ maxModelLength
+d100 1
+a100 1
+.B \-m\ model
+d132 1
+a132 1
+.B \-o\ outputFile
+d137 1
+a137 1
+.B -s 
+d153 1
+a153 1
+.B \-u\ updateFreq 
+d182 1
+a182 1
+.B -q
+a184 1
+
+d197 8
+a204 3
+It is strongly recommended that you go through the tutorial distributed with
+the software.
+
+d206 3
+a208 3
+bitcp(1),
+dct2mstr(1),
+expgram(1),
+d211 8
+a218 8
+impkimmo(1),
+impmsc(1),
+impwbstr(1),
+listword(1),
+printint(1),
+scramble(1),
+sortdct(1),
+txt2dct(1).
+@

@@ -1,0 +1,66 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.3
+date	97.03.05.17.53.41;	author markc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.03.21.17.20.31;	author markc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.02.14.00.35.06;	author markc;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial
+@
+
+
+1.3
+log
+@Added static char rcsid []  = "@@(#)$Id$";
+@
+text
+@
+static char rcsid []  = "@@(#)$Id$";
+
+#include <iostream.h>
+
+int main()
+{
+	cerr << "counting to stdout..." << endl;
+
+	for(int i=0; i<16384+2048; i++)
+		cout << i << endl;
+
+	return 0;
+}
+@
+
+
+1.2
+log
+@modified program names and messages (minor)
+@
+text
+@d1 3
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 2
+@
